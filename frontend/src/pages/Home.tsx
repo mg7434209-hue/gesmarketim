@@ -1,8 +1,19 @@
+import Hero from '../components/Hero';
+import TrustBadges from '../components/TrustBadges';
+import CategoryGrid from '../components/CategoryGrid';
+import HybridInfo from '../components/HybridInfo';
+import ProductGrid from '../components/ProductGrid';
+import GespaEnerjiReferral from '../components/GespaEnerjiReferral';
+
 export default function Home() {
   return (
-    <section className="placeholder">
-      <h1>GES MARKETİM</h1>
-      <p>Solar ürünler için ekonomik alışveriş — yakında.</p>
-    </section>
+    <>
+      <Hero />
+      <TrustBadges />
+      <CategoryGrid />
+      <HybridInfo />
+      <ProductGrid />
+      <GespaEnerjiReferral />
+    </>
   );
 }
