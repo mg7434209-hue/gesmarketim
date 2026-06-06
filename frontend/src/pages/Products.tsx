@@ -1,29 +1,13 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { getProducts, type PublicProduct } from '../lib/api';
 import { WHATSAPP_URL } from '../config';
-
-type Fulfillment = 'stock' | 'order';
-type ProductCategory = 'panel' | 'inverter' | 'battery';
-
-type Product = {
-  id: string;
-  brand: string;
-  name: string;
-  price: number;
-  fulfillment: Fulfillment;
-  category: ProductCategory;
-};
-
-const PRODUCTS: Product[] = [
-  { id: 'deye-5kw-inverter', brand: 'DEYE', name: 'DEYE 5kW Hibrit İnverter', price: 28500, fulfillment: 'stock', category: 'inverter' },
-  { id: 'lexron-460w-panel', brand: 'LEXRON', name: 'LEXRON 460W Monokristal Güneş Paneli', price: 3250, fulfillment: 'stock', category: 'panel' },
-  { id: 'eve-100ah-lifepo4', brand: 'EVE', name: 'EVE 100Ah LiFePO4 Lityum Batarya', price: 18750, fulfillment: 'order', category: 'battery' },
-  { id: 'huawei-sun2000-6kw', brand: 'HUAWEI', name: 'HUAWEI SUN2000 6kW Trifaze İnverter', price: 34900, fulfillment: 'stock', category: 'inverter' },
-  { id: 'deye-410w-mono', brand: 'DEYE', name: 'DEYE 410W Mono Half-Cut Panel', price: 2890, fulfillment: 'stock', category: 'panel' },
-  { id: 'lexron-200ah-jel', brand: 'LEXRON', name: 'LEXRON 200Ah Jel Akü 12V', price: 6450, fulfillment: 'order', category: 'battery' },
-  { id: 'eve-280ah-hucre', brand: 'EVE', name: 'EVE 280Ah LiFePO4 Hücre (Tekli)', price: 4200, fulfillment: 'order', category: 'battery' },
-  { id: 'deye-hibrit-8kw', brand: 'DEYE', name: 'DEYE 8kW Hibrit Trifaze İnverter', price: 42000, fulfillment: 'stock', category: 'inverter' },
-];
+import {
+  LoadError,
+  ProductCard,
+  ProductGridSkeleton,
+  ProductsEmpty,
+} from '../components/product-ui';
 
 const CATEGORY_FILTERS = [
   'Güneş Paneli',
@@ -37,17 +21,33 @@ const CATEGORY_FILTERS = [
 const STOCK_FILTERS = ['Stokta', 'Siparişe özel'];
 const BRAND_FILTERS = ['DEYE', 'LEXRON', 'EVE', 'HUAWEI'];
 
-const SORT_OPTIONS = [
-  'Önerilen',
-  'Fiyat: Artan',
-  'Fiyat: Azalan',
-  'İsim: A-Z',
-];
+const SORT_OPTIONS = ['Önerilen', 'Fiyat: Artan', 'Fiyat: Azalan', 'İsim: A-Z'];
 
-const PRICE_FORMATTER = new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 });
+type Status = 'loading' | 'ready' | 'error';
 
 export default function Products() {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [status, setStatus] = useState<Status>('loading');
+  const [products, setProducts] = useState<PublicProduct[]>([]);
+
+  const load = useCallback(() => {
+    let active = true;
+    setStatus('loading');
+    getProducts()
+      .then((data) => {
+        if (!active) return;
+        setProducts(data);
+        setStatus('ready');
+      })
+      .catch(() => {
+        if (active) setStatus('error');
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => load(), [load]);
 
   return (
     <div className="bg-surface">
@@ -149,8 +149,10 @@ export default function Products() {
           <section aria-label="Ürünler" className="flex-1">
             <div className="flex flex-col items-start justify-between gap-3 rounded-2xl border border-border bg-white p-4 shadow-card sm:flex-row sm:items-center">
               <p className="text-sm text-text-secondary">
-                <span className="font-bold text-primary">{PRODUCTS.length}</span> ürün
-                listeleniyor
+                <span className="font-bold text-primary">
+                  {status === 'ready' ? products.length : '—'}
+                </span>{' '}
+                ürün listeleniyor
               </p>
               <label className="inline-flex items-center gap-2 text-sm text-text-secondary">
                 <span className="font-semibold text-primary">Sırala:</span>
@@ -166,17 +168,25 @@ export default function Products() {
               </label>
             </div>
 
-            <ul className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {PRODUCTS.map((product) => (
-                <li key={product.id}>
-                  <ProductCard product={product} />
-                </li>
-              ))}
-            </ul>
+            <div className="mt-6">
+              {status === 'loading' && <ProductGridSkeleton count={6} />}
 
-            <p className="mt-10 text-center text-sm text-text-secondary">
-              Daha fazla ürün yakında eklenecek.
-            </p>
+              {status === 'error' && <LoadError onRetry={load} />}
+
+              {status === 'ready' && products.length === 0 && (
+                <ProductsEmpty title="Ürünler çok yakında — WhatsApp'tan sorabilirsiniz" />
+              )}
+
+              {status === 'ready' && products.length > 0 && (
+                <ul className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                  {products.map((product) => (
+                    <li key={product.id}>
+                      <ProductCard product={product} />
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           </section>
         </div>
       </div>
@@ -216,136 +226,6 @@ function SoonBadge() {
     <span className="inline-flex items-center rounded-full bg-warning/15 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-warning ring-1 ring-inset ring-warning/20">
       Yakında
     </span>
-  );
-}
-
-type ProductCardProps = { product: Product };
-
-function ProductCard({ product }: ProductCardProps) {
-  return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-xl border-2 border-border bg-white shadow-card transition-all duration-300 ease-out hover:-translate-y-1 hover:border-accent hover:shadow-lg">
-      <Link
-        to={`/urun/${product.id}`}
-        className="block focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2"
-        aria-label={product.name}
-      >
-        <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-primary-light/10 via-surface to-accent/10">
-          <div className="absolute inset-0 flex items-center justify-center text-primary/80 transition-transform duration-500 ease-out group-hover:scale-110">
-            <ProductGlyph category={product.category} />
-          </div>
-          <div className="absolute left-2.5 top-2.5">
-            <FulfillmentBadge fulfillment={product.fulfillment} />
-          </div>
-        </div>
-      </Link>
-
-      <div className="flex flex-1 flex-col gap-2.5 p-4">
-        <p className="text-[10px] font-bold uppercase tracking-wider text-text-secondary">
-          {product.brand}
-        </p>
-        <h3 className="line-clamp-2 min-h-[2.5rem] text-sm font-bold leading-snug text-primary">
-          <Link
-            to={`/urun/${product.id}`}
-            className="hover:text-accent-dark focus:outline-none focus:underline"
-          >
-            {product.name}
-          </Link>
-        </h3>
-
-        <div className="mt-auto pt-2">
-          <p className="text-xl font-extrabold text-primary">
-            ₺{PRICE_FORMATTER.format(product.price)}
-            <span className="ml-1 text-[10px] font-medium text-text-secondary">
-              KDV dahil
-            </span>
-          </p>
-
-          <Link
-            to={`/urun/${product.id}`}
-            className="mt-2.5 inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-accent px-3 py-2 text-xs font-bold text-primary shadow-sm transition-colors hover:bg-accent-dark focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2"
-          >
-            İncele
-            <span aria-hidden="true">→</span>
-          </Link>
-        </div>
-      </div>
-    </article>
-  );
-}
-
-type FulfillmentBadgeProps = { fulfillment: Fulfillment };
-
-function FulfillmentBadge({ fulfillment }: FulfillmentBadgeProps) {
-  const isStock = fulfillment === 'stock';
-  const label = isStock ? 'Stokta' : 'Siparişe özel';
-  const cls = isStock ? 'bg-success text-white' : 'bg-warning text-primary';
-
-  return (
-    <span
-      className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold shadow-sm ${cls}`}
-    >
-      <span className="h-1 w-1 rounded-full bg-white/80" aria-hidden="true" />
-      {label}
-    </span>
-  );
-}
-
-type ProductGlyphProps = { category: ProductCategory };
-
-function ProductGlyph({ category }: ProductGlyphProps) {
-  const common = {
-    viewBox: '0 0 64 64',
-    width: '54%',
-    height: '54%',
-    fill: 'none',
-    stroke: 'currentColor',
-    strokeWidth: 2.5,
-    strokeLinecap: 'round' as const,
-    strokeLinejoin: 'round' as const,
-    'aria-hidden': true,
-    focusable: false as const,
-  };
-
-  if (category === 'panel') {
-    return (
-      <svg {...common}>
-        <rect x="6" y="10" width="52" height="40" rx="2" />
-        <line x1="20" y1="10" x2="20" y2="50" />
-        <line x1="32" y1="10" x2="32" y2="50" />
-        <line x1="44" y1="10" x2="44" y2="50" />
-        <line x1="6" y1="23" x2="58" y2="23" />
-        <line x1="6" y1="36" x2="58" y2="36" />
-        <line x1="28" y1="56" x2="36" y2="56" />
-        <line x1="32" y1="50" x2="32" y2="56" />
-      </svg>
-    );
-  }
-
-  if (category === 'inverter') {
-    return (
-      <svg {...common}>
-        <rect x="10" y="8" width="44" height="48" rx="3" />
-        <path
-          d="M32 16 L24 32 H30 L28 44 L40 28 H32 L36 16 Z"
-          fill="currentColor"
-          stroke="none"
-        />
-        <line x1="20" y1="50" x2="24" y2="50" />
-        <line x1="40" y1="50" x2="44" y2="50" />
-      </svg>
-    );
-  }
-
-  return (
-    <svg {...common}>
-      <rect x="6" y="18" width="48" height="28" rx="3" />
-      <line x1="58" y1="26" x2="58" y2="38" />
-      <line x1="14" y1="24" x2="14" y2="40" />
-      <line x1="22" y1="24" x2="22" y2="40" />
-      <line x1="30" y1="24" x2="30" y2="40" />
-      <line x1="38" y1="24" x2="38" y2="40" />
-      <line x1="46" y1="24" x2="46" y2="40" />
-    </svg>
   );
 }
 

@@ -10,7 +10,9 @@ import MesafeliSatis from './pages/MesafeliSatis';
 import Cerez from './pages/Cerez';
 import OnBilgilendirme from './pages/OnBilgilendirme';
 import Categories from './pages/Categories';
+import CategoryPage from './pages/CategoryPage';
 import Products from './pages/Products';
+import ProductDetail from './pages/ProductDetail';
 
 export default function App() {
   return (
@@ -27,7 +29,9 @@ export default function App() {
           <Route path="/cerez-politikasi" element={<Cerez />} />
           <Route path="/on-bilgilendirme" element={<OnBilgilendirme />} />
           <Route path="/kategoriler" element={<Categories />} />
+          <Route path="/kategori/:slug" element={<CategoryPage />} />
           <Route path="/urunler" element={<Products />} />
+          <Route path="/urun/:slug" element={<ProductDetail />} />
         </Routes>
       </main>
       <Footer />

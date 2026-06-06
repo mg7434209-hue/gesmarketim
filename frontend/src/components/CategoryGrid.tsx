@@ -1,27 +1,32 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { getCategories, type PublicCategory } from '../lib/api';
 
-type Category = {
-  slug: string;
-  name: string;
-  count: number;
-  Icon: () => JSX.Element;
-};
-
-const CATEGORIES: Category[] = [
-  { slug: 'gunes-paneli', name: 'Güneş Paneli', count: 24, Icon: SolarPanelIcon },
-  { slug: 'inverter', name: 'İnverter', count: 18, Icon: InverterIcon },
-  { slug: 'batarya', name: 'Batarya', count: 12, Icon: BatteryIcon },
-  { slug: 'solar-kablo', name: 'Solar Kablo', count: 9, Icon: CableIcon },
-  { slug: 'montaj-aparati', name: 'Montaj Aparatı', count: 15, Icon: WrenchIcon },
-  { slug: 'aksesuar', name: 'Aksesuar', count: 32, Icon: AccessoryIcon },
-];
+type Status = 'loading' | 'ready' | 'error';
 
 export default function CategoryGrid() {
+  const [status, setStatus] = useState<Status>('loading');
+  const [categories, setCategories] = useState<PublicCategory[]>([]);
+
+  useEffect(() => {
+    let active = true;
+    setStatus('loading');
+    getCategories()
+      .then((data) => {
+        if (!active) return;
+        setCategories([...data].sort((a, b) => a.sortOrder - b.sortOrder));
+        setStatus('ready');
+      })
+      .catch(() => {
+        if (active) setStatus('error');
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
   return (
-    <section
-      aria-label="Kategoriler"
-      className="border-b border-border bg-white"
-    >
+    <section aria-label="Kategoriler" className="border-b border-border bg-white">
       <div className="container-x py-12 md:py-16">
         <div className="mb-8 flex items-end justify-between gap-4 md:mb-10">
           <div>
@@ -40,37 +45,88 @@ export default function CategoryGrid() {
           </Link>
         </div>
 
-        <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 lg:gap-6">
-          {CATEGORIES.map(({ slug, name, count, Icon }) => (
-            <li key={slug}>
-              <Link
-                to={`/kategori/${slug}`}
-                className="group flex h-full items-center gap-4 rounded-2xl border-2 border-border bg-white p-5 shadow-card transition-all duration-300 ease-out hover:-translate-y-1 hover:border-accent hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 sm:p-6"
-              >
-                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-accent text-primary shadow-sm transition-transform duration-300 ease-out group-hover:scale-110 sm:h-16 sm:w-16">
-                  <Icon />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <h3 className="truncate text-base font-bold text-primary sm:text-lg">
-                    {name}
-                  </h3>
-                  <p className="mt-0.5 text-xs text-text-secondary sm:text-sm">
-                    {count} ürün
-                  </p>
-                </div>
-                <span
-                  className="hidden text-primary opacity-0 transition-opacity duration-200 group-hover:opacity-100 sm:inline-block"
-                  aria-hidden="true"
+        {status === 'loading' && <CategoryGridSkeleton />}
+
+        {status === 'error' && (
+          <p className="rounded-2xl border-2 border-dashed border-danger/40 bg-white p-8 text-center text-sm font-semibold text-text-secondary">
+            Kategoriler şu an yüklenemedi. Lütfen birazdan tekrar deneyin.
+          </p>
+        )}
+
+        {status === 'ready' && (
+          <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 lg:gap-6">
+            {categories.map((category) => (
+              <li key={category.id}>
+                <Link
+                  to={`/kategori/${category.slug}`}
+                  className="group flex h-full items-center gap-4 rounded-2xl border-2 border-border bg-white p-5 shadow-card transition-all duration-300 ease-out hover:-translate-y-1 hover:border-accent hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 sm:p-6"
                 >
-                  <ArrowRightIcon />
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ul>
+                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-accent text-primary shadow-sm transition-transform duration-300 ease-out group-hover:scale-110 sm:h-16 sm:w-16">
+                    <CategoryIcon slug={category.slug} />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="truncate text-base font-bold text-primary sm:text-lg">
+                      {category.name}
+                    </h3>
+                    <p className="mt-0.5 text-xs text-text-secondary sm:text-sm">
+                      Ürünleri keşfet
+                    </p>
+                  </div>
+                  <span
+                    className="hidden text-primary opacity-0 transition-opacity duration-200 group-hover:opacity-100 sm:inline-block"
+                    aria-hidden="true"
+                  >
+                    <ArrowRightIcon />
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </section>
   );
+}
+
+function CategoryGridSkeleton() {
+  return (
+    <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 lg:gap-6">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <li key={i}>
+          <div className="flex h-full items-center gap-4 rounded-2xl border-2 border-border bg-white p-5 shadow-card sm:p-6">
+            <div className="h-14 w-14 shrink-0 animate-pulse rounded-xl bg-border/60 sm:h-16 sm:w-16" />
+            <div className="min-w-0 flex-1 space-y-2">
+              <div className="h-4 w-2/3 animate-pulse rounded bg-border/60" />
+              <div className="h-3 w-1/3 animate-pulse rounded bg-border/50" />
+            </div>
+          </div>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Icons mapped by category slug (falls back to a generic icon)
+// ---------------------------------------------------------------------------
+
+type IconProps = { slug: string };
+
+function CategoryIcon({ slug }: IconProps) {
+  switch (slug) {
+    case 'gunes-paneli':
+      return <SolarPanelIcon />;
+    case 'inverter':
+      return <InverterIcon />;
+    case 'batarya':
+      return <BatteryIcon />;
+    case 'solar-kablo':
+      return <CableIcon />;
+    case 'montaj-aparati':
+      return <WrenchIcon />;
+    default:
+      return <AccessoryIcon />;
+  }
 }
 
 function SolarPanelIcon() {

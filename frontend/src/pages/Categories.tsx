@@ -1,54 +1,46 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { getCategories, type PublicCategory } from '../lib/api';
 
-type Category = {
-  slug: string;
-  name: string;
-  description: string;
-  productCount: number;
+// Marketing copy per category (not part of the product API).
+const DESCRIPTIONS: Record<string, string> = {
+  'gunes-paneli':
+    'Mono/Polikristal, half-cut, full-black paneller. 410W-460W güç aralığında.',
+  inverter: 'Hibrit, on-grid, off-grid inverterler. 3kW-15kW kapasiteler.',
+  batarya: 'LiFePO4, Jel akü, Hücre batarya seçenekleri. 100Ah-280Ah.',
+  'solar-kablo':
+    'TÜV onaylı kırmızı/siyah solar DC kabloları. 4mm² ve 6mm² seçenekleri.',
+  'montaj-aparati':
+    'Çatı, zemin, tribün montaj kitleri. Galvaniz çelik ve alüminyum.',
+  aksesuar: 'MC4 konnektör, sigorta, by-pass diyot, monitoring üniteleri.',
 };
 
-const CATEGORIES: Category[] = [
-  {
-    slug: 'gunes-paneli',
-    name: 'Güneş Paneli',
-    description:
-      'Mono/Polikristal, half-cut, full-black paneller. 410W-460W güç aralığında.',
-    productCount: 24,
-  },
-  {
-    slug: 'inverter',
-    name: 'İnverter',
-    description: 'Hibrit, on-grid, off-grid inverterler. 3kW-15kW kapasiteler.',
-    productCount: 18,
-  },
-  {
-    slug: 'batarya',
-    name: 'Batarya',
-    description: 'LiFePO4, Jel akü, Hücre batarya seçenekleri. 100Ah-280Ah.',
-    productCount: 12,
-  },
-  {
-    slug: 'solar-kablo',
-    name: 'Solar Kablo',
-    description:
-      'TÜV onaylı kırmızı/siyah solar DC kabloları. 4mm² ve 6mm² seçenekleri.',
-    productCount: 9,
-  },
-  {
-    slug: 'montaj-aparati',
-    name: 'Montaj Aparatı',
-    description: 'Çatı, zemin, tribün montaj kitleri. Galvaniz çelik ve alüminyum.',
-    productCount: 15,
-  },
-  {
-    slug: 'aksesuar',
-    name: 'Aksesuar',
-    description: 'MC4 konnektör, sigorta, by-pass diyot, monitoring üniteleri.',
-    productCount: 32,
-  },
-];
+const DEFAULT_DESCRIPTION =
+  'Bu kategorideki ürünleri keşfet — KDV dahil net fiyatlarla.';
+
+type Status = 'loading' | 'ready' | 'error';
 
 export default function Categories() {
+  const [status, setStatus] = useState<Status>('loading');
+  const [categories, setCategories] = useState<PublicCategory[]>([]);
+
+  useEffect(() => {
+    let active = true;
+    setStatus('loading');
+    getCategories()
+      .then((data) => {
+        if (!active) return;
+        setCategories([...data].sort((a, b) => a.sortOrder - b.sortOrder));
+        setStatus('ready');
+      })
+      .catch(() => {
+        if (active) setStatus('error');
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
   return (
     <div className="bg-surface">
       <div className="container-x py-12">
@@ -77,19 +69,50 @@ export default function Categories() {
           </p>
         </header>
 
-        <ul className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-2 md:gap-6">
-          {CATEGORIES.map((category) => (
-            <li key={category.slug}>
-              <CategoryCard category={category} />
-            </li>
-          ))}
-        </ul>
+        {status === 'loading' && <CategoriesSkeleton />}
+
+        {status === 'error' && (
+          <p className="mt-10 rounded-2xl border-2 border-dashed border-danger/40 bg-white p-8 text-center text-sm font-semibold text-text-secondary">
+            Kategoriler şu an yüklenemedi. Lütfen birazdan tekrar deneyin.
+          </p>
+        )}
+
+        {status === 'ready' && (
+          <ul className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-2 md:gap-6">
+            {categories.map((category) => (
+              <li key={category.id}>
+                <CategoryCard category={category} />
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </div>
   );
 }
 
-type CategoryCardProps = { category: Category };
+function CategoriesSkeleton() {
+  return (
+    <ul className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-2 md:gap-6">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <li key={i}>
+          <div className="flex h-full flex-col gap-5 rounded-2xl border-2 border-border bg-white p-6 shadow-card sm:p-7">
+            <div className="flex items-start gap-5">
+              <div className="h-16 w-16 shrink-0 animate-pulse rounded-xl bg-border/60" />
+              <div className="flex-1 space-y-2">
+                <div className="h-5 w-1/2 animate-pulse rounded bg-border/60" />
+              </div>
+            </div>
+            <div className="h-4 w-full animate-pulse rounded bg-border/50" />
+            <div className="h-4 w-2/3 animate-pulse rounded bg-border/50" />
+          </div>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+type CategoryCardProps = { category: PublicCategory };
 
 function CategoryCard({ category }: CategoryCardProps) {
   return (
@@ -106,14 +129,11 @@ function CategoryCard({ category }: CategoryCardProps) {
           <h2 className="text-xl font-bold text-primary group-hover:text-accent-dark">
             {category.name}
           </h2>
-          <p className="mt-1 text-xs font-semibold uppercase tracking-wider text-text-secondary">
-            {category.productCount} ürün
-          </p>
         </div>
       </div>
 
       <p className="text-sm leading-relaxed text-text-secondary sm:text-base">
-        {category.description}
+        {DESCRIPTIONS[category.slug] ?? DEFAULT_DESCRIPTION}
       </p>
 
       <div className="mt-auto inline-flex items-center gap-1.5 text-sm font-bold text-primary group-hover:text-accent-dark">
@@ -196,14 +216,12 @@ function CategoryIcon({ slug }: CategoryIconProps) {
           <line x1="14" y1="14" x2="18" y2="14" />
         </svg>
       );
-    case 'aksesuar':
+    default:
       return (
         <svg {...props}>
           <circle cx="16" cy="16" r="3" />
           <path d="M16 4 v4 M16 24 v4 M4 16 h4 M24 16 h4 M7.5 7.5 l2.8 2.8 M21.7 21.7 l2.8 2.8 M7.5 24.5 l2.8 -2.8 M21.7 10.3 l2.8 -2.8" />
         </svg>
       );
-    default:
-      return null;
   }
 }
