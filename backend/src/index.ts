@@ -4,6 +4,7 @@ import cors from 'cors';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { healthRouter } from './routes/health.js';
+import { catalogRouter } from './routes/catalog.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -15,15 +16,19 @@ const CORS_ORIGIN = process.env.CORS_ORIGIN ?? 'http://localhost:5173';
 
 // ---------- middleware ----------
 app.use(express.json({ limit: '1mb' }));
+const corsOrigins = CORS_ORIGIN.split(',')
+  .map((s) => s.trim())
+  .filter((s) => s.length > 0);
 app.use(
   cors({
-    origin: CORS_ORIGIN.split(',').map((s) => s.trim()),
+    origin: corsOrigins,
     credentials: true,
   }),
 );
 
 // ---------- API routes ----------
 app.use('/api/health', healthRouter);
+app.use('/api', catalogRouter);
 
 // ---------- static frontend (production) ----------
 // In production the backend serves the built React app from frontend/dist.
