@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../cart/CartContext';
+import { useCustomer } from '../auth/CustomerContext';
 import { formatPrice } from '../components/product-ui';
 import { shippingFor } from '../lib/shipping';
 import {
@@ -50,6 +51,7 @@ const EMPTY: FormState = {
 export default function Checkout() {
   useSeo({ title: 'Ödeme', path: '/odeme', noindex: true });
   const { items, subtotal, clear } = useCart();
+  const { customer } = useCustomer();
   const navigate = useNavigate();
 
   const [form, setForm] = useState<FormState>(EMPTY);
@@ -74,6 +76,21 @@ export default function Checkout() {
       active = false;
     };
   }, []);
+
+  // Prefill from the signed-in customer — only fills blank fields so it never
+  // clobbers what the user is typing. Runs when the profile becomes available.
+  useEffect(() => {
+    if (!customer) return;
+    setForm((prev) => ({
+      ...prev,
+      customerName: prev.customerName || customer.name,
+      customerPhone: prev.customerPhone || (customer.phone ?? ''),
+      customerEmail: prev.customerEmail || customer.email,
+      city: prev.city || (customer.defaultCity ?? ''),
+      district: prev.district || (customer.defaultDistrict ?? ''),
+      addressLine: prev.addressLine || (customer.defaultAddress ?? ''),
+    }));
+  }, [customer]);
 
   const shipping = shippingFor(subtotal);
   const total = subtotal + shipping;

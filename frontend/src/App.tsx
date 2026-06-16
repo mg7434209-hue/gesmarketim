@@ -16,6 +16,7 @@ import ProductDetail from './pages/ProductDetail';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import OrderConfirmation from './pages/OrderConfirmation';
+import Account from './pages/Account';
 
 export default function App() {
   return (
@@ -38,6 +39,7 @@ export default function App() {
           <Route path="/sepet" element={<Cart />} />
           <Route path="/odeme" element={<Checkout />} />
           <Route path="/siparis/:number" element={<OrderConfirmation />} />
+          <Route path="/hesabim" element={<Account />} />
         </Routes>
       </main>
       <Footer />

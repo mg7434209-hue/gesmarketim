@@ -124,6 +124,12 @@ This monorepo is designed to deploy as a **single Railway service** for simplici
 | `GET /api/payment/methods` | Enabled payment methods + bank-transfer details |
 | `POST /api/payment/iyzico/callback` | iyzico Checkout Form return (card) |
 | `GET /sitemap.xml` | Dynamic sitemap — static pages + every active category & product |
+| `POST /api/account/register` | Create a customer account + start session |
+| `POST /api/account/login` | Start a customer session |
+| `POST /api/account/logout` | Clear the customer session |
+| `GET /api/account/me` | Current profile (cookie-gated) |
+| `PATCH /api/account/me` | Update profile / default address (cookie-gated) |
+| `GET /api/account/orders` | This customer's order history (cookie-gated) |
 
 Admin also exposes `GET /api/admin/upload-config` and `POST /api/admin/uploads`
 (base64 data URL → hosted image URL) for product image uploads, and
@@ -167,6 +173,20 @@ HMAC-signed session cookie keyed on `ADMIN_SESSION_SECRET` (see `src/lib/auth.ts
   the `/api/payment/iyzico/callback` route verifies the result and updates the
   order's payment status. Provider logic lives in `src/lib/payments/`; the
   provider-agnostic shape makes swapping/adding a processor straightforward.
+
+## Customer accounts
+
+- Optional storefront accounts: **register / login / logout**, an account page
+  (`/hesabim`) with editable profile + saved default address, and **order
+  history**. Checkout is prefilled from the signed-in profile.
+- **Guest checkout still works** — accounts are optional. When a customer is
+  logged in, new orders are linked to them (`orders.customerId`) so they appear
+  in their history; guest orders keep `customerId` null.
+- Auth mirrors the admin pattern: passwords hashed with **scrypt** (`node:crypto`,
+  no external lib), sessions are stateless **HMAC-signed cookies** keyed on
+  `CUSTOMER_SESSION_SECRET` (falls back to `ADMIN_SESSION_SECRET`). See
+  `src/lib/customerAuth.ts`. Run `npm run db:migrate` to add the `customers`
+  table + `orders.customer_id` column.
 
 ## Order notification emails
 

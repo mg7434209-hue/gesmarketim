@@ -22,6 +22,7 @@ import {
 } from "../lib/shopConfig.js";
 import { initCheckoutForm } from "../lib/payments/iyzico.js";
 import { sendOrderNotifications } from "../lib/notify/orderEmail.js";
+import { customerIdFromRequest } from "../lib/customerAuth.js";
 
 export const ordersRouter = Router();
 
@@ -68,6 +69,9 @@ ordersRouter.post(
   asyncHandler(async (req, res) => {
     const tenantId = await getTenantId();
     const body = (req.body ?? {}) as Record<string, unknown>;
+    // Logged-in customer (if any) — links the order to their account. Guest
+    // checkout still works: this stays null when no valid session cookie.
+    const customerId = customerIdFromRequest(req);
 
     // --- customer / address validation ---
     const customerName = str(body.customerName);
@@ -177,6 +181,7 @@ ordersRouter.post(
           .values({
             tenantId,
             orderNumber,
+            customerId,
             customerName,
             customerPhone,
             customerEmail: customerEmail || null,

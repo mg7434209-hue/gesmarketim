@@ -8,6 +8,7 @@ import { catalogRouter } from './routes/catalog.js';
 import { ordersRouter } from './routes/orders.js';
 import { adminRouter } from './routes/admin.js';
 import { paymentRouter } from './routes/payment.js';
+import { accountRouter } from './routes/account.js';
 import { seoRouter } from './routes/seo.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -38,6 +39,7 @@ app.use('/api/admin', adminRouter);
 app.use('/api', catalogRouter);
 app.use('/api', ordersRouter);
 app.use('/api', paymentRouter);
+app.use('/api', accountRouter);
 
 // ---------- SEO (served at site root, before the SPA fallback) ----------
 app.use('/', seoRouter);

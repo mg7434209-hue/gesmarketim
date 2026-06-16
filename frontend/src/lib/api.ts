@@ -179,6 +179,8 @@ export async function createOrder(payload: CheckoutPayload): Promise<OrderResult
   const res = await fetch(`${API_URL}/api/orders`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    // Send the customer session cookie so the order links to their account.
+    credentials: 'include',
     body: JSON.stringify(payload),
   });
   if (!res.ok) {
@@ -205,6 +207,118 @@ export async function getOrder(orderNumber: string): Promise<OrderDetail> {
   if (res.status === 404) throw new NotFoundError();
   if (!res.ok) throw new Error(`API ${res.status}`);
   return (await res.json()) as OrderDetail;
+}
+
+// ---------------------------------------------------------------------------
+// Customer accounts (register / login / profile / order history)
+// ---------------------------------------------------------------------------
+
+export type Customer = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string | null;
+  defaultCity: string | null;
+  defaultDistrict: string | null;
+  defaultAddress: string | null;
+};
+
+export type RegisterPayload = {
+  name: string;
+  email: string;
+  password: string;
+  phone?: string;
+};
+
+export type ProfilePatch = {
+  name?: string;
+  phone?: string;
+  defaultCity?: string;
+  defaultDistrict?: string;
+  defaultAddress?: string;
+};
+
+export type CustomerOrder = {
+  orderNumber: string;
+  status: string;
+  paymentMethod: PaymentMethod;
+  paymentStatus: PaymentStatus;
+  subtotal: number;
+  shippingCost: number;
+  total: number;
+  currency: string;
+  createdAt: string;
+  items: OrderLine[];
+};
+
+/** Thrown by account calls; carries per-field validation messages. */
+export class AccountError extends Error {
+  status: number;
+  fields?: Record<string, string>;
+  constructor(message: string, status: number, fields?: Record<string, string>) {
+    super(message);
+    this.name = 'AccountError';
+    this.status = status;
+    this.fields = fields;
+  }
+}
+
+async function accountRequest<T>(
+  path: string,
+  method: string,
+  body?: unknown,
+): Promise<T> {
+  const res = await fetch(`${API_URL}/api/account${path}`, {
+    method,
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    credentials: 'include',
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });
+  if (!res.ok) {
+    let data: { message?: string; fields?: Record<string, string> } = {};
+    try {
+      data = await res.json();
+    } catch {
+      /* ignore */
+    }
+    throw new AccountError(
+      data.message ?? 'İşlem başarısız.',
+      res.status,
+      data.fields,
+    );
+  }
+  return (await res.json()) as T;
+}
+
+export function registerCustomer(payload: RegisterPayload): Promise<Customer> {
+  return accountRequest<Customer>('/register', 'POST', payload);
+}
+
+export function loginCustomer(email: string, password: string): Promise<Customer> {
+  return accountRequest<Customer>('/login', 'POST', { email, password });
+}
+
+export async function logoutCustomer(): Promise<void> {
+  await accountRequest<{ ok: boolean }>('/logout', 'POST');
+}
+
+/** Current profile, or null when not signed in (401 is not an error here). */
+export async function getMe(): Promise<Customer | null> {
+  const res = await fetch(`${API_URL}/api/account/me`, {
+    headers: { Accept: 'application/json' },
+    credentials: 'include',
+  });
+  if (res.status === 401) return null;
+  if (!res.ok) throw new Error(`API ${res.status}`);
+  return (await res.json()) as Customer;
+}
+
+export function updateProfile(patch: ProfilePatch): Promise<Customer> {
+  return accountRequest<Customer>('/me', 'PATCH', patch);
+}
+
+export function getMyOrders(): Promise<CustomerOrder[]> {
+  return accountRequest<CustomerOrder[]>('/orders', 'GET');
 }
 
 export async function getProduct(slug: string): Promise<PublicProduct> {

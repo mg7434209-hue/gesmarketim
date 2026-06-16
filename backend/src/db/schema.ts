@@ -288,7 +288,13 @@ export const orders = pgTable(
     // insana okunur sipariş numarası (müşteriye gösterilir): GM-XXXXXX
     orderNumber: text("order_number").notNull(),
 
-    // müşteri bilgileri (snapshot — hesap sistemi yok)
+    // opsiyonel müşteri hesabı bağlantısı (misafir siparişlerde null kalır).
+    // Hesap silinse bile sipariş + snapshot bilgileri korunur.
+    customerId: uuid("customer_id").references(() => customers.id, {
+      onDelete: "set null",
+    }),
+
+    // müşteri bilgileri (snapshot — hesaplı veya misafir, her zaman yazılır)
     customerName: text("customer_name").notNull(),
     customerPhone: text("customer_phone").notNull(),
     customerEmail: text("customer_email"),
@@ -369,6 +375,44 @@ export const orderItems = pgTable(
 );
 
 // ---------------------------------------------------------------------------
+// customers — opsiyonel müşteri hesapları (kayıt/giriş + sipariş geçmişi)
+// ---------------------------------------------------------------------------
+export const customers = pgTable(
+  "customers",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id")
+      .notNull()
+      .references(() => tenants.id, { onDelete: "cascade" }),
+
+    // e-posta küçük harfe normalize edilerek saklanır (tenant başına benzersiz)
+    email: text("email").notNull(),
+    passwordHash: text("password_hash").notNull(),
+
+    name: text("name").notNull(),
+    phone: text("phone"),
+
+    // checkout'u hızlandırmak için opsiyonel varsayılan teslimat adresi
+    defaultCity: text("default_city"),
+    defaultDistrict: text("default_district"),
+    defaultAddress: text("default_address"),
+
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => ({
+    tenantEmailIdx: uniqueIndex("customers_tenant_email_idx").on(
+      t.tenantId,
+      t.email,
+    ),
+  }),
+);
+
+// ---------------------------------------------------------------------------
 // Relations
 // ---------------------------------------------------------------------------
 export const tenantsRelations = relations(tenants, ({ many }) => ({
@@ -377,6 +421,7 @@ export const tenantsRelations = relations(tenants, ({ many }) => ({
   categories: many(categories),
   products: many(products),
   orders: many(orders),
+  customers: many(customers),
 }));
 
 export const suppliersRelations = relations(suppliers, ({ one, many }) => ({
@@ -418,7 +463,19 @@ export const productsRelations = relations(products, ({ one }) => ({
 
 export const ordersRelations = relations(orders, ({ one, many }) => ({
   tenant: one(tenants, { fields: [orders.tenantId], references: [tenants.id] }),
+  customer: one(customers, {
+    fields: [orders.customerId],
+    references: [customers.id],
+  }),
   items: many(orderItems),
+}));
+
+export const customersRelations = relations(customers, ({ one, many }) => ({
+  tenant: one(tenants, {
+    fields: [customers.tenantId],
+    references: [tenants.id],
+  }),
+  orders: many(orders),
 }));
 
 export const orderItemsRelations = relations(orderItems, ({ one }) => ({

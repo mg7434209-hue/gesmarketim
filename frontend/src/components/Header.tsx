@@ -3,6 +3,7 @@ import { Link, NavLink } from 'react-router-dom';
 import Logo from './Logo';
 import { WHATSAPP_URL } from '../config';
 import { useCart } from '../cart/CartContext';
+import { useCustomer } from '../auth/CustomerContext';
 
 type NavItem = { to: string; label: string };
 
@@ -17,6 +18,7 @@ const NAV_ITEMS: NavItem[] = [
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { count } = useCart();
+  const { customer } = useCustomer();
 
   return (
     <header className="sticky top-0 z-50 bg-white shadow-header">
@@ -74,6 +76,17 @@ export default function Header() {
 
           <div className="flex items-center gap-1.5">
             <Link
+              to="/hesabim"
+              className="inline-flex h-10 items-center justify-center gap-1.5 rounded-lg px-2 text-primary hover:bg-surface focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2"
+              aria-label={customer ? 'Hesabım' : 'Giriş yap'}
+              onClick={() => setMobileOpen(false)}
+            >
+              <UserIcon />
+              <span className="hidden text-sm font-semibold lg:inline">
+                {customer ? customer.name.split(' ')[0] : 'Giriş'}
+              </span>
+            </Link>
+            <Link
               to="/sepet"
               className="relative inline-flex h-10 w-10 items-center justify-center rounded-lg text-primary hover:bg-surface focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2"
               aria-label={`Sepetim (${count} ürün)`}
@@ -128,10 +141,45 @@ export default function Header() {
                 </NavLink>
               </li>
             ))}
+            <li>
+              <NavLink
+                to="/hesabim"
+                onClick={() => setMobileOpen(false)}
+                className={({ isActive }) =>
+                  `block rounded-md px-3 py-3 text-base font-semibold ${
+                    isActive
+                      ? 'bg-surface text-primary'
+                      : 'text-text-secondary hover:bg-surface hover:text-primary'
+                  }`
+                }
+              >
+                {customer ? 'Hesabım' : 'Giriş / Kayıt'}
+              </NavLink>
+            </li>
           </ul>
         </nav>
       )}
     </header>
+  );
+}
+
+function UserIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="22"
+      height="22"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+      <circle cx="12" cy="7" r="4" />
+    </svg>
   );
 }
 
