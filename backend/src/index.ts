@@ -51,6 +51,20 @@ if (NODE_ENV === 'production') {
   });
 }
 
+// ---------- root info (API-only deployments) ----------
+// When the frontend is a separate service, the backend root has no SPA to
+// serve. Return a small JSON status instead of a bare "Cannot GET /" so the
+// API URL looks healthy. In single-service production the static handler above
+// already claimed '/' (served index.html), so this only runs in API-only mode.
+app.get('/', (_req, res) => {
+  res.json({
+    name: 'gesmarketim-api',
+    status: 'ok',
+    health: '/api/health',
+    products: '/api/products',
+  });
+});
+
 // ---------- 404 (API only) ----------
 app.use('/api', (_req, res) => {
   res.status(404).json({ error: 'Not found' });
