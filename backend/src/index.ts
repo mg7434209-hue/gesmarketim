@@ -10,6 +10,7 @@ import { adminRouter } from './routes/admin.js';
 import { paymentRouter } from './routes/payment.js';
 import { accountRouter } from './routes/account.js';
 import { seoRouter } from './routes/seo.js';
+import { startSyncScheduler } from './lib/sync/scheduler.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -84,4 +85,6 @@ app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
 
 app.listen(PORT, () => {
   console.log(`[gesmarketim] backend listening on :${PORT} (${NODE_ENV})`);
+  // Opt-in supplier feed scheduler (no-op unless SYNC_SCHEDULER_ENABLED=true).
+  startSyncScheduler();
 });

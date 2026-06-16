@@ -38,6 +38,7 @@ import { slugify } from "../lib/util.js";
 import { isUploadConfigured, uploadImage, activeProvider, UploadError } from "../lib/storage/index.js";
 import { parseCsv } from "../lib/sync/csv.js";
 import { runCsvSync } from "../lib/sync/engine.js";
+import { runFeedSync } from "../lib/sync/feed.js";
 import {
   verifyCredentials,
   issueToken,
@@ -702,17 +703,64 @@ adminRouter.post(
   }),
 );
 
+// Allowlist for the editable portion of suppliers.syncConfig. Engine-managed
+// fields (lastSyncedAt / lastResult) are never accepted from the client.
+function sanitizeSyncConfig(
+  input: unknown,
+  existing: Record<string, unknown>,
+): Record<string, unknown> {
+  if (!input || typeof input !== "object") return existing;
+  const src = input as Record<string, unknown>;
+  const out: Record<string, unknown> = { ...existing };
+  if ("feedUrl" in src)
+    out.feedUrl = typeof src.feedUrl === "string" ? src.feedUrl.trim() : undefined;
+  if ("intervalMinutes" in src) {
+    const n = Number(src.intervalMinutes);
+    out.intervalMinutes = Number.isFinite(n) && n > 0 ? Math.floor(n) : undefined;
+  }
+  if ("createMissing" in src) out.createMissing = src.createMissing === true;
+  if ("defaultCategoryId" in src)
+    out.defaultCategoryId =
+      typeof src.defaultCategoryId === "string" && src.defaultCategoryId
+        ? src.defaultCategoryId
+        : null;
+  if ("enabled" in src) out.enabled = src.enabled !== false;
+  return out;
+}
+
 adminRouter.patch(
   "/suppliers/:id",
   asyncHandler(async (req, res) => {
     const tenantId = await getTenantId();
-    const data = pick(req.body ?? {}, ["name", "slug", "defaultMarkupPercent", "syncMethod"] as const);
+    const data = pick(req.body ?? {}, [
+      "name",
+      "slug",
+      "defaultMarkupPercent",
+      "syncMethod",
+      "syncConfig",
+    ] as const);
     const update: Record<string, unknown> = { updatedAt: new Date() };
     if (typeof data.name === "string") update.name = data.name.trim();
     if (typeof data.slug === "string" && data.slug.trim()) update.slug = slugify(data.slug);
     if ("defaultMarkupPercent" in data) update.defaultMarkupPercent = asNumericStr(data.defaultMarkupPercent);
     if (["manual", "csv", "api", "scrape"].includes(data.syncMethod as string))
       update.syncMethod = data.syncMethod;
+
+    if ("syncConfig" in data) {
+      // Merge with current config so engine-written fields (lastSyncedAt /
+      // lastResult) survive an admin edit.
+      const [current] = await db
+        .select({ syncConfig: suppliers.syncConfig })
+        .from(suppliers)
+        .where(and(eq(suppliers.tenantId, tenantId), eq(suppliers.id, req.params.id)))
+        .limit(1);
+      const existing =
+        current?.syncConfig && typeof current.syncConfig === "object"
+          ? (current.syncConfig as Record<string, unknown>)
+          : {};
+      update.syncConfig = sanitizeSyncConfig(data.syncConfig, existing);
+    }
+
     const [row] = await db
       .update(suppliers)
       .set(update)
@@ -800,6 +848,38 @@ adminRouter.post(
     }
 
     res.json(summary);
+  }),
+);
+
+// Trigger a remote-feed sync now (uses suppliers.syncConfig.feedUrl).
+// Pass { "dryRun": true } to preview without writing. The scheduler runs this
+// automatically on a timer; this endpoint is for on-demand / testing.
+adminRouter.post(
+  "/suppliers/:id/sync/feed",
+  asyncHandler(async (req, res) => {
+    const tenantId = await getTenantId();
+    const supplierId = req.params.id;
+
+    const [supplier] = await db
+      .select({ id: suppliers.id, syncConfig: suppliers.syncConfig })
+      .from(suppliers)
+      .where(and(eq(suppliers.tenantId, tenantId), eq(suppliers.id, supplierId)))
+      .limit(1);
+    if (!supplier) {
+      res.status(404).json({ error: "not_found" });
+      return;
+    }
+
+    const dryRun = (req.body ?? {}).dryRun === true;
+    const result = await runFeedSync(tenantId, supplierId, supplier.syncConfig, {
+      dryRun,
+    });
+
+    if (result.status === "error") {
+      res.status(400).json({ error: "feed_sync_failed", message: result.error });
+      return;
+    }
+    res.json(result.summary);
   }),
 );
 

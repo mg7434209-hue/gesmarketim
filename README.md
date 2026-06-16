@@ -221,17 +221,36 @@ HMAC-signed session cookie keyed on `ADMIN_SESSION_SECRET` (see `src/lib/auth.ts
   products. A **dry-run / preview** mode reports created/updated/skipped counts
   and per-row errors without writing.
 - Parser (`src/lib/sync/csv.ts`) is dependency-free, auto-detects `,`/`;`
-  delimiters and TR/EN decimal formats. The same engine
-  (`src/lib/sync/engine.ts`) can later be driven by a scheduled job or a
-  supplier API/feed (the `suppliers.syncMethod` field already models this).
+  delimiters and TR/EN decimal formats.
+
+### Scheduled / feed-based sync
+
+- The same engine is driven automatically from a **remote feed URL**. Configure
+  a supplier's `syncConfig` (from the admin) with `feedUrl` (+ optional
+  `intervalMinutes` (default daily), `createMissing`, `defaultCategoryId`,
+  `enabled`). `src/lib/sync/feed.ts` fetches the feed (http/https, 20s timeout,
+  8 MB / 5000-row caps), runs it through the CSV engine, and records
+  `lastSyncedAt` / `lastResult` back into `syncConfig`.
+- An **in-process scheduler** (`src/lib/sync/scheduler.ts`) ticks every
+  `SYNC_SCHEDULER_TICK_MINUTES` (default 15) and syncs each eligible supplier
+  when its interval is due. Opt-in via `SYNC_SCHEDULER_ENABLED=true` so
+  feed-less deployments make no outbound requests. Per-supplier cadence guards
+  against re-running too often; a hard-failing feed records the failure and
+  waits for the next interval rather than hot-looping.
+- On-demand trigger: `POST /api/admin/suppliers/:id/sync/feed` (admin), with
+  `{ "dryRun": true }` to preview. For multiple backend replicas, move to an
+  external cron/queue that calls `runFeedSync()` — the reusable unit.
 
 ---
 
 ## Status
 
 > **Production-ready storefront + admin.** Catalog API, cart/checkout/orders,
-> payments (bank transfer / cash on delivery / iyzico card), product image
-> management, and supplier CSV sync are implemented behind a cookie-gated admin
-> panel. Run `npm run db:migrate` then `npm run db:seed` to populate the tenant,
-> taxonomy and a sample catalogue.
-> Possible next steps: scheduled/API-based supplier sync and customer accounts.
+> payments (bank transfer / cash on delivery / iyzico card), order notification
+> emails, customer accounts (login + order history), product image management,
+> supplier CSV **and scheduled feed** sync, plus full per-page SEO
+> (meta/OG/JSON-LD, robots, dynamic sitemap) are implemented behind a
+> cookie-gated admin panel. Run `npm run db:migrate` then `npm run db:seed` to
+> populate the tenant, taxonomy and a sample catalogue.
+> Possible next steps: customer password reset, multi-replica scheduler
+> (external cron/queue), and analytics.
