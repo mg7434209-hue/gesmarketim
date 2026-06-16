@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { WHATSAPP_URL } from '../config';
 import type { FulfillmentType, PublicProduct } from '../lib/api';
+import { useCart } from '../cart/CartContext';
 
 const PRICE_FORMATTER = new Intl.NumberFormat('tr-TR', {
   style: 'currency',
@@ -127,6 +129,56 @@ export function FulfillmentBadge({
 }
 
 // ---------------------------------------------------------------------------
+// Add-to-cart button (with brief confirmation feedback)
+// ---------------------------------------------------------------------------
+
+type AddToCartButtonProps = {
+  product: PublicProduct;
+  quantity?: number;
+  size?: 'sm' | 'lg';
+  className?: string;
+};
+
+export function AddToCartButton({
+  product,
+  quantity = 1,
+  size = 'sm',
+  className = '',
+}: AddToCartButtonProps) {
+  const { add } = useCart();
+  const [added, setAdded] = useState(false);
+
+  const padding = size === 'lg' ? 'px-6 py-3.5 text-base' : 'px-3 py-2 text-xs';
+
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        add(product, quantity);
+        setAdded(true);
+        window.setTimeout(() => setAdded(false), 1600);
+      }}
+      aria-label={`${product.name} sepete ekle`}
+      className={`inline-flex w-full items-center justify-center gap-1.5 rounded-lg font-bold shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 ${padding} ${
+        added
+          ? 'bg-success text-white'
+          : 'bg-accent text-primary hover:bg-accent-dark'
+      } ${className}`}
+    >
+      {added ? (
+        <>
+          <CheckIcon /> Sepete eklendi
+        </>
+      ) : (
+        <>
+          <CartPlusIcon /> Sepete ekle
+        </>
+      )}
+    </button>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Product card (shared across home grid, listing and category pages)
 // ---------------------------------------------------------------------------
 
@@ -189,13 +241,16 @@ export function ProductCard({ product }: ProductCardProps) {
             </span>
           </p>
 
-          <Link
-            to={href}
-            className="mt-2.5 inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-accent px-3 py-2 text-xs font-bold text-primary shadow-sm transition-colors hover:bg-accent-dark focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2"
-          >
-            İncele
-            <span aria-hidden="true">→</span>
-          </Link>
+          <div className="mt-2.5 flex flex-col gap-2">
+            <AddToCartButton product={product} />
+            <Link
+              to={href}
+              className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg border-2 border-border px-3 py-1.5 text-xs font-bold text-primary transition-colors hover:border-primary focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2"
+            >
+              İncele
+              <span aria-hidden="true">→</span>
+            </Link>
+          </div>
         </div>
       </div>
     </article>
@@ -296,6 +351,48 @@ export function WhatsAppIcon() {
       focusable="false"
     >
       <path d="M.06 24l1.68-6.13A11.86 11.86 0 0 1 .16 11.9C.16 5.34 5.5 0 12.06 0a11.82 11.82 0 0 1 8.41 3.49 11.82 11.82 0 0 1 3.48 8.42c0 6.56-5.34 11.9-11.9 11.9a11.9 11.9 0 0 1-5.69-1.45L.06 24zM6.6 20.13c1.68.99 3.28 1.59 5.45 1.59 5.45 0 9.89-4.43 9.89-9.88 0-5.45-4.44-9.89-9.89-9.89S2.17 6.49 2.17 11.94a9.8 9.8 0 0 0 1.51 5.26l-.99 3.61 3.91-1.02zm11.39-5.46c-.07-.12-.27-.2-.56-.34-.29-.15-1.73-.85-2-.95-.27-.1-.46-.15-.66.15-.2.29-.76.94-.93 1.14-.17.2-.34.22-.63.07-.29-.15-1.24-.46-2.36-1.46-.87-.78-1.46-1.73-1.63-2.02-.17-.29-.02-.45.13-.6.13-.13.29-.34.44-.51.15-.17.2-.29.29-.49.1-.2.05-.37-.02-.51-.07-.15-.66-1.59-.9-2.18-.24-.57-.48-.49-.66-.5l-.56-.01c-.2 0-.51.07-.78.37-.27.29-1.02 1-1.02 2.44s1.05 2.83 1.2 3.02c.15.2 2.06 3.14 4.99 4.41.7.3 1.24.48 1.66.62.7.22 1.34.19 1.84.12.56-.08 1.73-.71 1.98-1.39.24-.69.24-1.27.17-1.39z" />
+    </svg>
+  );
+}
+
+export function CartPlusIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="16"
+      height="16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <circle cx="9" cy="21" r="1" />
+      <circle cx="19" cy="21" r="1" />
+      <path d="M2.5 3h2l2.2 11.2a2 2 0 0 0 2 1.6h8.6a2 2 0 0 0 2-1.6L22 7H6" />
+      <line x1="14" y1="6" x2="14" y2="10" />
+      <line x1="12" y1="8" x2="16" y2="8" />
+    </svg>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="16"
+      height="16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <polyline points="20 6 9 17 4 12" />
     </svg>
   );
 }

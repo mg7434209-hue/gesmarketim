@@ -5,6 +5,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { healthRouter } from './routes/health.js';
 import { catalogRouter } from './routes/catalog.js';
+import { ordersRouter } from './routes/orders.js';
+import { adminRouter } from './routes/admin.js';
+import { paymentRouter } from './routes/payment.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -16,6 +19,8 @@ const CORS_ORIGIN = process.env.CORS_ORIGIN ?? 'http://localhost:5173';
 
 // ---------- middleware ----------
 app.use(express.json({ limit: '1mb' }));
+// Payment provider callbacks (iyzico) post application/x-www-form-urlencoded.
+app.use(express.urlencoded({ extended: false }));
 const corsOrigins = CORS_ORIGIN.split(',')
   .map((s) => s.trim())
   .filter((s) => s.length > 0);
@@ -28,7 +33,10 @@ app.use(
 
 // ---------- API routes ----------
 app.use('/api/health', healthRouter);
+app.use('/api/admin', adminRouter);
 app.use('/api', catalogRouter);
+app.use('/api', ordersRouter);
+app.use('/api', paymentRouter);
 
 // ---------- static frontend (production) ----------
 // In production the backend serves the built React app from frontend/dist.
@@ -42,6 +50,20 @@ if (NODE_ENV === 'production') {
     res.sendFile(path.join(frontendDist, 'index.html'));
   });
 }
+
+// ---------- root info (API-only deployments) ----------
+// When the frontend is a separate service, the backend root has no SPA to
+// serve. Return a small JSON status instead of a bare "Cannot GET /" so the
+// API URL looks healthy. In single-service production the static handler above
+// already claimed '/' (served index.html), so this only runs in API-only mode.
+app.get('/', (_req, res) => {
+  res.json({
+    name: 'gesmarketim-api',
+    status: 'ok',
+    health: '/api/health',
+    products: '/api/products',
+  });
+});
 
 // ---------- 404 (API only) ----------
 app.use('/api', (_req, res) => {

@@ -58,6 +58,28 @@ export const syncStatusEnum = pgEnum("sync_status", [
   "error",
 ]);
 
+export const orderStatusEnum = pgEnum("order_status", [
+  "pending", // yeni sipariş, ödeme/onay bekliyor
+  "confirmed", // onaylandı, hazırlanıyor
+  "shipped", // kargoya verildi
+  "delivered", // teslim edildi
+  "cancelled", // iptal
+]);
+
+export const paymentMethodEnum = pgEnum("payment_method", [
+  "bank_transfer", // havale/EFT
+  "cash_on_delivery", // kapıda ödeme
+  "card", // online kart (iyzico vb.)
+]);
+
+export const paymentStatusEnum = pgEnum("payment_status", [
+  "unpaid", // ödeme bekleniyor (havale/kapıda)
+  "awaiting", // kart: sağlayıcıya yönlendirildi, sonuç bekleniyor
+  "paid", // ödendi
+  "failed", // başarısız
+  "refunded", // iade edildi
+]);
+
 // ---------------------------------------------------------------------------
 // tenants — multi-tenant kök
 // ---------------------------------------------------------------------------
@@ -253,6 +275,100 @@ export const products = pgTable(
 );
 
 // ---------------------------------------------------------------------------
+// orders — müşteri siparişleri (checkout ile oluşur)
+// ---------------------------------------------------------------------------
+export const orders = pgTable(
+  "orders",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id")
+      .notNull()
+      .references(() => tenants.id, { onDelete: "cascade" }),
+
+    // insana okunur sipariş numarası (müşteriye gösterilir): GM-XXXXXX
+    orderNumber: text("order_number").notNull(),
+
+    // müşteri bilgileri (snapshot — hesap sistemi yok)
+    customerName: text("customer_name").notNull(),
+    customerPhone: text("customer_phone").notNull(),
+    customerEmail: text("customer_email"),
+
+    // teslimat adresi
+    city: text("city").notNull(),
+    district: text("district").notNull(),
+    addressLine: text("address_line").notNull(),
+    note: text("note"),
+
+    status: orderStatusEnum("status").notNull().default("pending"),
+
+    // --- ödeme ---
+    paymentMethod: paymentMethodEnum("payment_method")
+      .notNull()
+      .default("bank_transfer"),
+    paymentStatus: paymentStatusEnum("payment_status")
+      .notNull()
+      .default("unpaid"),
+    paymentRef: text("payment_ref"), // sağlayıcı işlem/ödeme kimliği (kart)
+
+    // tutarlar — checkout sırasında sunucu tarafında hesaplanır (snapshot)
+    subtotal: numeric("subtotal", { precision: 12, scale: 2 })
+      .notNull()
+      .default("0"),
+    shippingCost: numeric("shipping_cost", { precision: 12, scale: 2 })
+      .notNull()
+      .default("0"),
+    total: numeric("total", { precision: 12, scale: 2 }).notNull().default("0"),
+    currency: text("currency").notNull().default("TRY"),
+
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => ({
+    tenantOrderNumberIdx: uniqueIndex("orders_tenant_order_number_idx").on(
+      t.tenantId,
+      t.orderNumber,
+    ),
+    tenantStatusIdx: index("orders_tenant_status_idx").on(t.tenantId, t.status),
+    createdAtIdx: index("orders_created_at_idx").on(t.createdAt),
+  }),
+);
+
+// ---------------------------------------------------------------------------
+// order_items — sipariş satırları (fiyat/isim snapshot olarak yazılır)
+// ---------------------------------------------------------------------------
+export const orderItems = pgTable(
+  "order_items",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    orderId: uuid("order_id")
+      .notNull()
+      .references(() => orders.id, { onDelete: "cascade" }),
+    // ürün silinse bile satır kalır → set null + snapshot alanları
+    productId: uuid("product_id").references(() => products.id, {
+      onDelete: "set null",
+    }),
+
+    // snapshot — sipariş anındaki değerler
+    productName: text("product_name").notNull(),
+    productSlug: text("product_slug").notNull(),
+    unitPrice: numeric("unit_price", { precision: 12, scale: 2 }).notNull(),
+    quantity: integer("quantity").notNull(),
+    lineTotal: numeric("line_total", { precision: 12, scale: 2 }).notNull(),
+
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => ({
+    orderIdx: index("order_items_order_idx").on(t.orderId),
+  }),
+);
+
+// ---------------------------------------------------------------------------
 // Relations
 // ---------------------------------------------------------------------------
 export const tenantsRelations = relations(tenants, ({ many }) => ({
@@ -260,6 +376,7 @@ export const tenantsRelations = relations(tenants, ({ many }) => ({
   brands: many(brands),
   categories: many(categories),
   products: many(products),
+  orders: many(orders),
 }));
 
 export const suppliersRelations = relations(suppliers, ({ one, many }) => ({
@@ -299,6 +416,19 @@ export const productsRelations = relations(products, ({ one }) => ({
   }),
 }));
 
+export const ordersRelations = relations(orders, ({ one, many }) => ({
+  tenant: one(tenants, { fields: [orders.tenantId], references: [tenants.id] }),
+  items: many(orderItems),
+}));
+
+export const orderItemsRelations = relations(orderItems, ({ one }) => ({
+  order: one(orders, { fields: [orderItems.orderId], references: [orders.id] }),
+  product: one(products, {
+    fields: [orderItems.productId],
+    references: [products.id],
+  }),
+}));
+
 // ---------------------------------------------------------------------------
 // Inferred types
 // ---------------------------------------------------------------------------
@@ -312,6 +442,10 @@ export type Category = typeof categories.$inferSelect;
 export type NewCategory = typeof categories.$inferInsert;
 export type Product = typeof products.$inferSelect;
 export type NewProduct = typeof products.$inferInsert;
+export type Order = typeof orders.$inferSelect;
+export type NewOrder = typeof orders.$inferInsert;
+export type OrderItem = typeof orderItems.$inferSelect;
+export type NewOrderItem = typeof orderItems.$inferInsert;
 
 // product.images jsonb şekli
 export type ProductImage = {

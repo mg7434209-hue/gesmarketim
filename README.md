@@ -106,10 +106,84 @@ This monorepo is designed to deploy as a **single Railway service** for simplici
 - **Suppliers are admin-only.** Names like *Mexxsun* and *Enerji Pazarı* must never appear in storefront responses or HTML. *Brands* (DEYE, LEXRON, EVE) are customer-visible.
 - **Bulk / seed endpoints use an allowlist filter.** Before any write that takes a multi-field payload, intersect the incoming keys with an explicit `ALLOWED_FIELDS` set. A previous deploy 500'd because of unfiltered extra fields — don't repeat it.
 - **npm only.** A `pnpm-lock.yaml` or `yarn.lock` in this repo is a bug; the `.gitignore` excludes them.
-- **Skeleton state.** This README describes the target state. Until the first product/admin features are implemented, both pages are intentionally empty placeholders and the API exposes only `/api/health`.
+---
+
+## API surface
+
+**Public (storefront)**
+
+| Method & path | Purpose |
+|---|---|
+| `GET /api/health` | Liveness check |
+| `GET /api/categories` | Active tenant categories |
+| `GET /api/brands` | Customer-visible brands |
+| `GET /api/products` | Product list — filters: `category`, `brand`, `inStock`, `q`, `minPrice`, `maxPrice`, `sort` (`name`/`price_asc`/`price_desc`/`newest`) |
+| `GET /api/products/:slug` | Single product |
+| `POST /api/orders` | Create an order from a cart (prices re-validated server-side) |
+| `GET /api/orders/:number` | Order lookup for the confirmation page |
+| `GET /api/payment/methods` | Enabled payment methods + bank-transfer details |
+| `POST /api/payment/iyzico/callback` | iyzico Checkout Form return (card) |
+
+Admin also exposes `GET /api/admin/upload-config` and `POST /api/admin/uploads`
+(base64 data URL → hosted image URL) for product image uploads, and
+`POST /api/admin/suppliers/:id/sync/csv` for supplier price/stock import.
+
+**Admin (cookie-gated — `POST /api/admin/login` first)**
+
+`GET /stats` · products `GET/POST/PATCH/DELETE` · categories / brands / suppliers
+`GET/POST/PATCH/DELETE` · orders `GET` + `PATCH` (status). Auth is a stateless
+HMAC-signed session cookie keyed on `ADMIN_SESSION_SECRET` (see `src/lib/auth.ts`).
+
+## Storefront / admin UI
+
+- **Storefront:** home, categories, category page, product list (live search +
+  category/brand/stock/price filters + sort), product detail, **cart**,
+  **checkout**, **order confirmation**. Cart is localStorage-persisted.
+- **Admin (`/admin`):** login → dashboard (revenue/orders/products stats),
+  product CRUD with auto-priced `finalPrice`, order management with order +
+  payment status flow, and catalog structure (categories / brands / suppliers).
+
+## Payments
+
+- **Bank transfer (havale/EFT)** and **cash on delivery** work with no external
+  setup — fill `BANK_*` env vars to show IBAN details on the confirmation page.
+- **Card (iyzico)** is offered only when `IYZICO_API_KEY` + `IYZICO_SECRET_KEY`
+  are set. Checkout creates the order, redirects to the iyzico Checkout Form, and
+  the `/api/payment/iyzico/callback` route verifies the result and updates the
+  order's payment status. Provider logic lives in `src/lib/payments/`; the
+  provider-agnostic shape makes swapping/adding a processor straightforward.
+
+## Media / product images
+
+- The admin product form manages **multiple images** — paste URLs, reorder, pick
+  a cover (primary), remove. Pasting URLs needs no setup.
+- **File upload** is offered when Cloudinary keys are set: the admin sends a
+  base64 data URL to `POST /api/admin/uploads`, which signs and forwards it to
+  Cloudinary and returns the hosted URL. Storage logic is abstracted in
+  `src/lib/storage/` so S3/R2 can be added without changing the UI.
+
+## Supplier sync (CSV import)
+
+- Admin **Senkron** tab: pick a supplier, paste/upload a CSV (or download the
+  template), and import price/stock. Rows match products by
+  `(supplierId, supplierSku)`; cost/stock/markup are updated and `finalPrice` is
+  recomputed from the markup chain.
+- Out-of-stock stock items are auto-archived when `autoDisableOnOos` is set, and
+  re-activated when stock returns. Unmatched rows can optionally create draft
+  products. A **dry-run / preview** mode reports created/updated/skipped counts
+  and per-row errors without writing.
+- Parser (`src/lib/sync/csv.ts`) is dependency-free, auto-detects `,`/`;`
+  delimiters and TR/EN decimal formats. The same engine
+  (`src/lib/sync/engine.ts`) can later be driven by a scheduled job or a
+  supplier API/feed (the `suppliers.syncMethod` field already models this).
 
 ---
 
 ## Status
 
-> **Skeleton only** — no products, no admin features, no database schema yet. See the next-step plan in conversation.
+> **Production-ready storefront + admin.** Catalog API, cart/checkout/orders,
+> payments (bank transfer / cash on delivery / iyzico card), product image
+> management, and supplier CSV sync are implemented behind a cookie-gated admin
+> panel. Run `npm run db:migrate` then `npm run db:seed` to populate the tenant,
+> taxonomy and a sample catalogue.
+> Possible next steps: scheduled/API-based supplier sync and customer accounts.

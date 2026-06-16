@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import Logo from './Logo';
 import { WHATSAPP_URL } from '../config';
+import { useCart } from '../cart/CartContext';
 
 type NavItem = { to: string; label: string };
 
 const NAV_ITEMS: NavItem[] = [
   { to: '/', label: 'Anasayfa' },
+  { to: '/urunler', label: 'Ürünler' },
   { to: '/kategoriler', label: 'Kategoriler' },
   { to: '/hakkimizda', label: 'Hakkımızda' },
   { to: '/iletisim', label: 'İletişim' },
@@ -14,6 +16,7 @@ const NAV_ITEMS: NavItem[] = [
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { count } = useCart();
 
   return (
     <header className="sticky top-0 z-50 bg-white shadow-header">
@@ -70,19 +73,22 @@ export default function Header() {
           </nav>
 
           <div className="flex items-center gap-1.5">
-            <button
-              type="button"
+            <Link
+              to="/sepet"
               className="relative inline-flex h-10 w-10 items-center justify-center rounded-lg text-primary hover:bg-surface focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2"
-              aria-label="Sepetim (0 ürün)"
+              aria-label={`Sepetim (${count} ürün)`}
+              onClick={() => setMobileOpen(false)}
             >
               <CartIcon />
-              <span
-                className="absolute -right-0.5 -top-0.5 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-accent px-1 text-[10px] font-bold text-primary"
-                aria-hidden="true"
-              >
-                0
-              </span>
-            </button>
+              {count > 0 && (
+                <span
+                  className="absolute -right-0.5 -top-0.5 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-accent px-1 text-[10px] font-bold text-primary"
+                  aria-hidden="true"
+                >
+                  {count > 99 ? '99+' : count}
+                </span>
+              )}
+            </Link>
             <button
               type="button"
               className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-primary hover:bg-surface focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 md:hidden"

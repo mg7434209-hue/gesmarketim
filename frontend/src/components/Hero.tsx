@@ -4,22 +4,34 @@ import { WHATSAPP_URL } from '../config';
 export default function Hero() {
   return (
     <section className="relative overflow-hidden bg-primary text-white">
+      {/* Flowing gradient backdrop */}
+      <div
+        className="pointer-events-none absolute inset-0"
+        aria-hidden="true"
+        style={{
+          background:
+            'radial-gradient(1100px 520px at 82% -8%, rgba(245,184,0,0.22), transparent 60%), radial-gradient(900px 600px at 8% 110%, rgba(30,58,111,0.55), transparent 60%), linear-gradient(160deg, #0A1A33 0%, #0F2547 45%, #15315c 100%)',
+        }}
+      />
       <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-        <div className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-accent/10 blur-3xl" />
-        <div className="absolute -bottom-40 -left-20 h-80 w-80 rounded-full bg-primary-light/40 blur-3xl" />
+        <div className="absolute -top-32 -right-24 h-96 w-96 animate-float rounded-full bg-accent/15 blur-3xl" />
+        <div className="absolute top-1/3 -left-24 h-80 w-80 animate-float-slow rounded-full bg-primary-light/40 blur-3xl" />
+        <div className="absolute -bottom-32 right-1/4 h-72 w-72 animate-drift rounded-full bg-accent/10 blur-3xl" />
       </div>
 
-      <div className="container-x relative py-14 sm:py-20 lg:py-24">
-        <div className="grid items-center gap-10 lg:grid-cols-12 lg:gap-12">
-          <div className="lg:col-span-7">
-            <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-accent ring-1 ring-inset ring-white/15">
-              <span className="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden="true" />
+      <div className="container-x relative py-14 sm:py-20 lg:py-28">
+        <div className="relative z-10 grid items-center gap-12 lg:grid-cols-12 lg:gap-10">
+          <div className="lg:col-span-6">
+            <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-accent ring-1 ring-inset ring-white/15 backdrop-blur">
+              <span className="h-1.5 w-1.5 animate-sun rounded-full bg-accent" aria-hidden="true" />
               Solar e-ticaret
             </span>
 
             <h1 className="mt-5 text-4xl font-extrabold leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-6xl">
-              Solar ürünleri{' '}
-              <span className="text-accent">tedarikçi fiyatına</span>
+              Güneşten gelen güç,{' '}
+              <span className="bg-gradient-to-r from-accent to-amber-300 bg-clip-text text-transparent">
+                tedarikçi fiyatına
+              </span>
             </h1>
 
             <p className="mt-5 max-w-xl text-base leading-relaxed text-white/80 sm:text-lg">
@@ -28,7 +40,7 @@ export default function Hero() {
             </p>
 
             <div className="mt-8 flex flex-wrap items-center gap-3 sm:gap-4">
-              <Link to="/kategoriler" className="btn-primary text-base">
+              <Link to="/kategoriler" className="btn-primary text-base shadow-lg shadow-accent/20">
                 Ürünleri Keşfet
                 <ArrowIcon />
               </Link>
@@ -52,9 +64,7 @@ export default function Hero() {
                 <dd className="mt-1 text-2xl font-extrabold text-white">500+</dd>
               </div>
               <div>
-                <dt className="text-xs font-medium uppercase tracking-wider text-white/60">
-                  KDV
-                </dt>
+                <dt className="text-xs font-medium uppercase tracking-wider text-white/60">KDV</dt>
                 <dd className="mt-1 text-2xl font-extrabold text-white">Dahil</dd>
               </div>
               <div>
@@ -66,51 +76,150 @@ export default function Hero() {
             </dl>
           </div>
 
-          <div className="hidden lg:col-span-5 lg:block">
-            <HeroIllustration />
+          <div className="lg:col-span-6">
+            <SolarScene />
           </div>
         </div>
+      </div>
+
+      {/* Fluid wave transition into the next (surface) section */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0" aria-hidden="true">
+        <svg
+          viewBox="0 0 1440 120"
+          preserveAspectRatio="none"
+          className="block h-[60px] w-full sm:h-[90px]"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M0,64 C240,128 480,16 720,40 C960,64 1200,120 1440,72 L1440,120 L0,120 Z"
+            fill="#F8F9FB"
+          />
+        </svg>
       </div>
     </section>
   );
 }
 
-function HeroIllustration() {
+/* A layered, photographic-feeling solar scene built entirely in SVG so it
+   renders crisply at any size with no external image dependency. */
+function SolarScene() {
   return (
-    <div className="relative mx-auto aspect-square w-full max-w-md">
-      <svg
-        viewBox="0 0 400 400"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        aria-hidden="true"
-        focusable="false"
-        className="h-full w-full"
-      >
-        <circle cx="280" cy="120" r="64" fill="#F5B800" />
-        <g stroke="#F5B800" strokeWidth="6" strokeLinecap="round">
-          <line x1="280" y1="28" x2="280" y2="48" />
-          <line x1="345.05" y1="54.95" x2="330.91" y2="69.09" />
-          <line x1="372" y1="120" x2="352" y2="120" />
-          <line x1="345.05" y1="185.05" x2="330.91" y2="170.91" />
-          <line x1="280" y1="212" x2="280" y2="192" />
-          <line x1="214.95" y1="185.05" x2="229.09" y2="170.91" />
-          <line x1="188" y1="120" x2="208" y2="120" />
-          <line x1="214.95" y1="54.95" x2="229.09" y2="69.09" />
-        </g>
+    <div className="relative mx-auto w-full max-w-lg">
+      {/* Floating feature chips */}
+      <div className="absolute -left-3 top-6 z-10 animate-float-slow rounded-xl bg-white/95 px-3 py-2 shadow-card backdrop-blur sm:-left-6">
+        <p className="text-[11px] font-bold uppercase tracking-wider text-accent-dark">
+          %100 Yeşil
+        </p>
+        <p className="text-xs font-semibold text-primary">Temiz enerji</p>
+      </div>
+      <div className="absolute -right-2 bottom-10 z-10 animate-float rounded-xl bg-white/95 px-3 py-2 shadow-card backdrop-blur sm:-right-5">
+        <p className="text-[11px] font-bold uppercase tracking-wider text-success">Anahtar teslim</p>
+        <p className="text-xs font-semibold text-primary">Kurulum desteği</p>
+      </div>
 
-        <g transform="translate(40 200)">
-          <rect width="320" height="160" rx="8" fill="#1E3A6F" stroke="#F5B800" strokeWidth="3" />
-          <g stroke="#F5B800" strokeOpacity="0.5" strokeWidth="2">
-            <line x1="80" y1="0" x2="80" y2="160" />
-            <line x1="160" y1="0" x2="160" y2="160" />
-            <line x1="240" y1="0" x2="240" y2="160" />
-            <line x1="0" y1="40" x2="320" y2="40" />
-            <line x1="0" y1="80" x2="320" y2="80" />
-            <line x1="0" y1="120" x2="320" y2="120" />
+      <div className="overflow-hidden rounded-[28px] ring-1 ring-white/15 shadow-2xl">
+        <svg
+          viewBox="0 0 480 440"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+          focusable="false"
+          className="h-full w-full"
+        >
+          <defs>
+            <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#FCE9A8" />
+              <stop offset="38%" stopColor="#F4B976" />
+              <stop offset="100%" stopColor="#6E7FB0" />
+            </linearGradient>
+            <radialGradient id="sunCore" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="#FFF7DC" />
+              <stop offset="60%" stopColor="#FFD23F" />
+              <stop offset="100%" stopColor="#F5B800" />
+            </radialGradient>
+            <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="#FFD23F" stopOpacity="0.9" />
+              <stop offset="100%" stopColor="#FFD23F" stopOpacity="0" />
+            </radialGradient>
+            <linearGradient id="hillBack" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#3E7D4F" />
+              <stop offset="100%" stopColor="#2F6340" />
+            </linearGradient>
+            <linearGradient id="hillFront" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#4F9A5F" />
+              <stop offset="100%" stopColor="#3C7A4B" />
+            </linearGradient>
+            <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor="#26508f" />
+              <stop offset="55%" stopColor="#173863" />
+              <stop offset="100%" stopColor="#0F2547" />
+            </linearGradient>
+            <linearGradient id="sheen" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor="#ffffff" stopOpacity="0.35" />
+              <stop offset="45%" stopColor="#ffffff" stopOpacity="0" />
+            </linearGradient>
+          </defs>
+
+          {/* Sky */}
+          <rect width="480" height="440" fill="url(#sky)" />
+
+          {/* Sun + animated glow & rays */}
+          <circle
+            cx="350"
+            cy="120"
+            r="120"
+            fill="url(#sunGlow)"
+            className="animate-sun"
+            style={{ transformBox: 'fill-box', transformOrigin: 'center' }}
+          />
+          <g
+            className="animate-spin-slow"
+            style={{ transformBox: 'fill-box', transformOrigin: 'center' }}
+          >
+            <g stroke="#FFE38A" strokeWidth="5" strokeLinecap="round" opacity="0.85">
+              <line x1="350" y1="22" x2="350" y2="48" />
+              <line x1="350" y1="192" x2="350" y2="218" />
+              <line x1="252" y1="120" x2="278" y2="120" />
+              <line x1="422" y1="120" x2="448" y2="120" />
+              <line x1="281" y1="51" x2="299" y2="69" />
+              <line x1="401" y1="171" x2="419" y2="189" />
+              <line x1="419" y1="51" x2="401" y2="69" />
+              <line x1="299" y1="171" x2="281" y2="189" />
+            </g>
           </g>
-        </g>
-        <rect x="195" y="360" width="10" height="32" rx="2" fill="#0A1A33" />
-      </svg>
+          <circle cx="350" cy="120" r="50" fill="url(#sunCore)" />
+
+          {/* Soft clouds */}
+          <g fill="#ffffff" opacity="0.55">
+            <ellipse cx="120" cy="86" rx="46" ry="16" />
+            <ellipse cx="150" cy="74" rx="30" ry="13" />
+            <ellipse cx="86" cy="150" rx="34" ry="11" opacity="0.7" />
+          </g>
+
+          {/* Hills */}
+          <path d="M0,300 C120,250 220,290 320,268 C400,250 450,272 480,262 L480,440 L0,440 Z" fill="url(#hillBack)" />
+          <path d="M0,348 C140,308 260,360 360,340 C420,328 460,346 480,338 L480,440 L0,440 Z" fill="url(#hillFront)" />
+
+          {/* Solar panel array (perspective) with grid + sheen */}
+          <g>
+            {/* support legs */}
+            <rect x="96" y="356" width="9" height="46" rx="2" fill="#22364f" />
+            <rect x="356" y="356" width="9" height="46" rx="2" fill="#22364f" />
+            {/* tilted panel surface */}
+            <path d="M70,360 L300,300 L420,332 L190,392 Z" fill="url(#panel)" stroke="#0A1A33" strokeWidth="3" />
+            {/* cell grid */}
+            <g stroke="#5b86c4" strokeOpacity="0.5" strokeWidth="1.5">
+              <path d="M127,345 L247,377" />
+              <path d="M184,330 L304,362" />
+              <path d="M241,315 L361,347" />
+              <path d="M145,378 L375,318" />
+              <path d="M118,371 L348,311" />
+            </g>
+            {/* sheen highlight */}
+            <path d="M70,360 L300,300 L335,309 L105,369 Z" fill="url(#sheen)" />
+          </g>
+        </svg>
+      </div>
     </div>
   );
 }

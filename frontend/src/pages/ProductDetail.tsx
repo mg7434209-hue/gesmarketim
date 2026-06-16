@@ -6,6 +6,7 @@ import {
   type PublicProduct,
 } from '../lib/api';
 import {
+  AddToCartButton,
   FulfillmentBadge,
   ProductGlyph,
   WhatsAppIcon,
@@ -56,6 +57,7 @@ export default function ProductDetail() {
 
 function DetailView({ product }: { product: PublicProduct }) {
   const image = primaryImage(product);
+  const [quantity, setQuantity] = useState(1);
 
   return (
     <>
@@ -145,18 +147,48 @@ function DetailView({ product }: { product: PublicProduct }) {
           )}
 
           <div className="mt-8">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-stretch">
+              <div className="flex items-center rounded-lg border-2 border-border bg-white">
+                <button
+                  type="button"
+                  onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                  className="flex h-12 w-12 items-center justify-center text-xl font-bold text-primary hover:bg-surface focus:outline-none focus:ring-2 focus:ring-accent focus:ring-inset"
+                  aria-label="Adet azalt"
+                >
+                  −
+                </button>
+                <span
+                  className="w-10 text-center text-base font-bold text-primary"
+                  aria-live="polite"
+                >
+                  {quantity}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setQuantity((q) => Math.min(99, q + 1))}
+                  className="flex h-12 w-12 items-center justify-center text-xl font-bold text-primary hover:bg-surface focus:outline-none focus:ring-2 focus:ring-accent focus:ring-inset"
+                  aria-label="Adet artır"
+                >
+                  +
+                </button>
+              </div>
+              <div className="flex-1">
+                <AddToCartButton product={product} quantity={quantity} size="lg" />
+              </div>
+            </div>
+
             <a
               href={whatsappProductUrl(product.name)}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-accent px-6 py-3.5 text-base font-bold text-primary shadow-sm transition-colors hover:bg-accent-dark focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 sm:w-auto"
+              className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg border-2 border-primary px-6 py-3 text-base font-bold text-primary transition-colors hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2"
             >
               <WhatsAppIcon />
               WhatsApp ile sor
             </a>
             <p className="mt-3 text-xs text-text-secondary">
-              Fiyat, stok ve teslimat detayları için bizimle WhatsApp üzerinden iletişime
-              geçebilirsin.
+              Siparişini sepetten tamamlayabilir ya da fiyat, stok ve teslimat detayları
+              için WhatsApp üzerinden bize ulaşabilirsin.
             </p>
           </div>
         </div>

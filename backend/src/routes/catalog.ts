@@ -8,7 +8,7 @@
 // Mounted in src/index.ts alongside /api/health.
 
 import { Router, type Request, type Response, type NextFunction } from 'express';
-import { and, asc, eq, gt, or } from 'drizzle-orm';
+import { and, asc, desc, eq, gt, gte, ilike, lte, or, type SQL } from 'drizzle-orm';
 import { db } from '../db/index.js';
 import { brands, categories, products } from '../db/schema.js';
 import { getTenantId } from '../lib/tenant.js';
@@ -23,6 +23,13 @@ function asyncHandler(
   return (req, res, next) => {
     fn(req, res).catch(next);
   };
+}
+
+/** Parse a query value into a finite, non-negative number or null. */
+function toFiniteNumber(raw: unknown): number | null {
+  if (typeof raw !== 'string' || raw.trim() === '') return null;
+  const n = Number(raw);
+  return Number.isFinite(n) && n >= 0 ? n : null;
 }
 
 // ---------- GET /api/categories ----------
@@ -47,6 +54,27 @@ catalogRouter.get(
   }),
 );
 
+// ---------- GET /api/brands ----------
+catalogRouter.get(
+  '/brands',
+  asyncHandler(async (_req, res) => {
+    const tenantId = await getTenantId();
+
+    const rows = await db
+      .select({
+        id: brands.id,
+        name: brands.name,
+        slug: brands.slug,
+        logoUrl: brands.logoUrl,
+      })
+      .from(brands)
+      .where(eq(brands.tenantId, tenantId))
+      .orderBy(asc(brands.name));
+
+    res.json(rows);
+  }),
+);
+
 // ---------- GET /api/products ----------
 catalogRouter.get(
   '/products',
@@ -58,11 +86,26 @@ catalogRouter.get(
     const brandSlug =
       typeof req.query.brand === 'string' ? req.query.brand : undefined;
     const inStockOnly = req.query.inStock === 'true';
+    const search =
+      typeof req.query.q === 'string' ? req.query.q.trim() : '';
+    const minPrice = toFiniteNumber(req.query.minPrice);
+    const maxPrice = toFiniteNumber(req.query.maxPrice);
+    const sort = typeof req.query.sort === 'string' ? req.query.sort : 'name';
 
-    const conditions = [
+    const conditions: SQL[] = [
       eq(products.tenantId, tenantId),
       eq(products.status, 'active'),
     ];
+
+    if (search.length > 0) {
+      conditions.push(ilike(products.name, `%${search}%`));
+    }
+    if (minPrice !== null) {
+      conditions.push(gte(products.finalPrice, String(minPrice)));
+    }
+    if (maxPrice !== null) {
+      conditions.push(lte(products.finalPrice, String(maxPrice)));
+    }
 
     // Resolve optional category/brand slug filters to ids. An unknown slug
     // matches nothing → return an empty array.
@@ -106,13 +149,22 @@ catalogRouter.get(
       if (stockCond) conditions.push(stockCond);
     }
 
+    const orderBy =
+      sort === 'price_asc'
+        ? [asc(products.finalPrice)]
+        : sort === 'price_desc'
+          ? [desc(products.finalPrice)]
+          : sort === 'newest'
+            ? [desc(products.createdAt)]
+            : [asc(products.name)];
+
     const rows = await db.query.products.findMany({
       where: and(...conditions),
       with: {
         brand: { columns: { name: true, slug: true } },
         category: { columns: { name: true, slug: true } },
       },
-      orderBy: (p, { asc: ascFn }) => [ascFn(p.name)],
+      orderBy,
     });
 
     const payload = rows.map((row) =>

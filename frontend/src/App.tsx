@@ -13,6 +13,9 @@ import Categories from './pages/Categories';
 import CategoryPage from './pages/CategoryPage';
 import Products from './pages/Products';
 import ProductDetail from './pages/ProductDetail';
+import Cart from './pages/Cart';
+import Checkout from './pages/Checkout';
+import OrderConfirmation from './pages/OrderConfirmation';
 
 export default function App() {
   return (
@@ -21,7 +24,7 @@ export default function App() {
       <main className="flex-1">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/admin" element={<Admin />} />
+          <Route path="/admin/*" element={<Admin />} />
           <Route path="/hakkimizda" element={<About />} />
           <Route path="/iletisim" element={<Contact />} />
           <Route path="/kvkk" element={<Kvkk />} />
@@ -32,6 +35,9 @@ export default function App() {
           <Route path="/kategori/:slug" element={<CategoryPage />} />
           <Route path="/urunler" element={<Products />} />
           <Route path="/urun/:slug" element={<ProductDetail />} />
+          <Route path="/sepet" element={<Cart />} />
+          <Route path="/odeme" element={<Checkout />} />
+          <Route path="/siparis/:number" element={<OrderConfirmation />} />
         </Routes>
       </main>
       <Footer />
