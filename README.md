@@ -124,6 +124,9 @@ This monorepo is designed to deploy as a **single Railway service** for simplici
 | `GET /api/payment/methods` | Enabled payment methods + bank-transfer details |
 | `POST /api/payment/iyzico/callback` | iyzico Checkout Form return (card) |
 
+Admin also exposes `GET /api/admin/upload-config` and `POST /api/admin/uploads`
+(base64 data URL → hosted image URL) for product image uploads.
+
 **Admin (cookie-gated — `POST /api/admin/login` first)**
 
 `GET /stats` · products `GET/POST/PATCH/DELETE` · categories / brands / suppliers
@@ -149,12 +152,21 @@ HMAC-signed session cookie keyed on `ADMIN_SESSION_SECRET` (see `src/lib/auth.ts
   order's payment status. Provider logic lives in `src/lib/payments/`; the
   provider-agnostic shape makes swapping/adding a processor straightforward.
 
+## Media / product images
+
+- The admin product form manages **multiple images** — paste URLs, reorder, pick
+  a cover (primary), remove. Pasting URLs needs no setup.
+- **File upload** is offered when Cloudinary keys are set: the admin sends a
+  base64 data URL to `POST /api/admin/uploads`, which signs and forwards it to
+  Cloudinary and returns the hosted URL. Storage logic is abstracted in
+  `src/lib/storage/` so S3/R2 can be added without changing the UI.
+
 ---
 
 ## Status
 
-> **Functional storefront + admin.** Catalog API, cart/checkout/orders, and a
-> cookie-gated admin panel are implemented. Run `npm run db:migrate` then
+> **Functional storefront + admin.** Catalog API, cart/checkout/orders, payments
+> (bank transfer / cash on delivery / iyzico card), product image management, and
+> a cookie-gated admin panel are implemented. Run `npm run db:migrate` then
 > `npm run db:seed` to populate the tenant, taxonomy and a sample catalogue.
-> Possible next steps: online payment integration, supplier sync automation,
-> product image uploads, and customer accounts.
+> Possible next steps: supplier sync automation and customer accounts.

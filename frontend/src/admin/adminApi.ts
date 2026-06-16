@@ -174,6 +174,12 @@ export type AdminStats = {
 export const adminApi = {
   stats: () => request<AdminStats>('/stats'),
 
+  uploads: {
+    config: () => request<{ enabled: boolean; provider: string }>('/upload-config'),
+    upload: (dataUrl: string) =>
+      request<{ url: string }>('/uploads', { method: 'POST', body: { dataUrl } }),
+  },
+
   products: {
     list: (params: { q?: string; status?: string } = {}) => {
       const s = new URLSearchParams();

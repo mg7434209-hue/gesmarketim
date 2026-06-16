@@ -21,7 +21,7 @@
 // with an explicit ALLOWED_FIELDS set before touching the DB. finalPrice is
 // ALWAYS recomputed server-side from the markup chain — never client-supplied.
 
-import { Router, type Request, type Response, type NextFunction } from "express";
+import { Router, json, type Request, type Response, type NextFunction } from "express";
 import { and, asc, desc, eq, ilike, sql, type SQL } from "drizzle-orm";
 import { db } from "../db/index.js";
 import {
@@ -35,6 +35,7 @@ import {
 import { getTenantId } from "../lib/tenant.js";
 import { computeFinalPrice } from "../db/pricing.js";
 import { slugify } from "../lib/util.js";
+import { isUploadConfigured, uploadImage, activeProvider, UploadError } from "../lib/storage/index.js";
 import {
   verifyCredentials,
   issueToken,
@@ -228,6 +229,43 @@ adminRouter.get(
         createdAt: o.createdAt,
       })),
     });
+  }),
+);
+
+// ===========================================================================
+// UPLOADS (image storage)
+// ===========================================================================
+adminRouter.get("/upload-config", (_req, res) => {
+  res.json({ enabled: isUploadConfigured(), provider: activeProvider() });
+});
+
+// Larger JSON limit just for this route — base64 image payloads can be a few MB.
+adminRouter.post(
+  "/uploads",
+  json({ limit: "12mb" }),
+  asyncHandler(async (req, res) => {
+    const dataUrl = (req.body ?? {}).dataUrl;
+    if (typeof dataUrl !== "string") {
+      res.status(400).json({ error: "validation", message: "dataUrl gerekli." });
+      return;
+    }
+    try {
+      const url = await uploadImage(dataUrl);
+      res.status(201).json({ url });
+    } catch (err) {
+      if (err instanceof UploadError) {
+        if (err.message === "not_configured") {
+          res.status(501).json({
+            error: "not_configured",
+            message: "Dosya yükleme yapılandırılmamış. Görsel URL'si yapıştırabilirsiniz.",
+          });
+          return;
+        }
+        res.status(400).json({ error: "upload_failed", message: err.message });
+        return;
+      }
+      throw err;
+    }
   }),
 );
 

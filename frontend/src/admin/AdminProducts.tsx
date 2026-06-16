@@ -20,6 +20,7 @@ import {
   inputCls,
   labelCls,
 } from './ui';
+import ImageManager, { type ManagedImage } from './ImageManager';
 
 export default function AdminProducts({ onAuthError }: { onAuthError: () => void }) {
   const [products, setProducts] = useState<AdminProduct[]>([]);
@@ -31,6 +32,7 @@ export default function AdminProducts({ onAuthError }: { onAuthError: () => void
   const [q, setQ] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [editing, setEditing] = useState<AdminProduct | 'new' | null>(null);
+  const [uploadEnabled, setUploadEnabled] = useState(false);
 
   const catName = useMemo(
     () => new Map(categories.map((c) => [c.id, c.name])),
@@ -74,6 +76,10 @@ export default function AdminProducts({ onAuthError }: { onAuthError: () => void
         setSuppliers(s);
       })
       .catch(handleError);
+    adminApi.uploads
+      .config()
+      .then((cfg) => setUploadEnabled(cfg.enabled))
+      .catch(() => setUploadEnabled(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -196,6 +202,7 @@ export default function AdminProducts({ onAuthError }: { onAuthError: () => void
           categories={categories}
           brands={brands}
           suppliers={suppliers}
+          uploadEnabled={uploadEnabled}
           onClose={() => setEditing(null)}
           onSaved={(saved) => {
             setProducts((prev) => {
@@ -219,6 +226,7 @@ function ProductForm({
   categories,
   brands,
   suppliers,
+  uploadEnabled,
   onClose,
   onSaved,
   onAuthError,
@@ -227,6 +235,7 @@ function ProductForm({
   categories: AdminCategory[];
   brands: AdminBrand[];
   suppliers: AdminSupplier[];
+  uploadEnabled: boolean;
   onClose: () => void;
   onSaved: (p: AdminProduct) => void;
   onAuthError: () => void;
@@ -244,8 +253,8 @@ function ProductForm({
     fulfillmentType: product?.fulfillmentType ?? 'stock',
     stockQty: product ? String(product.stockQty) : '0',
     status: product?.status ?? 'draft',
-    imageUrl: product?.images?.[0]?.url ?? '',
   });
+  const [images, setImages] = useState<ManagedImage[]>(product?.images ?? []);
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
@@ -272,9 +281,7 @@ function ProductForm({
       fulfillmentType: form.fulfillmentType as 'stock' | 'dropship',
       stockQty: form.stockQty === '' ? 0 : Number(form.stockQty),
       status: form.status as 'draft' | 'active' | 'archived',
-      images: form.imageUrl.trim()
-        ? [{ url: form.imageUrl.trim(), isPrimary: true }]
-        : [],
+      images,
     };
 
     try {
@@ -402,10 +409,7 @@ function ProductForm({
           </div>
         </div>
 
-        <div>
-          <label className={labelCls}>Görsel URL</label>
-          <input className={inputCls} value={form.imageUrl} onChange={(e) => set('imageUrl', e.target.value)} placeholder="https://…" />
-        </div>
+        <ImageManager value={images} onChange={setImages} uploadEnabled={uploadEnabled} />
 
         {formError && (
           <p className="rounded-lg bg-danger/10 px-3 py-2 text-sm font-semibold text-danger">{formError}</p>
