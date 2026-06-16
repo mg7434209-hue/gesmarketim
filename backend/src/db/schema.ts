@@ -66,6 +66,20 @@ export const orderStatusEnum = pgEnum("order_status", [
   "cancelled", // iptal
 ]);
 
+export const paymentMethodEnum = pgEnum("payment_method", [
+  "bank_transfer", // havale/EFT
+  "cash_on_delivery", // kapıda ödeme
+  "card", // online kart (iyzico vb.)
+]);
+
+export const paymentStatusEnum = pgEnum("payment_status", [
+  "unpaid", // ödeme bekleniyor (havale/kapıda)
+  "awaiting", // kart: sağlayıcıya yönlendirildi, sonuç bekleniyor
+  "paid", // ödendi
+  "failed", // başarısız
+  "refunded", // iade edildi
+]);
+
 // ---------------------------------------------------------------------------
 // tenants — multi-tenant kök
 // ---------------------------------------------------------------------------
@@ -286,6 +300,15 @@ export const orders = pgTable(
     note: text("note"),
 
     status: orderStatusEnum("status").notNull().default("pending"),
+
+    // --- ödeme ---
+    paymentMethod: paymentMethodEnum("payment_method")
+      .notNull()
+      .default("bank_transfer"),
+    paymentStatus: paymentStatusEnum("payment_status")
+      .notNull()
+      .default("unpaid"),
+    paymentRef: text("payment_ref"), // sağlayıcı işlem/ödeme kimliği (kart)
 
     // tutarlar — checkout sırasında sunucu tarafında hesaplanır (snapshot)
     subtotal: numeric("subtotal", { precision: 12, scale: 2 })

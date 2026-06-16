@@ -7,6 +7,7 @@ import { healthRouter } from './routes/health.js';
 import { catalogRouter } from './routes/catalog.js';
 import { ordersRouter } from './routes/orders.js';
 import { adminRouter } from './routes/admin.js';
+import { paymentRouter } from './routes/payment.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -18,6 +19,8 @@ const CORS_ORIGIN = process.env.CORS_ORIGIN ?? 'http://localhost:5173';
 
 // ---------- middleware ----------
 app.use(express.json({ limit: '1mb' }));
+// Payment provider callbacks (iyzico) post application/x-www-form-urlencoded.
+app.use(express.urlencoded({ extended: false }));
 const corsOrigins = CORS_ORIGIN.split(',')
   .map((s) => s.trim())
   .filter((s) => s.length > 0);
@@ -33,6 +36,7 @@ app.use('/api/health', healthRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api', catalogRouter);
 app.use('/api', ordersRouter);
+app.use('/api', paymentRouter);
 
 // ---------- static frontend (production) ----------
 // In production the backend serves the built React app from frontend/dist.

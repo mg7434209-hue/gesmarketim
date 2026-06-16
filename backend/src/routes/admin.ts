@@ -767,6 +767,8 @@ adminRouter.get(
         city: o.city,
         district: o.district,
         status: o.status,
+        paymentMethod: o.paymentMethod,
+        paymentStatus: o.paymentStatus,
         total: Number(o.total),
         currency: o.currency,
         createdAt: o.createdAt,
@@ -798,6 +800,9 @@ adminRouter.get(
       addressLine: order.addressLine,
       note: order.note,
       status: order.status,
+      paymentMethod: order.paymentMethod,
+      paymentStatus: order.paymentStatus,
+      paymentRef: order.paymentRef,
       subtotal: Number(order.subtotal),
       shippingCost: Number(order.shippingCost),
       total: Number(order.total),
@@ -815,25 +820,43 @@ adminRouter.get(
   }),
 );
 
+const PAYMENT_STATUSES = ["unpaid", "awaiting", "paid", "failed", "refunded"] as const;
+
 adminRouter.patch(
   "/orders/:id",
   asyncHandler(async (req, res) => {
     const tenantId = await getTenantId();
     const body = (req.body ?? {}) as Record<string, unknown>;
-    const status = body.status;
-    if (!(ORDER_STATUSES as readonly string[]).includes(status as string)) {
-      res.status(400).json({ error: "validation", fields: { status: "Geçersiz durum." } });
+
+    const update: Record<string, unknown> = { updatedAt: new Date() };
+    if ("status" in body) {
+      if (!(ORDER_STATUSES as readonly string[]).includes(body.status as string)) {
+        res.status(400).json({ error: "validation", fields: { status: "Geçersiz durum." } });
+        return;
+      }
+      update.status = body.status;
+    }
+    if ("paymentStatus" in body) {
+      if (!(PAYMENT_STATUSES as readonly string[]).includes(body.paymentStatus as string)) {
+        res.status(400).json({ error: "validation", fields: { paymentStatus: "Geçersiz ödeme durumu." } });
+        return;
+      }
+      update.paymentStatus = body.paymentStatus;
+    }
+    if (Object.keys(update).length === 1) {
+      res.status(400).json({ error: "validation", fields: { status: "Güncellenecek alan yok." } });
       return;
     }
+
     const [row] = await db
       .update(orders)
-      .set({ status: status as (typeof ORDER_STATUSES)[number], updatedAt: new Date() })
+      .set(update)
       .where(and(eq(orders.tenantId, tenantId), eq(orders.id, req.params.id)))
-      .returning({ id: orders.id, status: orders.status });
+      .returning({ id: orders.id, status: orders.status, paymentStatus: orders.paymentStatus });
     if (!row) {
       res.status(404).json({ error: "not_found" });
       return;
     }
-    res.json({ ok: true, status: row.status });
+    res.json({ ok: true, status: row.status, paymentStatus: row.paymentStatus });
   }),
 );

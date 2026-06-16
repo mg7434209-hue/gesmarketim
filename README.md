@@ -121,6 +121,8 @@ This monorepo is designed to deploy as a **single Railway service** for simplici
 | `GET /api/products/:slug` | Single product |
 | `POST /api/orders` | Create an order from a cart (prices re-validated server-side) |
 | `GET /api/orders/:number` | Order lookup for the confirmation page |
+| `GET /api/payment/methods` | Enabled payment methods + bank-transfer details |
+| `POST /api/payment/iyzico/callback` | iyzico Checkout Form return (card) |
 
 **Admin (cookie-gated — `POST /api/admin/login` first)**
 
@@ -134,8 +136,18 @@ HMAC-signed session cookie keyed on `ADMIN_SESSION_SECRET` (see `src/lib/auth.ts
   category/brand/stock/price filters + sort), product detail, **cart**,
   **checkout**, **order confirmation**. Cart is localStorage-persisted.
 - **Admin (`/admin`):** login → dashboard (revenue/orders/products stats),
-  product CRUD with auto-priced `finalPrice`, order management with status flow,
-  and catalog structure (categories / brands / suppliers).
+  product CRUD with auto-priced `finalPrice`, order management with order +
+  payment status flow, and catalog structure (categories / brands / suppliers).
+
+## Payments
+
+- **Bank transfer (havale/EFT)** and **cash on delivery** work with no external
+  setup — fill `BANK_*` env vars to show IBAN details on the confirmation page.
+- **Card (iyzico)** is offered only when `IYZICO_API_KEY` + `IYZICO_SECRET_KEY`
+  are set. Checkout creates the order, redirects to the iyzico Checkout Form, and
+  the `/api/payment/iyzico/callback` route verifies the result and updates the
+  order's payment status. Provider logic lives in `src/lib/payments/`; the
+  provider-agnostic shape makes swapping/adding a processor straightforward.
 
 ---
 

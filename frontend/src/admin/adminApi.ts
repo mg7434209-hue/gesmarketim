@@ -119,6 +119,8 @@ export type AdminSupplier = {
 };
 
 export type OrderStatus = 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled';
+export type PaymentMethod = 'bank_transfer' | 'cash_on_delivery' | 'card';
+export type PaymentStatus = 'unpaid' | 'awaiting' | 'paid' | 'failed' | 'refunded';
 
 export type AdminOrderListItem = {
   id: string;
@@ -128,6 +130,8 @@ export type AdminOrderListItem = {
   city: string;
   district: string;
   status: OrderStatus;
+  paymentMethod: PaymentMethod;
+  paymentStatus: PaymentStatus;
   total: number;
   currency: string;
   createdAt: string;
@@ -137,6 +141,7 @@ export type AdminOrderDetail = AdminOrderListItem & {
   customerEmail: string | null;
   addressLine: string;
   note: string | null;
+  paymentRef: string | null;
   subtotal: number;
   shippingCost: number;
   items: {
@@ -221,6 +226,11 @@ export const adminApi = {
       request<{ ok: true; status: OrderStatus }>(`/orders/${id}`, {
         method: 'PATCH',
         body: { status },
+      }),
+    setPaymentStatus: (id: string, paymentStatus: PaymentStatus) =>
+      request<{ ok: true; paymentStatus: PaymentStatus }>(`/orders/${id}`, {
+        method: 'PATCH',
+        body: { paymentStatus },
       }),
   },
 };

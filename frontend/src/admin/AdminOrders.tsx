@@ -4,11 +4,14 @@ import {
   type AdminOrderDetail,
   type AdminOrderListItem,
   type OrderStatus,
+  type PaymentStatus,
 } from './adminApi';
 import {
   Badge,
   Modal,
   ORDER_STATUS_META,
+  PAYMENT_METHOD_LABEL,
+  PAYMENT_STATUS_META,
   Spinner,
   btnGhost,
   formatDate,
@@ -17,6 +20,7 @@ import {
 } from './ui';
 
 const STATUS_FLOW: OrderStatus[] = ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'];
+const PAYMENT_FLOW: PaymentStatus[] = ['unpaid', 'awaiting', 'paid', 'failed', 'refunded'];
 
 export default function AdminOrders({ onAuthError }: { onAuthError: () => void }) {
   const [orders, setOrders] = useState<AdminOrderListItem[]>([]);
@@ -52,6 +56,10 @@ export default function AdminOrders({ onAuthError }: { onAuthError: () => void }
 
   function applyStatus(id: string, status: OrderStatus) {
     setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, status } : o)));
+  }
+
+  function applyPayment(id: string, paymentStatus: PaymentStatus) {
+    setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, paymentStatus } : o)));
   }
 
   return (
@@ -93,6 +101,7 @@ export default function AdminOrders({ onAuthError }: { onAuthError: () => void }
                 <th className="px-4 py-3 font-bold">Konum</th>
                 <th className="px-4 py-3 font-bold">Tarih</th>
                 <th className="px-4 py-3 font-bold">Tutar</th>
+                <th className="px-4 py-3 font-bold">Ödeme</th>
                 <th className="px-4 py-3 font-bold">Durum</th>
                 <th className="px-4 py-3 font-bold text-right">İşlem</th>
               </tr>
@@ -100,6 +109,7 @@ export default function AdminOrders({ onAuthError }: { onAuthError: () => void }
             <tbody className="divide-y divide-border">
               {orders.map((o) => {
                 const meta = ORDER_STATUS_META[o.status];
+                const pay = PAYMENT_STATUS_META[o.paymentStatus];
                 return (
                   <tr key={o.id} className="hover:bg-surface/60">
                     <td className="px-4 py-3 font-bold text-primary">{o.orderNumber}</td>
@@ -110,6 +120,12 @@ export default function AdminOrders({ onAuthError }: { onAuthError: () => void }
                     <td className="px-4 py-3 text-text-secondary">{o.district} / {o.city}</td>
                     <td className="px-4 py-3 text-text-secondary">{formatDate(o.createdAt)}</td>
                     <td className="px-4 py-3 font-bold text-primary">{formatTRY(o.total)}</td>
+                    <td className="px-4 py-3">
+                      <Badge label={pay.label} cls={pay.cls} />
+                      <p className="mt-1 text-[11px] text-text-secondary">
+                        {PAYMENT_METHOD_LABEL[o.paymentMethod]}
+                      </p>
+                    </td>
                     <td className="px-4 py-3"><Badge label={meta.label} cls={meta.cls} /></td>
                     <td className="px-4 py-3 text-right">
                       <button type="button" className={btnGhost + ' !px-3 !py-1.5'} onClick={() => setOpenId(o.id)}>
@@ -129,6 +145,7 @@ export default function AdminOrders({ onAuthError }: { onAuthError: () => void }
           id={openId}
           onClose={() => setOpenId(null)}
           onStatusChange={applyStatus}
+          onPaymentChange={applyPayment}
           onAuthError={onAuthError}
         />
       )}
@@ -140,11 +157,13 @@ function OrderDetailModal({
   id,
   onClose,
   onStatusChange,
+  onPaymentChange,
   onAuthError,
 }: {
   id: string;
   onClose: () => void;
   onStatusChange: (id: string, status: OrderStatus) => void;
+  onPaymentChange: (id: string, paymentStatus: PaymentStatus) => void;
   onAuthError: () => void;
 }) {
   const [order, setOrder] = useState<AdminOrderDetail | null>(null);
@@ -171,6 +190,20 @@ function OrderDetailModal({
       await adminApi.orders.setStatus(order.id, status);
       setOrder({ ...order, status });
       onStatusChange(order.id, status);
+    } catch (err) {
+      handleError(err);
+    } finally {
+      setUpdating(false);
+    }
+  }
+
+  async function changePayment(paymentStatus: PaymentStatus) {
+    if (!order) return;
+    setUpdating(true);
+    try {
+      await adminApi.orders.setPaymentStatus(order.id, paymentStatus);
+      setOrder({ ...order, paymentStatus });
+      onPaymentChange(order.id, paymentStatus);
     } catch (err) {
       handleError(err);
     } finally {
@@ -221,7 +254,33 @@ function OrderDetailModal({
           </div>
 
           <div className="border-t border-border pt-4">
-            <h3 className="mb-2 text-xs font-bold uppercase tracking-wider text-text-secondary">Durum Güncelle</h3>
+            <div className="mb-2 flex items-center justify-between">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-text-secondary">Ödeme</h3>
+              <span className="text-xs text-text-secondary">{PAYMENT_METHOD_LABEL[order.paymentMethod]}</span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {PAYMENT_FLOW.map((s) => {
+                const meta = PAYMENT_STATUS_META[s];
+                const active = order.paymentStatus === s;
+                return (
+                  <button
+                    key={s}
+                    type="button"
+                    disabled={updating || active}
+                    onClick={() => changePayment(s)}
+                    className={`rounded-lg px-3 py-1.5 text-sm font-bold ring-1 ring-inset transition-colors disabled:cursor-default ${
+                      active ? meta.cls : 'bg-white text-text-secondary ring-border hover:bg-surface'
+                    }`}
+                  >
+                    {meta.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="border-t border-border pt-4">
+            <h3 className="mb-2 text-xs font-bold uppercase tracking-wider text-text-secondary">Sipariş Durumu</h3>
             <div className="flex flex-wrap gap-2">
               {STATUS_FLOW.map((s) => {
                 const meta = ORDER_STATUS_META[s];

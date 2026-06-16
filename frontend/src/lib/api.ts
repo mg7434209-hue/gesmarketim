@@ -99,6 +99,25 @@ export function getProducts(params: ProductQuery = {}): Promise<PublicProduct[]>
 
 export type CheckoutItem = { productId: string; quantity: number };
 
+export type PaymentMethod = 'bank_transfer' | 'cash_on_delivery' | 'card';
+export type PaymentStatus = 'unpaid' | 'awaiting' | 'paid' | 'failed' | 'refunded';
+
+export type BankTransferDetails = {
+  bankName: string;
+  accountHolder: string;
+  iban: string;
+};
+
+export type PaymentMethodsInfo = {
+  methods: PaymentMethod[];
+  bankTransfer: BankTransferDetails | null;
+  card: { enabled: boolean; provider: string };
+};
+
+export function getPaymentMethods(): Promise<PaymentMethodsInfo> {
+  return getJson<PaymentMethodsInfo>('/api/payment/methods');
+}
+
 export type CheckoutPayload = {
   customerName: string;
   customerPhone: string;
@@ -107,6 +126,7 @@ export type CheckoutPayload = {
   district: string;
   addressLine: string;
   note?: string;
+  paymentMethod: PaymentMethod;
   items: CheckoutItem[];
 };
 
@@ -121,11 +141,18 @@ export type OrderLine = {
 export type OrderResult = {
   orderNumber: string;
   status: string;
+  paymentMethod: PaymentMethod;
+  paymentStatus: PaymentStatus;
   subtotal: number;
   shippingCost: number;
   total: number;
   currency: string;
   items: OrderLine[];
+  payment?: {
+    provider: string;
+    paymentPageUrl?: string;
+    error?: string;
+  };
 };
 
 export type OrderDetail = OrderResult & {
@@ -133,6 +160,7 @@ export type OrderDetail = OrderResult & {
   city: string;
   district: string;
   createdAt: string;
+  bankTransfer: BankTransferDetails | null;
 };
 
 /** Thrown when checkout fails validation or an item became unavailable. */

@@ -13,7 +13,14 @@ import { db } from "../db/index.js";
 import { products, orders, orderItems } from "../db/schema.js";
 import { getTenantId } from "../lib/tenant.js";
 import { generateOrderNumber } from "../lib/util.js";
-import { shippingFor, shopConfig } from "../lib/shopConfig.js";
+import {
+  shippingFor,
+  shopConfig,
+  enabledPaymentMethods,
+  paymentConfig,
+  type PaymentMethod,
+} from "../lib/shopConfig.js";
+import { initCheckoutForm } from "../lib/payments/iyzico.js";
 
 export const ordersRouter = Router();
 
@@ -81,6 +88,14 @@ ordersRouter.post(
 
     const items = parseItems(body.items);
     if (!items) errors.items = "Sepet geçersiz.";
+
+    const allowedMethods = enabledPaymentMethods();
+    const paymentMethod = (
+      typeof body.paymentMethod === "string" ? body.paymentMethod : "bank_transfer"
+    ) as PaymentMethod;
+    if (!allowedMethods.includes(paymentMethod)) {
+      errors.paymentMethod = "Geçersiz ödeme yöntemi.";
+    }
 
     if (Object.keys(errors).length > 0) {
       res.status(400).json({ error: "validation", fields: errors });
@@ -169,6 +184,8 @@ ordersRouter.post(
             addressLine,
             note: note || null,
             status: "pending",
+            paymentMethod,
+            paymentStatus: paymentMethod === "card" ? "awaiting" : "unpaid",
             subtotal: subtotal.toFixed(2),
             shippingCost: shippingCost.toFixed(2),
             total: total.toFixed(2),
@@ -202,9 +219,11 @@ ordersRouter.post(
       return orderRow;
     });
 
-    res.status(201).json({
+    const responseBody: Record<string, unknown> = {
       orderNumber: created.orderNumber,
       status: "pending",
+      paymentMethod,
+      paymentStatus: paymentMethod === "card" ? "awaiting" : "unpaid",
       subtotal,
       shippingCost,
       total,
@@ -216,7 +235,61 @@ ordersRouter.post(
         quantity: l.quantity,
         lineTotal: l.lineTotal,
       })),
-    });
+    };
+
+    // Card → kick off iyzico Checkout Form and return a redirect URL.
+    if (paymentMethod === "card") {
+      const [firstName, ...rest] = customerName.split(" ");
+      const surname = rest.join(" ") || firstName;
+      const callbackBase =
+        process.env.PAYMENT_CALLBACK_BASE?.trim() ||
+        `${req.protocol}://${req.get("host")}`;
+
+      const init = await initCheckoutForm({
+        conversationId: created.orderNumber,
+        price: subtotal.toFixed(2),
+        paidPrice: total.toFixed(2),
+        callbackUrl: `${callbackBase}/api/payment/iyzico/callback`,
+        buyer: {
+          id: created.id,
+          name: firstName,
+          surname,
+          email: customerEmail || "musteri@gesmarketim.com",
+          phone: customerPhone,
+          city,
+          country: "Turkey",
+          address: addressLine,
+        },
+        basketItems: lineValues.map((l) => ({
+          id: l.productId,
+          name: l.productName,
+          category: "Solar",
+          price: l.lineTotal.toFixed(2),
+        })),
+      });
+
+      if (init.status === "success" && init.paymentPageUrl) {
+        if (init.token) {
+          await db
+            .update(orders)
+            .set({ paymentRef: init.token, updatedAt: new Date() })
+            .where(eq(orders.id, created.id));
+        }
+        responseBody.payment = {
+          provider: "iyzico",
+          paymentPageUrl: init.paymentPageUrl,
+        };
+      } else {
+        responseBody.payment = {
+          provider: "iyzico",
+          error:
+            init.errorMessage ??
+            "Kart ödemesi başlatılamadı. Havale/EFT ile devam edebilirsiniz.",
+        };
+      }
+    }
+
+    res.status(201).json(responseBody);
   }),
 );
 
@@ -242,6 +315,16 @@ ordersRouter.get(
     res.json({
       orderNumber: order.orderNumber,
       status: order.status,
+      paymentMethod: order.paymentMethod,
+      paymentStatus: order.paymentStatus,
+      bankTransfer:
+        order.paymentMethod === "bank_transfer"
+          ? {
+              bankName: paymentConfig.bankTransfer.bankName,
+              accountHolder: paymentConfig.bankTransfer.accountHolder,
+              iban: paymentConfig.bankTransfer.iban,
+            }
+          : null,
       customerName: order.customerName,
       city: order.city,
       district: order.district,

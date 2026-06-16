@@ -1,9 +1,30 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../cart/CartContext';
 import { formatPrice } from '../components/product-ui';
 import { shippingFor } from '../lib/shipping';
-import { createOrder, CheckoutError } from '../lib/api';
+import {
+  createOrder,
+  CheckoutError,
+  getPaymentMethods,
+  type PaymentMethod,
+  type PaymentMethodsInfo,
+} from '../lib/api';
+
+const METHOD_LABELS: Record<PaymentMethod, { title: string; desc: string }> = {
+  bank_transfer: {
+    title: 'Havale / EFT',
+    desc: 'Sipariş sonrası IBAN bilgisi gösterilir.',
+  },
+  cash_on_delivery: {
+    title: 'Kapıda Ödeme',
+    desc: 'Teslimatta nakit veya kart ile öde.',
+  },
+  card: {
+    title: 'Kredi / Banka Kartı',
+    desc: 'Güvenli online ödeme (iyzico).',
+  },
+};
 
 type FormState = {
   customerName: string;
@@ -33,6 +54,24 @@ export default function Checkout() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const [payInfo, setPayInfo] = useState<PaymentMethodsInfo | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('bank_transfer');
+
+  useEffect(() => {
+    let active = true;
+    getPaymentMethods()
+      .then((info) => {
+        if (!active) return;
+        setPayInfo(info);
+        if (info.methods.length > 0) setPaymentMethod(info.methods[0]);
+      })
+      .catch(() => {
+        /* fall back to bank_transfer default */
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const shipping = shippingFor(subtotal);
   const total = subtotal + shipping;
@@ -81,8 +120,21 @@ export default function Checkout() {
         district: form.district,
         addressLine: form.addressLine,
         note: form.note || undefined,
+        paymentMethod,
         items: items.map((i) => ({ productId: i.id, quantity: i.quantity })),
       });
+
+      // Card: redirect to the provider's payment page.
+      if (result.payment?.paymentPageUrl) {
+        window.location.href = result.payment.paymentPageUrl;
+        return;
+      }
+      // Card init failed but order exists → surface the error, keep the cart.
+      if (paymentMethod === 'card' && result.payment?.error) {
+        setFormError(result.payment.error);
+        setSubmitting(false);
+        return;
+      }
       clear();
       navigate(`/siparis/${result.orderNumber}`, { state: { order: result } });
     } catch (err) {
@@ -172,11 +224,46 @@ export default function Checkout() {
               </div>
             </fieldset>
 
-            <div className="rounded-xl border border-border bg-white p-4 text-xs leading-relaxed text-text-secondary shadow-card">
-              <strong className="text-primary">Ödeme:</strong> Siparişin alındıktan sonra
-              ekibimiz seni telefonla arayıp ödeme (havale/EFT veya kapıda) ve teslimat
-              detaylarını netleştirir. Bu adımda kart bilgisi alınmaz.
-            </div>
+            <fieldset className="rounded-2xl border border-border bg-white p-6 shadow-card">
+              <legend className="px-2 text-sm font-bold uppercase tracking-wider text-text-secondary">
+                Ödeme Yöntemi
+              </legend>
+              <div className="space-y-3">
+                {(payInfo?.methods ?? ['bank_transfer']).map((m) => {
+                  const meta = METHOD_LABELS[m];
+                  const selected = paymentMethod === m;
+                  return (
+                    <label
+                      key={m}
+                      className={`flex cursor-pointer items-start gap-3 rounded-xl border-2 p-4 transition-colors ${
+                        selected
+                          ? 'border-accent bg-accent/5'
+                          : 'border-border hover:border-primary/30'
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="paymentMethod"
+                        checked={selected}
+                        onChange={() => setPaymentMethod(m)}
+                        className="mt-0.5 h-4 w-4 border-border text-accent focus:ring-accent"
+                      />
+                      <span>
+                        <span className="block text-sm font-bold text-primary">{meta.title}</span>
+                        <span className="block text-xs text-text-secondary">{meta.desc}</span>
+                      </span>
+                    </label>
+                  );
+                })}
+              </div>
+
+              {paymentMethod === 'bank_transfer' && payInfo?.bankTransfer?.iban && (
+                <p className="mt-3 rounded-lg bg-surface px-3 py-2 text-xs leading-relaxed text-text-secondary">
+                  Havale/EFT bilgileri sipariş onay sayfasında gösterilecek. Açıklamaya
+                  sipariş numaranı yazmayı unutma.
+                </p>
+              )}
+            </fieldset>
           </div>
 
           {/* Summary */}
@@ -227,7 +314,11 @@ export default function Checkout() {
                 disabled={submitting}
                 className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-accent px-5 py-3 text-base font-bold text-primary shadow-sm transition-colors hover:bg-accent-dark focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {submitting ? 'Gönderiliyor…' : 'Siparişi Onayla'}
+                {submitting
+                  ? 'Gönderiliyor…'
+                  : paymentMethod === 'card'
+                    ? 'Ödemeye Geç'
+                    : 'Siparişi Onayla'}
               </button>
             </div>
           </aside>

@@ -1,5 +1,5 @@
 import { useEffect, type ReactNode } from 'react';
-import type { OrderStatus } from './adminApi';
+import type { OrderStatus, PaymentMethod, PaymentStatus } from './adminApi';
 
 const TRY = new Intl.NumberFormat('tr-TR', {
   style: 'currency',
@@ -31,6 +31,20 @@ export const ORDER_STATUS_META: Record<OrderStatus, { label: string; cls: string
   shipped: { label: 'Kargoda', cls: 'bg-accent/20 text-accent-dark ring-accent/40' },
   delivered: { label: 'Teslim edildi', cls: 'bg-success/15 text-success ring-success/30' },
   cancelled: { label: 'İptal', cls: 'bg-danger/10 text-danger ring-danger/30' },
+};
+
+export const PAYMENT_STATUS_META: Record<PaymentStatus, { label: string; cls: string }> = {
+  unpaid: { label: 'Ödenmedi', cls: 'bg-warning/15 text-warning ring-warning/30' },
+  awaiting: { label: 'Bekleniyor', cls: 'bg-accent/20 text-accent-dark ring-accent/40' },
+  paid: { label: 'Ödendi', cls: 'bg-success/15 text-success ring-success/30' },
+  failed: { label: 'Başarısız', cls: 'bg-danger/10 text-danger ring-danger/30' },
+  refunded: { label: 'İade', cls: 'bg-text-secondary/10 text-text-secondary ring-text-secondary/20' },
+};
+
+export const PAYMENT_METHOD_LABEL: Record<PaymentMethod, string> = {
+  bank_transfer: 'Havale/EFT',
+  cash_on_delivery: 'Kapıda',
+  card: 'Kart',
 };
 
 export const PRODUCT_STATUS_META: Record<string, { label: string; cls: string }> = {

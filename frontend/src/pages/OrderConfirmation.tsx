@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Link, useLocation, useParams } from 'react-router-dom';
+import { Link, useLocation, useParams, useSearchParams } from 'react-router-dom';
 import {
   getOrder,
   NotFoundError,
@@ -21,6 +21,8 @@ const STATUS_LABEL: Record<string, string> = {
 export default function OrderConfirmation() {
   const { number = '' } = useParams<{ number: string }>();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const paymentResult = searchParams.get('payment'); // success|failed (card return)
   const passed = (location.state as { order?: OrderResult } | null)?.order;
 
   const [status, setStatus] = useState<Status>(passed ? 'ready' : 'loading');
@@ -28,7 +30,7 @@ export default function OrderConfirmation() {
 
   const load = useCallback(() => {
     let active = true;
-    setStatus('loading');
+    if (!passed) setStatus('loading');
     getOrder(number)
       .then((data) => {
         if (!active) return;
@@ -37,17 +39,20 @@ export default function OrderConfirmation() {
       })
       .catch((err) => {
         if (!active) return;
+        // If we already have the passed order, keep showing it on fetch error.
+        if (passed) {
+          setStatus('ready');
+          return;
+        }
         setStatus(err instanceof NotFoundError ? 'notfound' : 'error');
       });
     return () => {
       active = false;
     };
-  }, [number]);
+  }, [number, passed]);
 
-  useEffect(() => {
-    if (passed) return; // already have it from checkout navigation
-    return load();
-  }, [passed, load]);
+  // Always fetch to enrich (bank details, latest payment status).
+  useEffect(() => load(), [load]);
 
   return (
     <div className="bg-surface">
@@ -62,7 +67,9 @@ export default function OrderConfirmation() {
             </button>
           </div>
         )}
-        {status === 'ready' && order && <Confirmation order={order} orderNumber={number} />}
+        {status === 'ready' && order && (
+          <Confirmation order={order} orderNumber={number} paymentResult={paymentResult} />
+        )}
       </div>
     </div>
   );
@@ -71,22 +78,34 @@ export default function OrderConfirmation() {
 function Confirmation({
   order,
   orderNumber,
+  paymentResult,
 }: {
   order: OrderDetail | OrderResult;
   orderNumber: string;
+  paymentResult: string | null;
 }) {
+  const bankTransfer = 'bankTransfer' in order ? order.bankTransfer : null;
+  const cardFailed =
+    paymentResult === 'failed' || order.paymentStatus === 'failed';
+  const cardPaid = order.paymentStatus === 'paid';
+
   return (
     <div className="mx-auto max-w-2xl">
       <div className="rounded-2xl border border-border bg-white p-8 text-center shadow-card sm:p-10">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-success/15 text-success">
+        <div
+          className={`mx-auto flex h-16 w-16 items-center justify-center rounded-full ${
+            cardFailed ? 'bg-danger/15 text-danger' : 'bg-success/15 text-success'
+          }`}
+        >
           <CheckCircle />
         </div>
         <h1 className="mt-5 text-2xl font-bold text-primary sm:text-3xl">
-          Siparişin alındı! 🎉
+          {cardFailed ? 'Ödeme tamamlanamadı' : 'Siparişin alındı! 🎉'}
         </h1>
         <p className="mt-2 text-sm leading-relaxed text-text-secondary">
-          Teşekkürler. Ekibimiz en kısa sürede seni arayıp ödeme ve teslimat detaylarını
-          netleştirecek.
+          {cardFailed
+            ? 'Kart ödemesi başarısız oldu. Havale/EFT ile ödeyebilir ya da tekrar deneyebilirsin. Sipariş numaranı not al.'
+            : 'Teşekkürler. Ekibimiz en kısa sürede seni arayıp teslimat detaylarını netleştirecek.'}
         </p>
 
         <div className="mt-6 inline-flex flex-col items-center rounded-xl border border-border bg-surface px-6 py-4">
@@ -101,6 +120,59 @@ function Confirmation({
           </span>
         </div>
       </div>
+
+      {/* Payment instructions */}
+      {order.paymentMethod === 'bank_transfer' && !cardPaid && (
+        <div className="mt-6 rounded-2xl border-2 border-accent/40 bg-accent/5 p-6 shadow-card">
+          <h2 className="text-sm font-bold uppercase tracking-wider text-primary">
+            Havale / EFT ile Ödeme
+          </h2>
+          {bankTransfer?.iban ? (
+            <dl className="mt-3 space-y-2 text-sm">
+              <Row label="Banka" value={bankTransfer.bankName} />
+              <Row label="Alıcı" value={bankTransfer.accountHolder} />
+              <Row label="IBAN" value={bankTransfer.iban} mono />
+              <Row label="Tutar" value={formatPrice(order.total)} />
+              <Row label="Açıklama" value={order.orderNumber || orderNumber} mono />
+            </dl>
+          ) : (
+            <p className="mt-2 text-sm text-text-secondary">
+              Ödeme bilgileri için ekibimiz seninle iletişime geçecek.
+            </p>
+          )}
+          <p className="mt-3 text-xs leading-relaxed text-text-secondary">
+            Açıklama kısmına <strong>sipariş numaranı</strong> yazmayı unutma. Ödemen
+            onaylandığında siparişin hazırlanmaya başlar.
+          </p>
+        </div>
+      )}
+
+      {order.paymentMethod === 'cash_on_delivery' && (
+        <div className="mt-6 rounded-2xl border border-border bg-white p-6 shadow-card">
+          <h2 className="text-sm font-bold uppercase tracking-wider text-primary">
+            Kapıda Ödeme
+          </h2>
+          <p className="mt-2 text-sm text-text-secondary">
+            Teslimat sırasında <strong>{formatPrice(order.total)}</strong> tutarını nakit
+            veya kart ile ödeyebilirsin.
+          </p>
+        </div>
+      )}
+
+      {order.paymentMethod === 'card' && (
+        <div className="mt-6 rounded-2xl border border-border bg-white p-6 shadow-card">
+          <h2 className="text-sm font-bold uppercase tracking-wider text-primary">
+            Kart ile Ödeme
+          </h2>
+          <p className="mt-2 text-sm text-text-secondary">
+            {cardPaid
+              ? '✓ Ödemen başarıyla alındı.'
+              : cardFailed
+                ? 'Ödeme tamamlanamadı. Tekrar denemek için sepetine dönebilirsin.'
+                : 'Ödeme durumu güncelleniyor…'}
+          </p>
+        </div>
+      )}
 
       <div className="mt-6 rounded-2xl border border-border bg-white p-6 shadow-card">
         <h2 className="text-sm font-bold uppercase tracking-wider text-text-secondary">
@@ -143,6 +215,17 @@ function Confirmation({
           Alışverişe devam et →
         </Link>
       </div>
+    </div>
+  );
+}
+
+function Row({ label, value, mono = false }: { label: string; value: string; mono?: boolean }) {
+  return (
+    <div className="flex items-center justify-between gap-3">
+      <dt className="text-text-secondary">{label}</dt>
+      <dd className={`font-bold text-primary ${mono ? 'font-mono tracking-tight' : ''}`}>
+        {value}
+      </dd>
     </div>
   );
 }
