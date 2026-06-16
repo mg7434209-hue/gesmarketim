@@ -1,78 +1,75 @@
-// Effective-price resolver. Mirrors the rule documented at the top of schema.ts.
+// Effective-price resolver. Mirrors the rule documented at the top of schema.ts:
 //
-// Inputs are kept as strings (matching Drizzle's `numeric` return type for postgres.js).
-// We do math in `number` for now; if precision becomes a concern, switch to a Decimal lib.
+//   effectiveMarkup = product.markupPercent
+//                     ?? supplier.defaultMarkupPercent
+//                     ?? category.defaultMarkupPercent
+//                     ?? FALLBACK_MARGIN_PCT
+//   finalPrice = round2(costPrice * (1 + effectiveMarkup / 100))
+//
+// finalPrice is written to the DB as a snapshot; recompute whenever cost or any
+// markup in the chain changes. Inputs are kept as the `string | number | null`
+// shapes Drizzle returns for `numeric` columns.
 
-const FALLBACK_MARGIN_PCT = 25; // 25% — used when no margin is set anywhere
+const FALLBACK_MARGIN_PCT = 25; // used when no markup is set anywhere in the chain
 
 type Numericish = string | number | null | undefined;
 
 function toNum(v: Numericish): number | null {
-  if (v === null || v === undefined) return null;
-  const n = typeof v === 'number' ? v : parseFloat(v);
+  if (v === null || v === undefined || v === "") return null;
+  const n = typeof v === "number" ? v : parseFloat(v);
   return Number.isFinite(n) ? n : null;
 }
 
 export interface PriceInputs {
   costPrice: Numericish;
-  manualPriceOverride: Numericish;
-  productMarginPctOverride: Numericish;
-  supplierMarginPct: Numericish;
-  categoryMarginPct: Numericish;
+  productMarkupPct: Numericish; // product.markupPercent (null = no override)
+  supplierMarkupPct: Numericish; // supplier.defaultMarkupPercent
+  categoryMarkupPct: Numericish; // category.defaultMarkupPercent
 }
+
+export type MarkupSource =
+  | "product"
+  | "supplier"
+  | "category"
+  | "fallback";
 
 export interface PriceBreakdown {
-  effectivePrice: number;
-  source: 'manual' | 'product_margin' | 'supplier_margin' | 'category_margin' | 'fallback';
-  marginPct: number | null; // null when source === 'manual'
+  finalPrice: number;
+  markupPct: number;
+  source: MarkupSource;
 }
 
-export function computeEffectivePrice(inputs: PriceInputs): PriceBreakdown {
-  const manual = toNum(inputs.manualPriceOverride);
-  if (manual !== null) {
-    return { effectivePrice: round2(manual), source: 'manual', marginPct: null };
-  }
-
+export function computeFinalPrice(inputs: PriceInputs): PriceBreakdown {
   const cost = toNum(inputs.costPrice) ?? 0;
 
-  const productMargin = toNum(inputs.productMarginPctOverride);
-  if (productMargin !== null) {
-    return {
-      effectivePrice: applyMargin(cost, productMargin),
-      source: 'product_margin',
-      marginPct: productMargin,
-    };
+  const product = toNum(inputs.productMarkupPct);
+  if (product !== null) {
+    return { finalPrice: applyMarkup(cost, product), markupPct: product, source: "product" };
   }
 
-  const supplierMargin = toNum(inputs.supplierMarginPct);
-  if (supplierMargin !== null) {
-    return {
-      effectivePrice: applyMargin(cost, supplierMargin),
-      source: 'supplier_margin',
-      marginPct: supplierMargin,
-    };
+  const supplier = toNum(inputs.supplierMarkupPct);
+  if (supplier !== null) {
+    return { finalPrice: applyMarkup(cost, supplier), markupPct: supplier, source: "supplier" };
   }
 
-  const categoryMargin = toNum(inputs.categoryMarginPct);
-  if (categoryMargin !== null) {
-    return {
-      effectivePrice: applyMargin(cost, categoryMargin),
-      source: 'category_margin',
-      marginPct: categoryMargin,
-    };
+  const category = toNum(inputs.categoryMarkupPct);
+  if (category !== null) {
+    return { finalPrice: applyMarkup(cost, category), markupPct: category, source: "category" };
   }
 
   return {
-    effectivePrice: applyMargin(cost, FALLBACK_MARGIN_PCT),
-    source: 'fallback',
-    marginPct: FALLBACK_MARGIN_PCT,
+    finalPrice: applyMarkup(cost, FALLBACK_MARGIN_PCT),
+    markupPct: FALLBACK_MARGIN_PCT,
+    source: "fallback",
   };
 }
 
-function applyMargin(cost: number, marginPct: number): number {
-  return round2(cost * (1 + marginPct / 100));
+function applyMarkup(cost: number, markupPct: number): number {
+  return round2(cost * (1 + markupPct / 100));
 }
 
 function round2(n: number): number {
   return Math.round(n * 100) / 100;
 }
+
+export { FALLBACK_MARGIN_PCT };

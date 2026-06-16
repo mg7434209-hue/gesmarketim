@@ -1,7 +1,14 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { getProducts, type PublicProduct } from '../lib/api';
-import { WHATSAPP_URL } from '../config';
+import {
+  getBrands,
+  getCategories,
+  getProducts,
+  type ProductSort,
+  type PublicBrand,
+  type PublicCategory,
+  type PublicProduct,
+} from '../lib/api';
 import {
   LoadError,
   ProductCard,
@@ -9,45 +16,118 @@ import {
   ProductsEmpty,
 } from '../components/product-ui';
 
-const CATEGORY_FILTERS = [
-  'Güneş Paneli',
-  'İnverter',
-  'Batarya',
-  'Solar Kablo',
-  'Montaj Aparatı',
-  'Aksesuar',
+const SORT_OPTIONS: { value: ProductSort; label: string }[] = [
+  { value: 'name', label: 'Önerilen' },
+  { value: 'price_asc', label: 'Fiyat: Artan' },
+  { value: 'price_desc', label: 'Fiyat: Azalan' },
+  { value: 'newest', label: 'En Yeni' },
 ];
 
-const STOCK_FILTERS = ['Stokta', 'Siparişe özel'];
-const BRAND_FILTERS = ['DEYE', 'LEXRON', 'EVE', 'HUAWEI'];
-
-const SORT_OPTIONS = ['Önerilen', 'Fiyat: Artan', 'Fiyat: Azalan', 'İsim: A-Z'];
-
 type Status = 'loading' | 'ready' | 'error';
+
+type Filters = {
+  category: string;
+  brand: string;
+  inStock: boolean;
+  q: string;
+  minPrice: string;
+  maxPrice: string;
+  sort: ProductSort;
+};
+
+const EMPTY_FILTERS: Filters = {
+  category: '',
+  brand: '',
+  inStock: false,
+  q: '',
+  minPrice: '',
+  maxPrice: '',
+  sort: 'name',
+};
 
 export default function Products() {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [status, setStatus] = useState<Status>('loading');
   const [products, setProducts] = useState<PublicProduct[]>([]);
+  const [categories, setCategories] = useState<PublicCategory[]>([]);
+  const [brands, setBrands] = useState<PublicBrand[]>([]);
+  const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS);
+  const [reloadKey, setReloadKey] = useState(0);
 
-  const load = useCallback(() => {
+  // Load taxonomy once.
+  useEffect(() => {
     let active = true;
-    setStatus('loading');
-    getProducts()
-      .then((data) => {
+    Promise.all([getCategories(), getBrands()])
+      .then(([cats, brs]) => {
         if (!active) return;
-        setProducts(data);
-        setStatus('ready');
+        setCategories(cats);
+        setBrands(brs);
       })
       .catch(() => {
-        if (active) setStatus('error');
+        /* taxonomy failure is non-fatal; product list still works */
       });
     return () => {
       active = false;
     };
   }, []);
 
-  useEffect(() => load(), [load]);
+  // Debounced load of products whenever filters change.
+  const queryKey = useMemo(
+    () =>
+      JSON.stringify({
+        category: filters.category,
+        brand: filters.brand,
+        inStock: filters.inStock,
+        q: filters.q.trim(),
+        minPrice: filters.minPrice,
+        maxPrice: filters.maxPrice,
+        sort: filters.sort,
+        reloadKey,
+      }),
+    [filters, reloadKey],
+  );
+
+  useEffect(() => {
+    let active = true;
+    setStatus('loading');
+    const handle = window.setTimeout(() => {
+      const minPrice = filters.minPrice === '' ? undefined : Number(filters.minPrice);
+      const maxPrice = filters.maxPrice === '' ? undefined : Number(filters.maxPrice);
+      getProducts({
+        category: filters.category || undefined,
+        brand: filters.brand || undefined,
+        inStock: filters.inStock || undefined,
+        q: filters.q.trim() || undefined,
+        minPrice: Number.isFinite(minPrice) ? minPrice : undefined,
+        maxPrice: Number.isFinite(maxPrice) ? maxPrice : undefined,
+        sort: filters.sort,
+      })
+        .then((data) => {
+          if (!active) return;
+          setProducts(data);
+          setStatus('ready');
+        })
+        .catch(() => {
+          if (active) setStatus('error');
+        });
+    }, 250);
+    return () => {
+      active = false;
+      window.clearTimeout(handle);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [queryKey]);
+
+  const set = <K extends keyof Filters>(key: K, value: Filters[K]) =>
+    setFilters((f) => ({ ...f, [key]: value }));
+
+  const hasActiveFilters =
+    filters.category !== '' ||
+    filters.brand !== '' ||
+    filters.inStock ||
+    filters.q !== '' ||
+    filters.minPrice !== '' ||
+    filters.maxPrice !== '';
 
   return (
     <div className="bg-surface">
@@ -59,12 +139,8 @@ export default function Products() {
                 Anasayfa
               </Link>
             </li>
-            <li aria-hidden="true" className="text-text-secondary/60">
-              ›
-            </li>
-            <li aria-current="page" className="text-text-secondary">
-              Tüm Ürünler
-            </li>
+            <li aria-hidden="true" className="text-text-secondary/60">›</li>
+            <li aria-current="page" className="text-text-secondary">Tüm Ürünler</li>
           </ol>
         </nav>
 
@@ -77,7 +153,24 @@ export default function Products() {
           </p>
         </header>
 
-        <div className="mt-8 lg:hidden">
+        {/* Search bar */}
+        <div className="mt-6">
+          <label className="relative block max-w-xl">
+            <span className="sr-only">Ürün ara</span>
+            <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-text-secondary">
+              <SearchIcon />
+            </span>
+            <input
+              type="search"
+              value={filters.q}
+              onChange={(e) => set('q', e.target.value)}
+              placeholder="Ürün ara… (panel, inverter, batarya)"
+              className="w-full rounded-xl border border-border bg-white py-3 pl-11 pr-4 text-sm text-primary shadow-sm placeholder:text-text-secondary/70 focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30"
+            />
+          </label>
+        </div>
+
+        <div className="mt-6 lg:hidden">
           <button
             type="button"
             onClick={() => setMobileFiltersOpen((v) => !v)}
@@ -94,55 +187,105 @@ export default function Products() {
           </button>
         </div>
 
-        <div className="mt-6 flex flex-col gap-8 lg:mt-10 lg:flex-row lg:gap-10">
+        <div className="mt-6 flex flex-col gap-8 lg:mt-8 lg:flex-row lg:gap-10">
           <aside
             aria-label="Filtreler"
-            className={`${
-              mobileFiltersOpen ? 'block' : 'hidden'
-            } lg:block lg:w-64 lg:shrink-0`}
+            className={`${mobileFiltersOpen ? 'block' : 'hidden'} lg:block lg:w-64 lg:shrink-0`}
           >
             <div className="rounded-2xl border border-border bg-white p-5 shadow-card">
-              <h2 className="text-lg font-bold text-primary">Filtreler</h2>
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-bold text-primary">Filtreler</h2>
+                {hasActiveFilters && (
+                  <button
+                    type="button"
+                    onClick={() => setFilters(EMPTY_FILTERS)}
+                    className="text-xs font-semibold text-accent-dark hover:underline"
+                  >
+                    Temizle
+                  </button>
+                )}
+              </div>
 
-              <FilterGroup title="Kategori" items={CATEGORY_FILTERS} />
-              <FilterGroup title="Stok Durumu" items={STOCK_FILTERS} />
-              <FilterGroup title="Marka" items={BRAND_FILTERS} />
+              {/* Category */}
+              <FilterSection title="Kategori">
+                <RadioRow
+                  name="category"
+                  checked={filters.category === ''}
+                  onChange={() => set('category', '')}
+                  label="Tümü"
+                />
+                {categories.map((c) => (
+                  <RadioRow
+                    key={c.id}
+                    name="category"
+                    checked={filters.category === c.slug}
+                    onChange={() => set('category', c.slug)}
+                    label={c.name}
+                  />
+                ))}
+              </FilterSection>
 
-              <fieldset className="mt-6" disabled>
+              {/* Brand */}
+              {brands.length > 0 && (
+                <FilterSection title="Marka">
+                  <RadioRow
+                    name="brand"
+                    checked={filters.brand === ''}
+                    onChange={() => set('brand', '')}
+                    label="Tümü"
+                  />
+                  {brands.map((b) => (
+                    <RadioRow
+                      key={b.id}
+                      name="brand"
+                      checked={filters.brand === b.slug}
+                      onChange={() => set('brand', b.slug)}
+                      label={b.name}
+                    />
+                  ))}
+                </FilterSection>
+              )}
+
+              {/* Stock */}
+              <FilterSection title="Stok Durumu">
+                <label className="flex cursor-pointer items-center gap-2 text-sm text-primary">
+                  <input
+                    type="checkbox"
+                    checked={filters.inStock}
+                    onChange={(e) => set('inStock', e.target.checked)}
+                    className="h-4 w-4 rounded border-border text-accent focus:ring-accent"
+                  />
+                  Sadece mevcut ürünler
+                </label>
+              </FilterSection>
+
+              {/* Price */}
+              <fieldset className="mt-6">
                 <legend className="text-xs font-bold uppercase tracking-wider text-text-secondary">
-                  Fiyat Aralığı
+                  Fiyat Aralığı (₺)
                 </legend>
                 <div className="mt-3 flex items-center gap-2">
                   <input
                     type="number"
-                    placeholder="Min ₺"
+                    min="0"
+                    value={filters.minPrice}
+                    onChange={(e) => set('minPrice', e.target.value)}
+                    placeholder="Min"
                     aria-label="Minimum fiyat"
-                    className="w-full cursor-not-allowed rounded-lg border border-border bg-surface px-2.5 py-2 text-sm text-text-secondary placeholder:text-text-secondary/60"
+                    className="w-full rounded-lg border border-border bg-white px-2.5 py-2 text-sm text-primary placeholder:text-text-secondary/60 focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30"
                   />
                   <span className="text-text-secondary">—</span>
                   <input
                     type="number"
-                    placeholder="Max ₺"
+                    min="0"
+                    value={filters.maxPrice}
+                    onChange={(e) => set('maxPrice', e.target.value)}
+                    placeholder="Max"
                     aria-label="Maksimum fiyat"
-                    className="w-full cursor-not-allowed rounded-lg border border-border bg-surface px-2.5 py-2 text-sm text-text-secondary placeholder:text-text-secondary/60"
+                    className="w-full rounded-lg border border-border bg-white px-2.5 py-2 text-sm text-primary placeholder:text-text-secondary/60 focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30"
                   />
                 </div>
               </fieldset>
-
-              <div className="mt-6 rounded-xl border border-warning/30 bg-warning/10 p-3.5 text-xs leading-relaxed text-primary">
-                <p className="font-bold">Filtreler yakında aktif olacak.</p>
-                <p className="mt-1 text-text-secondary">
-                  Şu an{' '}
-                  <a
-                    href={WHATSAPP_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-bold text-primary underline decoration-accent decoration-2 underline-offset-2 hover:text-accent-dark"
-                  >
-                    WhatsApp ile detay sorabilirsin →
-                  </a>
-                </p>
-              </div>
             </div>
           </aside>
 
@@ -157,12 +300,15 @@ export default function Products() {
               <label className="inline-flex items-center gap-2 text-sm text-text-secondary">
                 <span className="font-semibold text-primary">Sırala:</span>
                 <select
-                  disabled
+                  value={filters.sort}
+                  onChange={(e) => set('sort', e.target.value as ProductSort)}
                   aria-label="Sıralama"
-                  className="cursor-not-allowed rounded-lg border border-border bg-surface px-3 py-1.5 text-sm text-text-secondary"
+                  className="rounded-lg border border-border bg-white px-3 py-1.5 text-sm text-primary focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30"
                 >
                   {SORT_OPTIONS.map((opt) => (
-                    <option key={opt}>{opt}</option>
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
                   ))}
                 </select>
               </label>
@@ -170,13 +316,16 @@ export default function Products() {
 
             <div className="mt-6">
               {status === 'loading' && <ProductGridSkeleton count={6} />}
-
-              {status === 'error' && <LoadError onRetry={load} />}
-
+              {status === 'error' && <LoadError onRetry={() => setReloadKey((k) => k + 1)} />}
               {status === 'ready' && products.length === 0 && (
-                <ProductsEmpty title="Ürünler çok yakında — WhatsApp'tan sorabilirsiniz" />
+                <ProductsEmpty
+                  title={
+                    hasActiveFilters
+                      ? 'Bu filtrelerle ürün bulunamadı'
+                      : "Ürünler çok yakında — WhatsApp'tan sorabilirsiniz"
+                  }
+                />
               )}
-
               {status === 'ready' && products.length > 0 && (
                 <ul className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
                   {products.map((product) => (
@@ -194,54 +343,54 @@ export default function Products() {
   );
 }
 
-type FilterGroupProps = { title: string; items: string[] };
-
-function FilterGroup({ title, items }: FilterGroupProps) {
+function FilterSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <fieldset className="mt-6" disabled>
-      <legend className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-text-secondary">
+    <fieldset className="mt-6">
+      <legend className="text-xs font-bold uppercase tracking-wider text-text-secondary">
         {title}
-        <SoonBadge />
       </legend>
-      <ul className="mt-3 space-y-2">
-        {items.map((item) => (
-          <li key={item}>
-            <label className="flex cursor-not-allowed items-center gap-2 text-sm text-text-secondary">
-              <input
-                type="checkbox"
-                disabled
-                className="h-4 w-4 cursor-not-allowed rounded border-border text-accent"
-              />
-              {item}
-            </label>
-          </li>
-        ))}
-      </ul>
+      <div className="mt-3 space-y-2">{children}</div>
     </fieldset>
   );
 }
 
-function SoonBadge() {
+function RadioRow({
+  name,
+  checked,
+  onChange,
+  label,
+}: {
+  name: string;
+  checked: boolean;
+  onChange: () => void;
+  label: string;
+}) {
   return (
-    <span className="inline-flex items-center rounded-full bg-warning/15 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-warning ring-1 ring-inset ring-warning/20">
-      Yakında
-    </span>
+    <label className="flex cursor-pointer items-center gap-2 text-sm text-primary">
+      <input
+        type="radio"
+        name={name}
+        checked={checked}
+        onChange={onChange}
+        className="h-4 w-4 border-border text-accent focus:ring-accent"
+      />
+      {label}
+    </label>
+  );
+}
+
+function SearchIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <circle cx="11" cy="11" r="8" />
+      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+    </svg>
   );
 }
 
 function FilterIcon() {
   return (
-    <svg
-      viewBox="0 0 24 24"
-      width="18"
-      height="18"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
     </svg>
   );

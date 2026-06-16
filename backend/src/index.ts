@@ -5,6 +5,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { healthRouter } from './routes/health.js';
 import { catalogRouter } from './routes/catalog.js';
+import { ordersRouter } from './routes/orders.js';
+import { adminRouter } from './routes/admin.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -28,7 +30,9 @@ app.use(
 
 // ---------- API routes ----------
 app.use('/api/health', healthRouter);
+app.use('/api/admin', adminRouter);
 app.use('/api', catalogRouter);
+app.use('/api', ordersRouter);
 
 // ---------- static frontend (production) ----------
 // In production the backend serves the built React app from frontend/dist.

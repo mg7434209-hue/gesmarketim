@@ -106,10 +106,43 @@ This monorepo is designed to deploy as a **single Railway service** for simplici
 - **Suppliers are admin-only.** Names like *Mexxsun* and *Enerji Pazarı* must never appear in storefront responses or HTML. *Brands* (DEYE, LEXRON, EVE) are customer-visible.
 - **Bulk / seed endpoints use an allowlist filter.** Before any write that takes a multi-field payload, intersect the incoming keys with an explicit `ALLOWED_FIELDS` set. A previous deploy 500'd because of unfiltered extra fields — don't repeat it.
 - **npm only.** A `pnpm-lock.yaml` or `yarn.lock` in this repo is a bug; the `.gitignore` excludes them.
-- **Skeleton state.** This README describes the target state. Until the first product/admin features are implemented, both pages are intentionally empty placeholders and the API exposes only `/api/health`.
+---
+
+## API surface
+
+**Public (storefront)**
+
+| Method & path | Purpose |
+|---|---|
+| `GET /api/health` | Liveness check |
+| `GET /api/categories` | Active tenant categories |
+| `GET /api/brands` | Customer-visible brands |
+| `GET /api/products` | Product list — filters: `category`, `brand`, `inStock`, `q`, `minPrice`, `maxPrice`, `sort` (`name`/`price_asc`/`price_desc`/`newest`) |
+| `GET /api/products/:slug` | Single product |
+| `POST /api/orders` | Create an order from a cart (prices re-validated server-side) |
+| `GET /api/orders/:number` | Order lookup for the confirmation page |
+
+**Admin (cookie-gated — `POST /api/admin/login` first)**
+
+`GET /stats` · products `GET/POST/PATCH/DELETE` · categories / brands / suppliers
+`GET/POST/PATCH/DELETE` · orders `GET` + `PATCH` (status). Auth is a stateless
+HMAC-signed session cookie keyed on `ADMIN_SESSION_SECRET` (see `src/lib/auth.ts`).
+
+## Storefront / admin UI
+
+- **Storefront:** home, categories, category page, product list (live search +
+  category/brand/stock/price filters + sort), product detail, **cart**,
+  **checkout**, **order confirmation**. Cart is localStorage-persisted.
+- **Admin (`/admin`):** login → dashboard (revenue/orders/products stats),
+  product CRUD with auto-priced `finalPrice`, order management with status flow,
+  and catalog structure (categories / brands / suppliers).
 
 ---
 
 ## Status
 
-> **Skeleton only** — no products, no admin features, no database schema yet. See the next-step plan in conversation.
+> **Functional storefront + admin.** Catalog API, cart/checkout/orders, and a
+> cookie-gated admin panel are implemented. Run `npm run db:migrate` then
+> `npm run db:seed` to populate the tenant, taxonomy and a sample catalogue.
+> Possible next steps: online payment integration, supplier sync automation,
+> product image uploads, and customer accounts.
