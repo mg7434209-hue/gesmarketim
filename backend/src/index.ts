@@ -11,6 +11,7 @@ import { paymentRouter } from './routes/payment.js';
 import { accountRouter } from './routes/account.js';
 import { seoRouter } from './routes/seo.js';
 import { startSyncScheduler } from './lib/sync/scheduler.js';
+import { runMigrations, isAutoMigrateEnabled } from './db/runMigrations.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -83,8 +84,24 @@ app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   res.status(500).json({ error: 'Internal server error' });
 });
 
-app.listen(PORT, () => {
-  console.log(`[gesmarketim] backend listening on :${PORT} (${NODE_ENV})`);
-  // Opt-in supplier feed scheduler (no-op unless SYNC_SCHEDULER_ENABLED=true).
-  startSyncScheduler();
-});
+async function start(): Promise<void> {
+  // Apply pending DB migrations before serving (AUTO_MIGRATE=false to skip).
+  // Fail-soft: a migration error is logged but doesn't stop the server, so
+  // browsing/catalog stay up even if the DB is briefly unreachable at boot.
+  if (isAutoMigrateEnabled()) {
+    try {
+      await runMigrations();
+      console.log('[gesmarketim] migrations up to date');
+    } catch (err) {
+      console.error('[gesmarketim] migration failed — run `npm run db:migrate`', err);
+    }
+  }
+
+  app.listen(PORT, () => {
+    console.log(`[gesmarketim] backend listening on :${PORT} (${NODE_ENV})`);
+    // Opt-in supplier feed scheduler (no-op unless SYNC_SCHEDULER_ENABLED=true).
+    startSyncScheduler();
+  });
+}
+
+void start();

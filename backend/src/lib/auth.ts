@@ -86,29 +86,32 @@ export function parseCookies(header: string | undefined): Record<string, string>
   return out;
 }
 
+// Cross-site (separate storefront/API domains) in production needs SameSite=None
+// + Secure so the admin cookie rides credentialed fetches. Dev (http) uses Lax.
+const COOKIE_SECURE = process.env.NODE_ENV === "production";
+const COOKIE_SAMESITE = COOKIE_SECURE ? "None" : "Lax";
+
 export function setAdminCookie(res: Response, token: string): void {
-  const secure = process.env.NODE_ENV === "production";
   const attrs = [
     `${ADMIN_COOKIE}=${token}`,
     "Path=/",
     "HttpOnly",
-    "SameSite=Lax",
+    `SameSite=${COOKIE_SAMESITE}`,
     `Max-Age=${Math.floor(MAX_AGE_MS / 1000)}`,
   ];
-  if (secure) attrs.push("Secure");
+  if (COOKIE_SECURE) attrs.push("Secure");
   res.append("Set-Cookie", attrs.join("; "));
 }
 
 export function clearAdminCookie(res: Response): void {
-  const secure = process.env.NODE_ENV === "production";
   const attrs = [
     `${ADMIN_COOKIE}=`,
     "Path=/",
     "HttpOnly",
-    "SameSite=Lax",
+    `SameSite=${COOKIE_SAMESITE}`,
     "Max-Age=0",
   ];
-  if (secure) attrs.push("Secure");
+  if (COOKIE_SECURE) attrs.push("Secure");
   res.append("Set-Cookie", attrs.join("; "));
 }
 
