@@ -5,9 +5,10 @@ import AdminDashboard from '../admin/AdminDashboard';
 import AdminProducts from '../admin/AdminProducts';
 import AdminOrders from '../admin/AdminOrders';
 import AdminTaxonomy from '../admin/AdminTaxonomy';
+import AdminSync from '../admin/AdminSync';
 import { btnGhost, btnPrimary, inputCls, labelCls, Spinner } from '../admin/ui';
 
-type Section = 'dashboard' | 'products' | 'orders' | 'taxonomy';
+type Section = 'dashboard' | 'products' | 'orders' | 'taxonomy' | 'sync';
 type AuthState = 'checking' | 'in' | 'out';
 
 const SECTIONS: { id: Section; label: string; icon: string }[] = [
@@ -15,6 +16,7 @@ const SECTIONS: { id: Section; label: string; icon: string }[] = [
   { id: 'products', label: 'Ürünler', icon: '▢' },
   { id: 'orders', label: 'Siparişler', icon: '◷' },
   { id: 'taxonomy', label: 'Katalog Yapısı', icon: '⛁' },
+  { id: 'sync', label: 'Senkron', icon: '⟳' },
 ];
 
 export default function Admin() {
@@ -94,6 +96,7 @@ export default function Admin() {
               {section === 'products' && <AdminProducts onAuthError={() => setAuth('out')} />}
               {section === 'orders' && <AdminOrders onAuthError={() => setAuth('out')} />}
               {section === 'taxonomy' && <AdminTaxonomy onAuthError={() => setAuth('out')} />}
+              {section === 'sync' && <AdminSync onAuthError={() => setAuth('out')} />}
             </div>
           </main>
         </div>

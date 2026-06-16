@@ -33,9 +33,11 @@ import {
   type ProductImage,
 } from "../db/schema.js";
 import { getTenantId } from "../lib/tenant.js";
-import { computeFinalPrice } from "../db/pricing.js";
+import { resolveFinalPrice } from "../db/resolvePrice.js";
 import { slugify } from "../lib/util.js";
 import { isUploadConfigured, uploadImage, activeProvider, UploadError } from "../lib/storage/index.js";
+import { parseCsv } from "../lib/sync/csv.js";
+import { runCsvSync } from "../lib/sync/engine.js";
 import {
   verifyCredentials,
   issueToken,
@@ -99,43 +101,6 @@ function sanitizeImages(v: unknown): ProductImage[] {
   // exactly one primary (first one wins if none flagged)
   if (out.length > 0 && !out.some((i) => i.isPrimary)) out[0].isPrimary = true;
   return out;
-}
-
-/** Resolve the snapshot finalPrice from cost + the markup chain. */
-async function resolveFinalPrice(args: {
-  tenantId: string;
-  costPrice: string | null;
-  markupPercent: string | null;
-  categoryId: string | null;
-  supplierId: string | null;
-}): Promise<string> {
-  let supplierMarkup: string | null = null;
-  let categoryMarkup: string | null = null;
-
-  if (args.supplierId) {
-    const [s] = await db
-      .select({ m: suppliers.defaultMarkupPercent })
-      .from(suppliers)
-      .where(and(eq(suppliers.tenantId, args.tenantId), eq(suppliers.id, args.supplierId)))
-      .limit(1);
-    supplierMarkup = s?.m ?? null;
-  }
-  if (args.categoryId) {
-    const [c] = await db
-      .select({ m: categories.defaultMarkupPercent })
-      .from(categories)
-      .where(and(eq(categories.tenantId, args.tenantId), eq(categories.id, args.categoryId)))
-      .limit(1);
-    categoryMarkup = c?.m ?? null;
-  }
-
-  const { finalPrice } = computeFinalPrice({
-    costPrice: args.costPrice,
-    productMarkupPct: args.markupPercent,
-    supplierMarkupPct: supplierMarkup,
-    categoryMarkupPct: categoryMarkup,
-  });
-  return finalPrice.toFixed(2);
 }
 
 const PG_UNIQUE_VIOLATION = "23505";
@@ -774,6 +739,67 @@ adminRouter.delete(
       return;
     }
     res.json({ ok: true });
+  }),
+);
+
+// ===========================================================================
+// SUPPLIER SYNC (CSV import)
+// ===========================================================================
+adminRouter.post(
+  "/suppliers/:id/sync/csv",
+  json({ limit: "8mb" }),
+  asyncHandler(async (req, res) => {
+    const tenantId = await getTenantId();
+    const supplierId = req.params.id;
+
+    // Supplier must belong to the active tenant.
+    const [supplier] = await db
+      .select({ id: suppliers.id })
+      .from(suppliers)
+      .where(and(eq(suppliers.tenantId, tenantId), eq(suppliers.id, supplierId)))
+      .limit(1);
+    if (!supplier) {
+      res.status(404).json({ error: "not_found" });
+      return;
+    }
+
+    const body = (req.body ?? {}) as Record<string, unknown>;
+    const csv = typeof body.csv === "string" ? body.csv : "";
+    if (csv.trim() === "") {
+      res.status(400).json({ error: "validation", message: "CSV içeriği boş." });
+      return;
+    }
+
+    const { rows } = parseCsv(csv);
+    if (rows.length === 0) {
+      res.status(400).json({ error: "validation", message: "CSV satırı bulunamadı." });
+      return;
+    }
+    if (rows.length > 5000) {
+      res.status(400).json({ error: "too_large", message: "En fazla 5000 satır." });
+      return;
+    }
+
+    const defaultCategoryId =
+      typeof body.defaultCategoryId === "string" && body.defaultCategoryId
+        ? body.defaultCategoryId
+        : null;
+
+    const summary = await runCsvSync(tenantId, supplierId, rows, {
+      createMissing: body.createMissing === true,
+      defaultCategoryId,
+      dryRun: body.dryRun === true,
+    });
+
+    // Bump supplier's lastSyncedAt-equivalent metadata via syncConfig timestamp.
+    if (!summary.dryRun) {
+      await db
+        .update(suppliers)
+        .set({ updatedAt: new Date() })
+        .where(and(eq(suppliers.tenantId, tenantId), eq(suppliers.id, supplierId)));
+    }
+
+    res.json(summary);
   }),
 );
 

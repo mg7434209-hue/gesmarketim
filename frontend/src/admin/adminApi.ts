@@ -154,6 +154,24 @@ export type AdminOrderDetail = AdminOrderListItem & {
   }[];
 };
 
+export type SyncSummary = {
+  total: number;
+  created: number;
+  updated: number;
+  unchanged: number;
+  skipped: number;
+  dryRun: boolean;
+  errors: { row: number; sku: string; reason: string }[];
+  details: { row: number; sku: string; action: string; note?: string }[];
+};
+
+export type SyncRequest = {
+  csv: string;
+  createMissing?: boolean;
+  defaultCategoryId?: string | null;
+  dryRun?: boolean;
+};
+
 export type AdminStats = {
   products: { total: number; active: number };
   orders: {
@@ -220,6 +238,8 @@ export const adminApi = {
     update: (id: string, body: Partial<AdminSupplier>) =>
       request<AdminSupplier>(`/suppliers/${id}`, { method: 'PATCH', body }),
     remove: (id: string) => request<{ ok: true }>(`/suppliers/${id}`, { method: 'DELETE' }),
+    syncCsv: (id: string, body: SyncRequest) =>
+      request<SyncSummary>(`/suppliers/${id}/sync/csv`, { method: 'POST', body }),
   },
 
   orders: {

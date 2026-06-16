@@ -125,7 +125,8 @@ This monorepo is designed to deploy as a **single Railway service** for simplici
 | `POST /api/payment/iyzico/callback` | iyzico Checkout Form return (card) |
 
 Admin also exposes `GET /api/admin/upload-config` and `POST /api/admin/uploads`
-(base64 data URL → hosted image URL) for product image uploads.
+(base64 data URL → hosted image URL) for product image uploads, and
+`POST /api/admin/suppliers/:id/sync/csv` for supplier price/stock import.
 
 **Admin (cookie-gated — `POST /api/admin/login` first)**
 
@@ -161,12 +162,28 @@ HMAC-signed session cookie keyed on `ADMIN_SESSION_SECRET` (see `src/lib/auth.ts
   Cloudinary and returns the hosted URL. Storage logic is abstracted in
   `src/lib/storage/` so S3/R2 can be added without changing the UI.
 
+## Supplier sync (CSV import)
+
+- Admin **Senkron** tab: pick a supplier, paste/upload a CSV (or download the
+  template), and import price/stock. Rows match products by
+  `(supplierId, supplierSku)`; cost/stock/markup are updated and `finalPrice` is
+  recomputed from the markup chain.
+- Out-of-stock stock items are auto-archived when `autoDisableOnOos` is set, and
+  re-activated when stock returns. Unmatched rows can optionally create draft
+  products. A **dry-run / preview** mode reports created/updated/skipped counts
+  and per-row errors without writing.
+- Parser (`src/lib/sync/csv.ts`) is dependency-free, auto-detects `,`/`;`
+  delimiters and TR/EN decimal formats. The same engine
+  (`src/lib/sync/engine.ts`) can later be driven by a scheduled job or a
+  supplier API/feed (the `suppliers.syncMethod` field already models this).
+
 ---
 
 ## Status
 
-> **Functional storefront + admin.** Catalog API, cart/checkout/orders, payments
-> (bank transfer / cash on delivery / iyzico card), product image management, and
-> a cookie-gated admin panel are implemented. Run `npm run db:migrate` then
-> `npm run db:seed` to populate the tenant, taxonomy and a sample catalogue.
-> Possible next steps: supplier sync automation and customer accounts.
+> **Production-ready storefront + admin.** Catalog API, cart/checkout/orders,
+> payments (bank transfer / cash on delivery / iyzico card), product image
+> management, and supplier CSV sync are implemented behind a cookie-gated admin
+> panel. Run `npm run db:migrate` then `npm run db:seed` to populate the tenant,
+> taxonomy and a sample catalogue.
+> Possible next steps: scheduled/API-based supplier sync and customer accounts.
