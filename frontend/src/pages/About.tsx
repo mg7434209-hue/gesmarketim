@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useSeo } from '../lib/seo';
 
 const REASONS = [
   {
@@ -24,6 +25,12 @@ const REASONS = [
 ];
 
 export default function About() {
+  useSeo({
+    title: 'Hakkımızda',
+    description:
+      'GES MARKETİM, Manavgat (Antalya) merkezli Gespa Enerji bünyesinde faaliyet gösteren, KDV dahil net fiyatlı online solar satış kanalıdır.',
+    path: '/hakkimizda',
+  });
   return (
     <div className="bg-white">
       <div className="container-x py-12">

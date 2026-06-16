@@ -15,6 +15,8 @@ import {
   primaryImage,
   whatsappProductUrl,
 } from '../components/product-ui';
+import { useSeo } from '../lib/seo';
+import { SITE_NAME, SITE_URL } from '../config';
 
 type Status = 'loading' | 'ready' | 'notfound' | 'error';
 
@@ -58,6 +60,68 @@ export default function ProductDetail() {
 function DetailView({ product }: { product: PublicProduct }) {
   const image = primaryImage(product);
   const [quantity, setQuantity] = useState(1);
+
+  const path = `/urun/${product.slug}`;
+  const metaDescription = (
+    product.description
+      ? product.description.replace(/\s+/g, ' ').trim()
+      : `${product.name} — KDV dahil net fiyatla GES MARKETİM'de.`
+  ).slice(0, 160);
+
+  useSeo({
+    title: product.brand ? `${product.name} — ${product.brand.name}` : product.name,
+    description: metaDescription,
+    path,
+    image: image?.url,
+    type: 'product',
+    jsonLd: [
+      {
+        '@context': 'https://schema.org',
+        '@type': 'Product',
+        name: product.name,
+        description: metaDescription,
+        image: product.images.map((img) => img.url).filter(Boolean),
+        sku: product.id,
+        ...(product.brand
+          ? { brand: { '@type': 'Brand', name: product.brand.name } }
+          : {}),
+        ...(product.category ? { category: product.category.name } : {}),
+        offers: {
+          '@type': 'Offer',
+          url: `${SITE_URL}${path}`,
+          price: product.price.toFixed(2),
+          priceCurrency: product.currency,
+          availability: product.inStock
+            ? 'https://schema.org/InStock'
+            : 'https://schema.org/OutOfStock',
+          seller: { '@type': 'Organization', name: SITE_NAME },
+        },
+      },
+      {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Anasayfa', item: SITE_URL },
+          ...(product.category
+            ? [
+                {
+                  '@type': 'ListItem',
+                  position: 2,
+                  name: product.category.name,
+                  item: `${SITE_URL}/kategori/${product.category.slug}`,
+                },
+              ]
+            : []),
+          {
+            '@type': 'ListItem',
+            position: product.category ? 3 : 2,
+            name: product.name,
+            item: `${SITE_URL}${path}`,
+          },
+        ],
+      },
+    ],
+  });
 
   return (
     <>

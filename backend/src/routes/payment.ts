@@ -17,6 +17,7 @@ import {
   paymentConfig,
 } from "../lib/shopConfig.js";
 import { retrieveCheckoutResult } from "../lib/payments/iyzico.js";
+import { siteBaseUrl } from "../lib/siteUrl.js";
 
 export const paymentRouter = Router();
 
@@ -26,14 +27,6 @@ function asyncHandler(
   return (req, res, next) => {
     fn(req, res).catch(next);
   };
-}
-
-function siteBaseUrl(): string {
-  const explicit = process.env.PUBLIC_SITE_URL?.trim();
-  if (explicit) return explicit.replace(/\/$/, "");
-  const cors = process.env.CORS_ORIGIN?.split(",")[0]?.trim();
-  if (cors) return cors.replace(/\/$/, "");
-  return "";
 }
 
 // ---------- GET /api/payment/methods ----------

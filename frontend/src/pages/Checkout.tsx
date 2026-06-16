@@ -10,6 +10,7 @@ import {
   type PaymentMethod,
   type PaymentMethodsInfo,
 } from '../lib/api';
+import { useSeo } from '../lib/seo';
 
 const METHOD_LABELS: Record<PaymentMethod, { title: string; desc: string }> = {
   bank_transfer: {
@@ -47,6 +48,7 @@ const EMPTY: FormState = {
 };
 
 export default function Checkout() {
+  useSeo({ title: 'Ödeme', path: '/odeme', noindex: true });
   const { items, subtotal, clear } = useCart();
   const navigate = useNavigate();
 

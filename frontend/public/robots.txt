@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Transactional / private areas — no SEO value, keep out of the index.
+Disallow: /sepet
+Disallow: /odeme
+Disallow: /siparis/
+Disallow: /admin
+
+Sitemap: https://gesmarketim.com/sitemap.xml

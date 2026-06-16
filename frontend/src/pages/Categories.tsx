@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getCategories, type PublicCategory } from '../lib/api';
+import { useSeo } from '../lib/seo';
 
 // Marketing copy per category (not part of the product API).
 const DESCRIPTIONS: Record<string, string> = {
@@ -21,6 +22,12 @@ const DEFAULT_DESCRIPTION =
 type Status = 'loading' | 'ready' | 'error';
 
 export default function Categories() {
+  useSeo({
+    title: 'Kategoriler',
+    description:
+      'Güneş paneli, inverter, batarya, solar kablo, montaj aparatı ve aksesuar kategorileri — KDV dahil net fiyatlarla GES MARKETİM.',
+    path: '/kategoriler',
+  });
   const [status, setStatus] = useState<Status>('loading');
   const [categories, setCategories] = useState<PublicCategory[]>([]);
 

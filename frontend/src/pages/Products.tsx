@@ -15,6 +15,7 @@ import {
   ProductGridSkeleton,
   ProductsEmpty,
 } from '../components/product-ui';
+import { useSeo } from '../lib/seo';
 
 const SORT_OPTIONS: { value: ProductSort; label: string }[] = [
   { value: 'name', label: 'Önerilen' },
@@ -46,6 +47,12 @@ const EMPTY_FILTERS: Filters = {
 };
 
 export default function Products() {
+  useSeo({
+    title: 'Tüm Ürünler — Güneş Paneli, İnverter, Batarya',
+    description:
+      'Güneş paneli, inverter, batarya, solar kablo ve aksesuarlar — KDV dahil net fiyatlarla. Markaya, fiyata ve stok durumuna göre filtrele.',
+    path: '/urunler',
+  });
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [status, setStatus] = useState<Status>('loading');
   const [products, setProducts] = useState<PublicProduct[]>([]);

@@ -8,6 +8,7 @@ import { catalogRouter } from './routes/catalog.js';
 import { ordersRouter } from './routes/orders.js';
 import { adminRouter } from './routes/admin.js';
 import { paymentRouter } from './routes/payment.js';
+import { seoRouter } from './routes/seo.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -37,6 +38,9 @@ app.use('/api/admin', adminRouter);
 app.use('/api', catalogRouter);
 app.use('/api', ordersRouter);
 app.use('/api', paymentRouter);
+
+// ---------- SEO (served at site root, before the SPA fallback) ----------
+app.use('/', seoRouter);
 
 // ---------- static frontend (production) ----------
 // In production the backend serves the built React app from frontend/dist.

@@ -2,8 +2,10 @@ import { Link } from 'react-router-dom';
 import { useCart } from '../cart/CartContext';
 import { formatPrice, FulfillmentBadge } from '../components/product-ui';
 import { FREE_SHIPPING_THRESHOLD, FLAT_SHIPPING, shippingFor } from '../lib/shipping';
+import { useSeo } from '../lib/seo';
 
 export default function Cart() {
+  useSeo({ title: 'Sepetim', path: '/sepet', noindex: true });
   const { items, subtotal, setQuantity, remove } = useCart();
 
   const shipping = shippingFor(subtotal);

@@ -1,6 +1,7 @@
 import { FormEvent, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { WHATSAPP_URL, WHATSAPP_DISPLAY } from '../config';
+import { useSeo } from '../lib/seo';
 
 const SUBJECTS = [
   'Genel Bilgi',
@@ -27,6 +28,12 @@ const INITIAL_STATE: FormState = {
 };
 
 export default function Contact() {
+  useSeo({
+    title: 'İletişim',
+    description:
+      'GES MARKETİM ile iletişime geçin — WhatsApp, telefon ve e-posta ile ürün, sipariş ve kargo desteği. Manavgat / Antalya.',
+    path: '/iletisim',
+  });
   const [form, setForm] = useState<FormState>(INITIAL_STATE);
 
   function handleChange<K extends keyof FormState>(field: K, value: FormState[K]) {

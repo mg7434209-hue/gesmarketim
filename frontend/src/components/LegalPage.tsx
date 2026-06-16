@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
+import { useSeo } from '../lib/seo';
 
 type LegalPageProps = {
   title: string;
@@ -16,6 +17,10 @@ export default function LegalPage({
   showDraftBadge = false,
   children,
 }: LegalPageProps) {
+  useSeo({
+    title,
+    description: `${title} — GES MARKETİM yasal bilgilendirme ve politika metni.`,
+  });
   return (
     <div className="bg-white">
       <div className="container-x py-12">

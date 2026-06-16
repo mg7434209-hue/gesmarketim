@@ -7,6 +7,7 @@ import {
   type OrderResult,
 } from '../lib/api';
 import { formatPrice } from '../components/product-ui';
+import { useSeo } from '../lib/seo';
 
 type Status = 'loading' | 'ready' | 'notfound' | 'error';
 
@@ -19,6 +20,7 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 export default function OrderConfirmation() {
+  useSeo({ title: 'Sipariş Onayı', noindex: true });
   const { number = '' } = useParams<{ number: string }>();
   const location = useLocation();
   const [searchParams] = useSearchParams();

@@ -123,6 +123,7 @@ This monorepo is designed to deploy as a **single Railway service** for simplici
 | `GET /api/orders/:number` | Order lookup for the confirmation page |
 | `GET /api/payment/methods` | Enabled payment methods + bank-transfer details |
 | `POST /api/payment/iyzico/callback` | iyzico Checkout Form return (card) |
+| `GET /sitemap.xml` | Dynamic sitemap — static pages + every active category & product |
 
 Admin also exposes `GET /api/admin/upload-config` and `POST /api/admin/uploads`
 (base64 data URL → hosted image URL) for product image uploads, and
@@ -142,6 +143,20 @@ HMAC-signed session cookie keyed on `ADMIN_SESSION_SECRET` (see `src/lib/auth.ts
 - **Admin (`/admin`):** login → dashboard (revenue/orders/products stats),
   product CRUD with auto-priced `finalPrice`, order management with order +
   payment status flow, and catalog structure (categories / brands / suppliers).
+
+## SEO
+
+- Each route sets its own **title, meta description, canonical, Open Graph and
+  Twitter tags** via a dependency-free `useSeo` hook (`frontend/src/lib/seo.ts`).
+  Product pages also emit **Product + BreadcrumbList JSON-LD** (price, currency,
+  availability); the home page emits **Organization + WebSite** JSON-LD.
+- Transactional pages (cart, checkout, order confirmation) are `noindex`.
+- `frontend/public/robots.txt` allows crawling, blocks transactional/admin
+  paths, and points to the sitemap. The backend serves a **dynamic
+  `/sitemap.xml`** built from the active catalogue.
+- Set `VITE_SITE_URL` (frontend, canonical base for OG/JSON-LD) and
+  `PUBLIC_SITE_URL` (backend, sitemap base). Both default to
+  `https://gesmarketim.com`.
 
 ## Payments
 

@@ -11,6 +11,7 @@ import {
   ProductGridSkeleton,
   ProductsEmpty,
 } from '../components/product-ui';
+import { useSeo } from '../lib/seo';
 
 type Status = 'loading' | 'ready' | 'error';
 
@@ -42,6 +43,14 @@ export default function CategoryPage() {
   useEffect(() => load(), [load]);
 
   const title = categoryName ?? 'Kategori';
+
+  useSeo({
+    title: `${title} — Solar Ürünler`,
+    description: categoryName
+      ? `${categoryName} kategorisindeki ürünleri keşfet — KDV dahil net fiyatlarla GES MARKETİM'de.`
+      : undefined,
+    path: `/kategori/${slug}`,
+  });
 
   return (
     <div className="bg-surface">
