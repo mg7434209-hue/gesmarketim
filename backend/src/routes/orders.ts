@@ -21,6 +21,7 @@ import {
   type PaymentMethod,
 } from "../lib/shopConfig.js";
 import { initCheckoutForm } from "../lib/payments/iyzico.js";
+import { sendOrderNotifications } from "../lib/notify/orderEmail.js";
 
 export const ordersRouter = Router();
 
@@ -288,6 +289,32 @@ ordersRouter.post(
         };
       }
     }
+
+    // Fire-and-forget order notifications (admin alert + customer copy).
+    // Email failures must never break checkout, so we don't await the result.
+    void sendOrderNotifications({
+      orderNumber: created.orderNumber,
+      customerName,
+      customerEmail: customerEmail || null,
+      customerPhone,
+      city,
+      district,
+      addressLine,
+      note: note || null,
+      paymentMethod,
+      items: lineValues.map((l) => ({
+        name: l.productName,
+        quantity: l.quantity,
+        unitPrice: l.unitPrice,
+        lineTotal: l.lineTotal,
+      })),
+      subtotal,
+      shippingCost,
+      total,
+      currency: shopConfig.currency,
+    }).catch((err) => {
+      console.error("[orders] notification failed", err);
+    });
 
     res.status(201).json(responseBody);
   }),

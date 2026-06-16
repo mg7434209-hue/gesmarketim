@@ -168,6 +168,19 @@ HMAC-signed session cookie keyed on `ADMIN_SESSION_SECRET` (see `src/lib/auth.ts
   order's payment status. Provider logic lives in `src/lib/payments/`; the
   provider-agnostic shape makes swapping/adding a processor straightforward.
 
+## Order notification emails
+
+- When an order is placed the backend sends an **admin alert** (full customer /
+  address / contact details + line items) and a **customer confirmation**
+  (summary + payment next steps; bank-transfer orders include the IBAN).
+- Activates only when `SMTP_HOST` + `SMTP_USER` + `SMTP_PASS` are set — otherwise
+  emails are skipped silently, exactly like the iyzico / Cloudinary integrations.
+  Works with any SMTP provider (Gmail App Password, Brevo, Yandex…).
+- Sending is **fire-and-forget**: an SMTP failure is logged but never blocks
+  checkout. Recipients for the admin alert come from `ORDER_NOTIFY_EMAIL`
+  (comma-separated), falling back to `MAIL_FROM` / `SMTP_USER`. Logic lives in
+  `src/lib/notify/`.
+
 ## Media / product images
 
 - The admin product form manages **multiple images** — paste URLs, reorder, pick
