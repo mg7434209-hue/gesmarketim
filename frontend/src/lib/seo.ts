@@ -14,6 +14,8 @@ export type SeoInput = {
   path?: string;
   /** Absolute or site-relative image URL for social cards. */
   image?: string;
+  /** Alt text for the social image. Defaults to the page title. */
+  imageAlt?: string;
   /** Open Graph object type. */
   type?: 'website' | 'product' | 'article';
   /** Keep the page out of search indexes (cart, checkout, admin…). */
@@ -84,6 +86,7 @@ export function useSeo(input: SeoInput): void {
     description = DEFAULT_DESCRIPTION,
     path,
     image,
+    imageAlt,
     type = 'website',
     noindex = false,
     jsonLd = null,
@@ -120,12 +123,14 @@ export function useSeo(input: SeoInput): void {
     metaProp('og:type', type);
     metaProp('og:url', canonical);
     metaProp('og:image', imageUrl);
+    if (imageUrl) metaProp('og:image:alt', imageAlt || title || SITE_NAME);
     metaProp('og:locale', 'tr_TR');
 
     metaName('twitter:card', imageUrl ? 'summary_large_image' : 'summary');
     metaName('twitter:title', fullTitle);
     metaName('twitter:description', description);
     metaName('twitter:image', imageUrl);
+    if (imageUrl) metaName('twitter:image:alt', imageAlt || title || SITE_NAME);
 
     const scriptSel = 'script[type="application/ld+json"][data-seo]';
     const existing = document.head.querySelector(scriptSel);
@@ -144,9 +149,11 @@ export function useSeo(input: SeoInput): void {
     }
   }, [
     fullTitle,
+    title,
     description,
     canonical,
     imageUrl,
+    imageAlt,
     type,
     noindex,
     jsonLdString,

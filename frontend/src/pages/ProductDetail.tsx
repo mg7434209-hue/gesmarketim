@@ -73,6 +73,7 @@ function DetailView({ product }: { product: PublicProduct }) {
     description: metaDescription,
     path,
     image: image?.url,
+    imageAlt: product.name,
     type: 'product',
     jsonLd: [
       {
@@ -163,6 +164,8 @@ function DetailView({ product }: { product: PublicProduct }) {
             <img
               src={image.url}
               alt={image.alt || product.name}
+              decoding="async"
+              fetchPriority="high"
               className="absolute inset-0 h-full w-full object-cover"
             />
           ) : (
