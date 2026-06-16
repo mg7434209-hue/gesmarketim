@@ -8,7 +8,7 @@
 // Mounted in src/index.ts alongside /api/health.
 
 import { Router, type Request, type Response, type NextFunction } from 'express';
-import { and, asc, desc, eq, gt, gte, ilike, lte, or, type SQL } from 'drizzle-orm';
+import { and, asc, desc, eq, gt, gte, ilike, lte, ne, or, type SQL } from 'drizzle-orm';
 import { db } from '../db/index.js';
 import { brands, categories, products } from '../db/schema.js';
 import { getTenantId } from '../lib/tenant.js';
@@ -209,6 +209,79 @@ catalogRouter.get(
         brand: row.brand,
         category: row.category,
       }),
+    );
+  }),
+);
+
+// ---------- GET /api/products/:slug/related ----------
+// Cross-sell: other active products in the same category (newest first),
+// falling back to newest overall when the product has no category or too few
+// siblings. Never returns the product itself.
+catalogRouter.get(
+  '/products/:slug/related',
+  asyncHandler(async (req, res) => {
+    const tenantId = await getTenantId();
+    const { slug } = req.params;
+    const limit = Math.min(
+      Math.max(Number(req.query.limit) || 4, 1),
+      12,
+    );
+
+    const base = await db.query.products.findFirst({
+      where: and(
+        eq(products.tenantId, tenantId),
+        eq(products.status, 'active'),
+        eq(products.slug, slug),
+      ),
+      columns: { id: true, categoryId: true },
+    });
+    if (!base) {
+      res.json([]);
+      return;
+    }
+
+    const withRels = {
+      brand: { columns: { name: true, slug: true } },
+      category: { columns: { name: true, slug: true } },
+    } as const;
+
+    const sameCategory = base.categoryId
+      ? await db.query.products.findMany({
+          where: and(
+            eq(products.tenantId, tenantId),
+            eq(products.status, 'active'),
+            eq(products.categoryId, base.categoryId),
+            ne(products.id, base.id),
+          ),
+          with: withRels,
+          orderBy: [desc(products.createdAt)],
+          limit,
+        })
+      : [];
+
+    // Top up with newest overall if the category didn't yield enough.
+    let rows = sameCategory;
+    if (rows.length < limit) {
+      const exclude = new Set([base.id, ...rows.map((r) => r.id)]);
+      const fillers = await db.query.products.findMany({
+        where: and(
+          eq(products.tenantId, tenantId),
+          eq(products.status, 'active'),
+          ne(products.id, base.id),
+        ),
+        with: withRels,
+        orderBy: [desc(products.createdAt)],
+        limit: limit + exclude.size,
+      });
+      rows = rows.concat(
+        fillers.filter((f) => !exclude.has(f.id)).slice(0, limit - rows.length),
+      );
+    }
+
+    res.json(
+      rows.map((row) =>
+        toPublicProduct({ product: row, brand: row.brand, category: row.category }),
+      ),
     );
   }),
 );

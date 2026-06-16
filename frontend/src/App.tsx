@@ -1,4 +1,5 @@
-import { Routes, Route } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -17,10 +18,22 @@ import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import OrderConfirmation from './pages/OrderConfirmation';
 import Account from './pages/Account';
+import NotFound from './pages/NotFound';
+
+// Reset scroll to the top on every route change — without this, navigating
+// (e.g. clicking a product) keeps the previous page's scroll position.
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
 
 export default function App() {
   return (
     <div className="flex min-h-screen flex-col bg-white">
+      <ScrollToTop />
       <Header />
       <main className="flex-1">
         <Routes>
@@ -40,6 +53,7 @@ export default function App() {
           <Route path="/odeme" element={<Checkout />} />
           <Route path="/siparis/:number" element={<OrderConfirmation />} />
           <Route path="/hesabim" element={<Account />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
       <Footer />

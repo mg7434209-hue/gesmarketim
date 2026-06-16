@@ -321,6 +321,12 @@ export function getMyOrders(): Promise<CustomerOrder[]> {
   return accountRequest<CustomerOrder[]>('/orders', 'GET');
 }
 
+export function getRelatedProducts(slug: string, limit = 4): Promise<PublicProduct[]> {
+  return getJson<PublicProduct[]>(
+    `/api/products/${encodeURIComponent(slug)}/related?limit=${limit}`,
+  );
+}
+
 export async function getProduct(slug: string): Promise<PublicProduct> {
   const res = await fetch(
     `${API_URL}/api/products/${encodeURIComponent(slug)}`,

@@ -2,12 +2,14 @@ import { useCallback, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import {
   getProduct,
+  getRelatedProducts,
   NotFoundError,
   type PublicProduct,
 } from '../lib/api';
 import {
   AddToCartButton,
   FulfillmentBadge,
+  ProductCard,
   ProductGlyph,
   WhatsAppIcon,
   formatPrice,
@@ -51,9 +53,43 @@ export default function ProductDetail() {
         {status === 'loading' && <DetailSkeleton />}
         {status === 'notfound' && <NotFound />}
         {status === 'error' && <DetailError onRetry={load} />}
-        {status === 'ready' && product && <DetailView product={product} />}
+        {status === 'ready' && product && (
+          <>
+            <DetailView product={product} />
+            <RelatedProducts slug={product.slug} />
+          </>
+        )}
       </div>
     </div>
+  );
+}
+
+function RelatedProducts({ slug }: { slug: string }) {
+  const [items, setItems] = useState<PublicProduct[]>([]);
+
+  useEffect(() => {
+    let active = true;
+    getRelatedProducts(slug, 4)
+      .then((data) => active && setItems(data))
+      .catch(() => active && setItems([]));
+    return () => {
+      active = false;
+    };
+  }, [slug]);
+
+  if (items.length === 0) return null;
+
+  return (
+    <section className="mt-16">
+      <h2 className="text-xl font-extrabold tracking-tight text-primary sm:text-2xl">
+        Benzer ürünler
+      </h2>
+      <div className="mt-6 grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-4">
+        {items.map((p) => (
+          <ProductCard key={p.id} product={p} />
+        ))}
+      </div>
+    </section>
   );
 }
 
