@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import Logo from './Logo';
+import SearchBox from './SearchBox';
 import { WHATSAPP_URL } from '../config';
 import { useCart } from '../cart/CartContext';
 import { useCustomer } from '../auth/CustomerContext';
@@ -74,6 +75,10 @@ export default function Header() {
             </ul>
           </nav>
 
+          <div className="hidden min-w-0 flex-1 px-2 md:block md:max-w-xs lg:max-w-sm">
+            <SearchBox />
+          </div>
+
           <div className="flex items-center gap-1.5">
             <Link
               to="/hesabim"
@@ -122,6 +127,9 @@ export default function Header() {
           className="border-b border-border bg-white md:hidden"
           aria-label="Mobil navigasyon"
         >
+          <div className="container-x py-3">
+            <SearchBox onNavigate={() => setMobileOpen(false)} />
+          </div>
           <ul className="container-x flex flex-col py-2">
             {NAV_ITEMS.map((item) => (
               <li key={item.to}>

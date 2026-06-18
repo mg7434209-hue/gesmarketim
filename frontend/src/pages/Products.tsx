@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import {
   getBrands,
   getCategories,
@@ -53,12 +53,17 @@ export default function Products() {
       'Güneş paneli, inverter, batarya, solar kablo ve aksesuarlar — KDV dahil net fiyatlarla. Markaya, fiyata ve stok durumuna göre filtrele.',
     path: '/urunler',
   });
+  const [searchParams] = useSearchParams();
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [status, setStatus] = useState<Status>('loading');
   const [products, setProducts] = useState<PublicProduct[]>([]);
   const [categories, setCategories] = useState<PublicCategory[]>([]);
   const [brands, setBrands] = useState<PublicBrand[]>([]);
-  const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS);
+  // Seed the search filter from ?q= so header search / SearchAction land here.
+  const [filters, setFilters] = useState<Filters>(() => ({
+    ...EMPTY_FILTERS,
+    q: searchParams.get('q') ?? '',
+  }));
   const [reloadKey, setReloadKey] = useState(0);
 
   // Load taxonomy once.

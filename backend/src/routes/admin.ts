@@ -40,6 +40,10 @@ import { parseCsv } from "../lib/sync/csv.js";
 import { runCsvSync } from "../lib/sync/engine.js";
 import { runFeedSync } from "../lib/sync/feed.js";
 import {
+  sendOrderStatusEmail,
+  isNotifiableStatus,
+} from "../lib/notify/orderEmail.js";
+import {
   verifyCredentials,
   issueToken,
   setAdminCookie,
@@ -996,11 +1000,36 @@ adminRouter.patch(
       .update(orders)
       .set(update)
       .where(and(eq(orders.tenantId, tenantId), eq(orders.id, req.params.id)))
-      .returning({ id: orders.id, status: orders.status, paymentStatus: orders.paymentStatus });
+      .returning({
+        id: orders.id,
+        status: orders.status,
+        paymentStatus: orders.paymentStatus,
+        orderNumber: orders.orderNumber,
+        customerName: orders.customerName,
+        customerEmail: orders.customerEmail,
+        total: orders.total,
+      });
     if (!row) {
       res.status(404).json({ error: "not_found" });
       return;
     }
+
+    // Notify the customer of a meaningful status change (fire-and-forget; an
+    // email failure must not fail the admin action).
+    if (
+      "status" in update &&
+      row.customerEmail &&
+      isNotifiableStatus(row.status)
+    ) {
+      void sendOrderStatusEmail({
+        orderNumber: row.orderNumber,
+        customerName: row.customerName,
+        customerEmail: row.customerEmail,
+        status: row.status,
+        total: Number(row.total),
+      }).catch((err) => console.error("[orders] status email failed", err));
+    }
+
     res.json({ ok: true, status: row.status, paymentStatus: row.paymentStatus });
   }),
 );

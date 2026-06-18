@@ -218,3 +218,78 @@ export async function sendOrderNotifications(
 
   return { admin: adminResult.status, customer: customerStatus };
 }
+
+// ---------------------------------------------------------------------------
+// Order status change → customer notification
+// ---------------------------------------------------------------------------
+
+export type NotifiableStatus = "confirmed" | "shipped" | "delivered" | "cancelled";
+
+const STATUS_COPY: Record<NotifiableStatus, { label: string; line: string }> = {
+  confirmed: {
+    label: "Onaylandı",
+    line: "Siparişiniz onaylandı ve hazırlanmaya başlandı.",
+  },
+  shipped: {
+    label: "Kargoya verildi",
+    line: "Siparişiniz kargoya verildi. Kısa süre içinde elinizde olacak.",
+  },
+  delivered: {
+    label: "Teslim edildi",
+    line: "Siparişiniz teslim edildi. Bizi tercih ettiğiniz için teşekkürler!",
+  },
+  cancelled: {
+    label: "İptal edildi",
+    line: "Siparişiniz iptal edildi. Sorunuz olursa bu e-postayı yanıtlayabilirsiniz.",
+  },
+};
+
+export function isNotifiableStatus(s: string): s is NotifiableStatus {
+  return s === "confirmed" || s === "shipped" || s === "delivered" || s === "cancelled";
+}
+
+export interface OrderStatusEmailData {
+  orderNumber: string;
+  customerName: string;
+  customerEmail: string;
+  status: NotifiableStatus;
+  total: number;
+}
+
+/**
+ * Email the customer when an admin changes their order status. Skipped when
+ * SMTP is unconfigured. Never throws — safe to fire-and-forget.
+ */
+export async function sendOrderStatusEmail(
+  o: OrderStatusEmailData,
+): Promise<string> {
+  if (!isEmailConfigured()) return "skipped";
+
+  const copy = STATUS_COPY[o.status];
+  const base = siteBaseUrl();
+  const trackLink = base
+    ? `<p style="margin-top:16px;font-size:14px">Sipariş detayı:
+        <a href="${base}/siparis/${encodeURIComponent(o.orderNumber)}" style="color:#0F2547">
+        ${base}/siparis/${esc(o.orderNumber)}</a></p>`
+    : "";
+
+  const html = shell(
+    `Sipariş durumu: ${copy.label}`,
+    `
+    <p style="margin:0 0 6px">Merhaba ${esc(o.customerName)},</p>
+    <p style="margin:0 0 14px">${copy.line}</p>
+    <table style="width:100%;font-size:14px;margin-bottom:6px">
+      <tr><td style="padding:3px 0;color:#555;width:140px">Sipariş no</td><td><strong>${esc(o.orderNumber)}</strong></td></tr>
+      <tr><td style="padding:3px 0;color:#555">Yeni durum</td><td>${copy.label}</td></tr>
+      <tr><td style="padding:3px 0;color:#555">Tutar</td><td>${money(o.total)}</td></tr>
+    </table>
+    ${trackLink}`,
+  );
+
+  const r = await sendMail({
+    to: o.customerEmail,
+    subject: `Sipariş ${o.orderNumber} — ${copy.label}`,
+    html,
+  });
+  return r.status;
+}
