@@ -12,6 +12,7 @@ import { accountRouter } from './routes/account.js';
 import { seoRouter } from './routes/seo.js';
 import { startSyncScheduler } from './lib/sync/scheduler.js';
 import { runMigrations, isAutoMigrateEnabled } from './db/runMigrations.js';
+import { runSeed, isAutoSeedEnabled } from './db/runSeed.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -94,6 +95,18 @@ async function start(): Promise<void> {
       console.log('[gesmarketim] migrations up to date');
     } catch (err) {
       console.error('[gesmarketim] migration failed — run `npm run db:migrate`', err);
+    }
+  }
+
+  // Optionally seed tenant/taxonomy/catalogue on boot (AUTO_SEED=true to enable).
+  // Fail-soft: a seed error is logged but doesn't stop the server. Idempotent, so
+  // re-running against an already-seeded database is a no-op.
+  if (isAutoSeedEnabled()) {
+    try {
+      await runSeed();
+      console.log('[gesmarketim] seed up to date');
+    } catch (err) {
+      console.error('[gesmarketim] seed failed — run `npm run db:seed`', err);
     }
   }
 

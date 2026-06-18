@@ -1,6 +1,6 @@
 import "dotenv/config";
 import { eq, and } from "drizzle-orm";
-import { db, pool } from "./index.js";
+import { db } from "./index.js";
 import { tenants, suppliers, categories, brands, products } from "./schema.js";
 import { computeFinalPrice } from "./pricing.js";
 import { slugify } from "../lib/util.js";
@@ -131,7 +131,7 @@ const PRODUCTS: SeedProduct[] = [
   },
 ];
 
-async function main() {
+export async function seedDatabase() {
   console.log("Seed başlıyor...");
 
   // 1) Tenant
@@ -224,10 +224,4 @@ async function main() {
   console.log(`✓ products: ${created} eklendi (${PRODUCTS.length - created} zaten vardı)`);
 
   console.log("Seed tamamlandı ✅");
-  await pool.end();
 }
-
-main().catch((err) => {
-  console.error("Seed hatası:", err);
-  process.exit(1);
-});
