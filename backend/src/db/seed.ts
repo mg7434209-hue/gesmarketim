@@ -20,12 +20,15 @@ type SeedProduct = {
   fulfillmentType: "stock" | "dropship";
   stockQty: number;
   description: string;
+  // Fiyatı henüz bilinmeyen ürünler "draft" eklenir; admin fiyat girip yayınlar.
+  status?: "active" | "draft";
 };
 
 const SUPPLIERS = [
   { name: "Lexron", slug: "lexron", defaultMarkupPercent: "20" },
   { name: "Mexxsun", slug: "mexxsun", defaultMarkupPercent: "22" },
   { name: "Enerji Pazarı", slug: "enerji-pazari", defaultMarkupPercent: "25" },
+  { name: "ACS Enerji", slug: "acs-enerji", defaultMarkupPercent: "20" },
 ];
 
 const CATEGORIES = [
@@ -42,6 +45,7 @@ const BRANDS = [
   { name: "LEXRON", slug: "lexron" },
   { name: "EVE", slug: "eve" },
   { name: "HUAWEI", slug: "huawei" },
+  { name: "SOROTEC", slug: "sorotec" },
 ];
 
 const PRODUCTS: SeedProduct[] = [
@@ -123,6 +127,195 @@ const PRODUCTS: SeedProduct[] = [
     costPrice: 520, markupPercent: 35, fulfillmentType: "stock", stockQty: 90,
     description: "Anodize alüminyum güneş paneli montaj rayı, 4.2 metre. Tüm standart kelepçelerle uyumlu.",
   },
+  // -------------------------------------------------------------------------
+  // İnverter kataloğu — tedarikçi listesinden (Temmuz 2026). Fiyatlar listede
+  // KDV dahil satış fiyatı olarak verildiği için costPrice=liste, markup=%0 →
+  // finalPrice birebir liste fiyatı. Marj eklemek isterseniz admin panelinden
+  // markupPercent güncelleyin. Fiyatı listede görünmeyenler "draft" durumunda.
+  // -------------------------------------------------------------------------
+
+  // --- LEXRON modifiye sinüs inverterler ---
+  {
+    name: "Lexron 2000W-24V Modifiye Sinüs İnverter",
+    category: "inverter", brand: "lexron", supplier: "lexron",
+    costPrice: 11044.80, markupPercent: 0, fulfillmentType: "dropship", stockQty: 0,
+    description: "2000W sürekli güç, 24V giriş modifiye sinüs inverter. Karavan, tekne ve şantiye kullanımına uygun. USB çıkışı ve aşırı yük koruması.",
+  },
+  {
+    name: "Lexron 2000W-12V Modifiye Sinüs İnverter",
+    category: "inverter", brand: "lexron", supplier: "lexron",
+    costPrice: 11044.80, markupPercent: 0, fulfillmentType: "dropship", stockQty: 0,
+    description: "2000W sürekli güç, 12V giriş modifiye sinüs inverter. Karavan, tekne ve şantiye kullanımına uygun. USB çıkışı ve aşırı yük koruması.",
+  },
+  {
+    name: "Lexron 1200W-24V Modifiye Sinüs İnverter",
+    category: "inverter", brand: "lexron", supplier: "lexron",
+    costPrice: 5154.24, markupPercent: 0, fulfillmentType: "dropship", stockQty: 0,
+    description: "1200W sürekli güç, 24V giriş modifiye sinüs inverter. Kompakt boyut, sessiz fan, kısa devre ve düşük voltaj koruması.",
+  },
+  {
+    name: "Lexron 1200W-12V Modifiye Sinüs İnverter",
+    category: "inverter", brand: "lexron", supplier: "lexron",
+    costPrice: 5154.24, markupPercent: 0, fulfillmentType: "dropship", stockQty: 0,
+    description: "1200W sürekli güç, 12V giriş modifiye sinüs inverter. Kompakt boyut, sessiz fan, kısa devre ve düşük voltaj koruması.",
+  },
+  {
+    name: "Lexron 600W-12V Modifiye Sinüs İnverter",
+    category: "inverter", brand: "lexron", supplier: "lexron",
+    costPrice: 0, markupPercent: 0, fulfillmentType: "dropship", stockQty: 0, status: "draft",
+    description: "600W sürekli güç, 12V giriş modifiye sinüs inverter. Küçük cihazlar ve mobil kullanım için ekonomik çözüm.",
+  },
+  {
+    name: "Lexron 300W-12V Modifiye Sinüs İnverter",
+    category: "inverter", brand: "lexron", supplier: "lexron",
+    costPrice: 0, markupPercent: 0, fulfillmentType: "dropship", stockQty: 0, status: "draft",
+    description: "300W sürekli güç, 12V giriş modifiye sinüs inverter. Araç içi ve kamp kullanımı için giriş seviyesi model.",
+  },
+
+  // --- LEXRON tam sinüs inverterler ---
+  {
+    name: "Lexron 2000W-12V Tam Sinüs İnverter (UPS)",
+    category: "inverter", brand: "lexron", supplier: "lexron",
+    costPrice: 25771.20, markupPercent: 0, fulfillmentType: "dropship", stockQty: 0,
+    description: "2000W tam sinüs inverter, dahili UPS (şebeke öncelikli otomatik transfer). Hassas elektronik cihazlar ve kombiler için güvenli dalga formu.",
+  },
+  {
+    name: "Lexron 1000W-12V Tam Sinüs İnverter (UPS)",
+    category: "inverter", brand: "lexron", supplier: "lexron",
+    costPrice: 13197.12, markupPercent: 0, fulfillmentType: "dropship", stockQty: 0,
+    description: "1000W tam sinüs inverter, dahili UPS fonksiyonu. Elektrik kesintisinde kesintisiz geçiş; modem, kombi ve aydınlatma için ideal.",
+  },
+  {
+    name: "Lexron 3000W-12V Tam Sinüs İnverter",
+    category: "inverter", brand: "lexron", supplier: "lexron",
+    costPrice: 22372.80, markupPercent: 0, fulfillmentType: "dropship", stockQty: 0,
+    description: "3000W sürekli güç tam sinüs inverter. Buzdolabı, pompa gibi kalkış akımı yüksek yükleri sürebilir. LED durum göstergesi.",
+  },
+  {
+    name: "Lexron 2000W-12V Tam Sinüs İnverter",
+    category: "inverter", brand: "lexron", supplier: "lexron",
+    costPrice: 16368.96, markupPercent: 0, fulfillmentType: "dropship", stockQty: 0,
+    description: "2000W sürekli güç tam sinüs inverter. Ev tipi cihazlarla tam uyumlu temiz sinüs çıkışı, akıllı fan ve çoklu koruma.",
+  },
+  {
+    name: "Lexron 1000W-24V Tam Sinüs İnverter",
+    category: "inverter", brand: "lexron", supplier: "lexron",
+    costPrice: 0, markupPercent: 0, fulfillmentType: "dropship", stockQty: 0, status: "draft",
+    description: "1000W sürekli güç, 24V giriş tam sinüs inverter. Kompakt gövde, sessiz çalışma.",
+  },
+  {
+    name: "Lexron 1000W-12V Tam Sinüs İnverter",
+    category: "inverter", brand: "lexron", supplier: "lexron",
+    costPrice: 0, markupPercent: 0, fulfillmentType: "dropship", stockQty: 0, status: "draft",
+    description: "1000W sürekli güç, 12V giriş tam sinüs inverter. Kompakt gövde, sessiz çalışma.",
+  },
+  {
+    name: "Lexron 600W-12V Tam Sinüs İnverter",
+    category: "inverter", brand: "lexron", supplier: "lexron",
+    costPrice: 0, markupPercent: 0, fulfillmentType: "dropship", stockQty: 0, status: "draft",
+    description: "600W sürekli güç, 12V giriş tam sinüs inverter. Hassas cihazlar için temiz sinüs, giriş seviyesi güç.",
+  },
+
+  // --- LEXRON / SOROTEC akıllı (MPPT şarjlı) inverterler ---
+  {
+    name: "Lexron 11kW HV 2xMPPT Akıllı İnverter 48V",
+    category: "inverter", brand: "lexron", supplier: "lexron",
+    costPrice: 73632.00, markupPercent: 0, fulfillmentType: "dropship", stockQty: 0,
+    description: "11kW off-grid akıllı inverter, çift MPPT yüksek voltaj PV girişi, 48V akü. Paralel çalışma desteği ile büyük sistemlere ölçeklenir.",
+  },
+  {
+    name: "Lexron 8kW HV MPPT Akıllı İnverter 48V",
+    category: "inverter", brand: "lexron", supplier: "lexron",
+    costPrice: 56640.00, markupPercent: 0, fulfillmentType: "dropship", stockQty: 0,
+    description: "8kW off-grid akıllı inverter, yüksek voltaj MPPT şarj kontrollü, 48V akü. WiFi izleme opsiyonu.",
+  },
+  {
+    name: "Lexron 6.2kW HV MPPT Akıllı İnverter 48V",
+    category: "inverter", brand: "lexron", supplier: "lexron",
+    costPrice: 35286.72, markupPercent: 0, fulfillmentType: "dropship", stockQty: 0,
+    description: "6.2kW off-grid akıllı inverter, HV MPPT girişli, 48V akü. Ev ve bağ evi sistemleri için güçlü tek ünite çözüm.",
+  },
+  {
+    name: "Lexron 4.2kW HV MPPT Akıllı İnverter 24V",
+    category: "inverter", brand: "lexron", supplier: "lexron",
+    costPrice: 28320.00, markupPercent: 0, fulfillmentType: "dropship", stockQty: 0,
+    description: "4.2kW off-grid akıllı inverter, HV MPPT şarj kontrollü, 24V akü. Orta ölçekli off-grid sistemler için.",
+  },
+  {
+    name: "Lexron 3kW HV MPPT Akıllı İnverter 24V",
+    category: "inverter", brand: "lexron", supplier: "lexron",
+    costPrice: 20107.20, markupPercent: 0, fulfillmentType: "dropship", stockQty: 0,
+    description: "3kW off-grid akıllı inverter, HV MPPT girişli, 24V akü. Bağ evi ve küçük ev sistemlerinin standardı.",
+  },
+  {
+    name: "Lexron 1kW MPPT Akıllı İnverter 12V",
+    category: "inverter", brand: "lexron", supplier: "lexron",
+    costPrice: 15066.24, markupPercent: 0, fulfillmentType: "dropship", stockQty: 0,
+    description: "1kW off-grid akıllı inverter, MPPT şarj kontrollü, 12V akü. Kamp, karavan ve küçük sistemler için hepsi bir arada.",
+  },
+  {
+    name: "Sorotec 5.5kW HV MPPT Akıllı İnverter 48V",
+    category: "inverter", brand: "sorotec", supplier: "lexron",
+    costPrice: 32851.20, markupPercent: 0, fulfillmentType: "dropship", stockQty: 0,
+    description: "5.5kW off-grid akıllı inverter, yüksek voltaj MPPT, 48V akü. Renkli LCD ekran, geniş PV giriş aralığı.",
+  },
+  {
+    name: "Sorotec 1.5kW HV MPPT Akıllı İnverter 12V",
+    category: "inverter", brand: "sorotec", supplier: "lexron",
+    costPrice: 16312.32, markupPercent: 0, fulfillmentType: "dropship", stockQty: 0,
+    description: "1.5kW off-grid akıllı inverter, HV MPPT girişli, 12V akü. Kompakt sistemler için ekonomik akıllı çözüm.",
+  },
+
+  // --- DEYE on-grid inverterler (ACS Enerji) ---
+  {
+    name: "DEYE 3kW On-Grid Monofaze İnverter",
+    category: "inverter", brand: "deye", supplier: "acs-enerji",
+    costPrice: 33247.68, markupPercent: 0, fulfillmentType: "dropship", stockQty: 0,
+    description: "3kW şebeke bağlantılı monofaze inverter. Dahili limiter ve WiFi ile üretim/tüketim izleme. Çatı GES mahsuplaşma sistemleri için.",
+  },
+  {
+    name: "DEYE 5kW On-Grid Monofaze İnverter",
+    category: "inverter", brand: "deye", supplier: "acs-enerji",
+    costPrice: 45312.00, markupPercent: 0, fulfillmentType: "dropship", stockQty: 0,
+    description: "5kW şebeke bağlantılı monofaze inverter. Dahili limiter ve WiFi. Konut çatı sistemlerinin en yaygın gücü.",
+  },
+  {
+    name: "DEYE 10kW On-Grid Trifaze İnverter",
+    category: "inverter", brand: "deye", supplier: "acs-enerji",
+    costPrice: 78049.92, markupPercent: 0, fulfillmentType: "dropship", stockQty: 0,
+    description: "10kW şebeke bağlantılı trifaze inverter. Dahili enerjimeter ve WiFi. Büyük konut ve küçük işletme çatıları için.",
+  },
+  {
+    name: "DEYE 20kW On-Grid Trifaze İnverter",
+    category: "inverter", brand: "deye", supplier: "acs-enerji",
+    costPrice: 113280.00, markupPercent: 0, fulfillmentType: "dropship", stockQty: 0,
+    description: "20kW şebeke bağlantılı trifaze inverter. Dahili enerjimeter ve WiFi. Ticari çatı GES projeleri için.",
+  },
+  {
+    name: "DEYE 25kW On-Grid Trifaze İnverter",
+    category: "inverter", brand: "deye", supplier: "acs-enerji",
+    costPrice: 117697.92, markupPercent: 0, fulfillmentType: "dropship", stockQty: 0,
+    description: "25kW şebeke bağlantılı trifaze inverter. Dahili enerjimeter ve WiFi. Ticari ve tarımsal GES kurulumları için.",
+  },
+  {
+    name: "DEYE 30kW On-Grid Trifaze İnverter",
+    category: "inverter", brand: "deye", supplier: "acs-enerji",
+    costPrice: 135936.00, markupPercent: 0, fulfillmentType: "dropship", stockQty: 0,
+    description: "30kW şebeke bağlantılı trifaze inverter. Dahili enerjimeter ve WiFi. Orta ölçekli ticari projeler için.",
+  },
+  {
+    name: "DEYE 50kW On-Grid Trifaze İnverter",
+    category: "inverter", brand: "deye", supplier: "acs-enerji",
+    costPrice: 250632.00, markupPercent: 0, fulfillmentType: "dropship", stockQty: 0,
+    description: "50kW şebeke bağlantılı trifaze inverter. Dahili enerjimeter ve WiFi. Sanayi çatıları ve arazi GES için.",
+  },
+  {
+    name: "DEYE 100kW On-Grid Trifaze İnverter",
+    category: "inverter", brand: "deye", supplier: "acs-enerji",
+    costPrice: 434202.24, markupPercent: 0, fulfillmentType: "dropship", stockQty: 0,
+    description: "100kW şebeke bağlantılı trifaze inverter. Dahili enerjimeter ve WiFi. Büyük ölçekli ticari ve sanayi GES santralleri için.",
+  },
+
   {
     name: "DC Sigorta + Parafudr Koruma Kutusu",
     category: "aksesuar", brand: "lexron", supplier: "mexxsun",
@@ -217,7 +410,7 @@ export async function seedDatabase() {
       fulfillmentType: p.fulfillmentType,
       stockQty: p.stockQty,
       images: [],
-      status: "active",
+      status: p.status ?? "active",
     });
     created++;
   }
