@@ -22,8 +22,16 @@ import {
   clearCustomerCookie,
   requireCustomer,
 } from "../lib/customerAuth.js";
+import { rateLimit } from "../lib/rateLimit.js";
 
 export const accountRouter = Router();
+
+// Parola denemesi / hesap açma spam'ine karşı IP başına limit.
+const authLimiter = rateLimit({
+  windowMs: 15 * 60_000,
+  max: 20,
+  message: "Çok fazla deneme yapıldı. Lütfen 15 dakika sonra tekrar deneyin.",
+});
 
 function asyncHandler(
   fn: (req: Request, res: Response) => Promise<void>,
@@ -56,6 +64,7 @@ function publicProfile(c: CustomerRow) {
 // ---------- POST /api/account/register ----------
 accountRouter.post(
   "/account/register",
+  authLimiter,
   asyncHandler(async (req, res) => {
     const tenantId = await getTenantId();
     const body = (req.body ?? {}) as Record<string, unknown>;
@@ -109,6 +118,7 @@ accountRouter.post(
 // ---------- POST /api/account/login ----------
 accountRouter.post(
   "/account/login",
+  authLimiter,
   asyncHandler(async (req, res) => {
     const tenantId = await getTenantId();
     const body = (req.body ?? {}) as Record<string, unknown>;

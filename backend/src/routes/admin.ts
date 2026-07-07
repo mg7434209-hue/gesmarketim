@@ -30,6 +30,7 @@ import {
   suppliers,
   products,
   orders,
+  orderItems,
   type ProductImage,
 } from "../db/schema.js";
 import { getTenantId } from "../lib/tenant.js";
@@ -50,6 +51,7 @@ import {
   clearAdminCookie,
   requireAdmin,
 } from "../lib/auth.js";
+import { rateLimit } from "../lib/rateLimit.js";
 
 export const adminRouter = Router();
 
@@ -116,8 +118,16 @@ function isUniqueViolation(err: unknown): boolean {
 // ===========================================================================
 // AUTH
 // ===========================================================================
+// Tek admin hesabına brute-force denemesini IP başına sınırla.
+const adminLoginLimiter = rateLimit({
+  windowMs: 15 * 60_000,
+  max: 10,
+  message: "Çok fazla giriş denemesi. Lütfen 15 dakika sonra tekrar deneyin.",
+});
+
 adminRouter.post(
   "/login",
+  adminLoginLimiter,
   asyncHandler(async (req, res) => {
     const body = (req.body ?? {}) as Record<string, unknown>;
     const username = typeof body.username === "string" ? body.username : "";
@@ -996,19 +1006,65 @@ adminRouter.patch(
       return;
     }
 
-    const [row] = await db
-      .update(orders)
-      .set(update)
-      .where(and(eq(orders.tenantId, tenantId), eq(orders.id, req.params.id)))
-      .returning({
-        id: orders.id,
-        status: orders.status,
-        paymentStatus: orders.paymentStatus,
-        orderNumber: orders.orderNumber,
-        customerName: orders.customerName,
-        customerEmail: orders.customerEmail,
-        total: orders.total,
+    // Durum geçişi + stok düzeltmesi tek transaction'da: iptalde stoklu
+    // ürünler depoya geri döner, iptal geri alınırsa tekrar düşülür.
+    const row = await db.transaction(async (tx) => {
+      const existing = await tx.query.orders.findFirst({
+        where: and(eq(orders.tenantId, tenantId), eq(orders.id, req.params.id)),
+        columns: { id: true, status: true },
       });
+      if (!existing) return null;
+
+      const [updated] = await tx
+        .update(orders)
+        .set(update)
+        .where(eq(orders.id, existing.id))
+        .returning({
+          id: orders.id,
+          status: orders.status,
+          paymentStatus: orders.paymentStatus,
+          orderNumber: orders.orderNumber,
+          customerName: orders.customerName,
+          customerEmail: orders.customerEmail,
+          total: orders.total,
+        });
+
+      const becameCancelled =
+        updated.status === "cancelled" && existing.status !== "cancelled";
+      const uncancelled =
+        existing.status === "cancelled" && updated.status !== "cancelled";
+
+      if (becameCancelled || uncancelled) {
+        const lines = await tx
+          .select({
+            productId: orderItems.productId,
+            quantity: orderItems.quantity,
+          })
+          .from(orderItems)
+          .where(eq(orderItems.orderId, existing.id));
+        for (const line of lines) {
+          if (!line.productId) continue;
+          await tx
+            .update(products)
+            .set({
+              stockQty: becameCancelled
+                ? sql`${products.stockQty} + ${line.quantity}`
+                : // İptal geri alınırken stok eksiye düşmesin (admin kararı,
+                  // aradaki satışlar stoğu tüketmiş olabilir).
+                  sql`GREATEST(${products.stockQty} - ${line.quantity}, 0)`,
+              updatedAt: new Date(),
+            })
+            .where(
+              and(
+                eq(products.id, line.productId),
+                eq(products.fulfillmentType, "stock"),
+              ),
+            );
+        }
+      }
+
+      return updated;
+    });
     if (!row) {
       res.status(404).json({ error: "not_found" });
       return;

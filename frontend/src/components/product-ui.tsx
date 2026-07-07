@@ -4,14 +4,24 @@ import { WHATSAPP_URL } from '../config';
 import type { FulfillmentType, PublicProduct } from '../lib/api';
 import { useCart } from '../cart/CartContext';
 
-const PRICE_FORMATTER = new Intl.NumberFormat('tr-TR', {
+const PRICE_FORMATTER_WHOLE = new Intl.NumberFormat('tr-TR', {
   style: 'currency',
   currency: 'TRY',
   maximumFractionDigits: 0,
 });
 
+const PRICE_FORMATTER_CENTS = new Intl.NumberFormat('tr-TR', {
+  style: 'currency',
+  currency: 'TRY',
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
 export function formatPrice(price: number): string {
-  return PRICE_FORMATTER.format(price);
+  // Kuruşlu tutarı tam liraya yuvarlamak, satır toplamlarının ara toplamla
+  // "tutmamasına" yol açıyordu; kuruş varsa iki haneli göster.
+  const hasCents = Math.round(price * 100) % 100 !== 0;
+  return (hasCents ? PRICE_FORMATTER_CENTS : PRICE_FORMATTER_WHOLE).format(price);
 }
 
 /** Build a wa.me link with a prefilled message about a product. */

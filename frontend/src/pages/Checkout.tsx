@@ -50,9 +50,29 @@ const EMPTY: FormState = {
 
 export default function Checkout() {
   useSeo({ title: 'Ödeme', path: '/odeme', noindex: true });
-  const { items, subtotal, clear } = useCart();
+  const { items, subtotal, clear, refresh } = useCart();
   const { customer } = useCustomer();
   const navigate = useNavigate();
+
+  // Ödeme adımında gösterilen tutar sunucunun keseceği tutarla aynı olsun:
+  // sayfa açılınca fiyatları tazele, değiştiyse kullanıcıyı bilgilendir.
+  const [priceNotice, setPriceNotice] = useState<string | null>(null);
+  useEffect(() => {
+    let active = true;
+    refresh().then(({ priceChanged, removedNames }) => {
+      if (!active) return;
+      if (removedNames.length > 0 || priceChanged)
+        setPriceNotice(
+          removedNames.length > 0
+            ? `${removedNames.join(', ')} artık satışta değil; sepet güncellendi.`
+            : 'Bazı ürünlerin fiyatı güncellendi; toplam tutar yenilendi.',
+        );
+    });
+    return () => {
+      active = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const [form, setForm] = useState<FormState>(EMPTY);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -192,6 +212,15 @@ export default function Checkout() {
           Siparişi Tamamla
         </h1>
 
+        {priceNotice && (
+          <p
+            role="status"
+            className="mt-4 rounded-lg bg-accent/10 px-4 py-3 text-sm font-semibold text-primary"
+          >
+            {priceNotice}
+          </p>
+        )}
+
         <form onSubmit={onSubmit} className="mt-8 flex flex-col gap-8 lg:flex-row lg:items-start">
           {/* Form */}
           <div className="flex-1 space-y-6">
@@ -201,10 +230,20 @@ export default function Checkout() {
               </legend>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <Field label="Ad Soyad" required error={errors.customerName} className="sm:col-span-2">
-                  <input {...inputProps} value={form.customerName} onChange={update('customerName')} autoComplete="name" />
+                  <input {...inputProps} required minLength={2} value={form.customerName} onChange={update('customerName')} autoComplete="name" />
                 </Field>
                 <Field label="Telefon" required error={errors.customerPhone}>
-                  <input {...inputProps} value={form.customerPhone} onChange={update('customerPhone')} inputMode="tel" autoComplete="tel" placeholder="05XX XXX XX XX" />
+                  <input
+                    {...inputProps}
+                    required
+                    pattern="[0-9+\s()\-]{10,20}"
+                    title="10-20 haneli bir telefon numarası girin (ör. 05XX XXX XX XX)"
+                    value={form.customerPhone}
+                    onChange={update('customerPhone')}
+                    inputMode="tel"
+                    autoComplete="tel"
+                    placeholder="05XX XXX XX XX"
+                  />
                 </Field>
                 <Field label="E-posta (opsiyonel)" error={errors.customerEmail}>
                   <input {...inputProps} type="email" value={form.customerEmail} onChange={update('customerEmail')} autoComplete="email" />
@@ -218,14 +257,16 @@ export default function Checkout() {
               </legend>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <Field label="İl" required error={errors.city}>
-                  <input {...inputProps} value={form.city} onChange={update('city')} autoComplete="address-level1" />
+                  <input {...inputProps} required minLength={2} value={form.city} onChange={update('city')} autoComplete="address-level1" />
                 </Field>
                 <Field label="İlçe" required error={errors.district}>
-                  <input {...inputProps} value={form.district} onChange={update('district')} autoComplete="address-level2" />
+                  <input {...inputProps} required minLength={2} value={form.district} onChange={update('district')} autoComplete="address-level2" />
                 </Field>
                 <Field label="Açık Adres" required error={errors.addressLine} className="sm:col-span-2">
                   <textarea
                     rows={3}
+                    required
+                    minLength={10}
                     value={form.addressLine}
                     onChange={update('addressLine')}
                     autoComplete="street-address"

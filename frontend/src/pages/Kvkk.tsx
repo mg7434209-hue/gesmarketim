@@ -2,7 +2,7 @@ import LegalPage, { LegalSection, LegalList } from '../components/LegalPage';
 
 export default function Kvkk() {
   return (
-    <LegalPage title="KVKK Aydınlatma Metni" showDraftBadge>
+    <LegalPage title="KVKK Aydınlatma Metni">
       <p>
         İşbu Aydınlatma Metni, 6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK")
         kapsamında, Veri Sorumlusu sıfatıyla GES MARKETİM (Gespa Enerji bünyesinde) tarafından

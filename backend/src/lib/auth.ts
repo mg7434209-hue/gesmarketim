@@ -11,9 +11,22 @@
 import crypto from "node:crypto";
 import type { Request, Response, NextFunction } from "express";
 
-const SECRET = process.env.ADMIN_SESSION_SECRET ?? "change-me-in-production";
+const DEFAULT_PLACEHOLDER = "change-me-in-production";
+const SECRET = process.env.ADMIN_SESSION_SECRET ?? DEFAULT_PLACEHOLDER;
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME ?? "admin";
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? "change-me-in-production";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? DEFAULT_PLACEHOLDER;
+
+// Prod'da placeholder şifre/secret ile admin girişi tamamen kapatılır: aksi
+// halde env ayarlanmadan yapılan bir deploy, paneli herkese açık bırakır ve
+// bilinen secret ile oturum çerezi dışarıda üretilebilir (cookie forgery).
+const INSECURE_DEFAULTS =
+  process.env.NODE_ENV === "production" &&
+  (ADMIN_PASSWORD === DEFAULT_PLACEHOLDER || SECRET === DEFAULT_PLACEHOLDER);
+if (INSECURE_DEFAULTS) {
+  console.error(
+    "[auth] UYARI: ADMIN_PASSWORD / ADMIN_SESSION_SECRET production'da varsayılan değerde — admin girişi devre dışı bırakıldı. Env değişkenlerini ayarlayın.",
+  );
+}
 
 export const ADMIN_COOKIE = "gm_admin";
 const MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 7 gün
@@ -36,6 +49,7 @@ function timingSafeEqual(a: string, b: string): boolean {
 
 /** Validate admin credentials (timing-safe on both fields). */
 export function verifyCredentials(username: string, password: string): boolean {
+  if (INSECURE_DEFAULTS) return false;
   // Compare both regardless of the first result to avoid short-circuit timing leaks.
   const userOk = timingSafeEqual(username ?? "", ADMIN_USERNAME);
   const passOk = timingSafeEqual(password ?? "", ADMIN_PASSWORD);
@@ -50,6 +64,7 @@ export function issueToken(): string {
 
 /** Verify a token's signature and freshness. Returns true when valid. */
 export function verifyToken(token: string | undefined): boolean {
+  if (INSECURE_DEFAULTS) return false;
   if (!token) return false;
   const [encodedPayload, signature] = token.split(".");
   if (!encodedPayload || !signature) return false;

@@ -1,9 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, lazy, Suspense } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Home from './pages/Home';
-import Admin from './pages/Admin';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import Kvkk from './pages/Kvkk';
@@ -19,6 +18,13 @@ import Checkout from './pages/Checkout';
 import OrderConfirmation from './pages/OrderConfirmation';
 import Account from './pages/Account';
 import NotFound from './pages/NotFound';
+import Sss from './pages/Sss';
+import Kargo from './pages/Kargo';
+import IadeDegisim from './pages/IadeDegisim';
+
+// Admin paneli (~1600 satır + adminApi) mağaza ziyaretçisinin bundle'ına
+// girmesin: sadece /admin ziyaretinde yüklenir.
+const Admin = lazy(() => import('./pages/Admin'));
 
 // Reset scroll to the top on every route change — without this, navigating
 // (e.g. clicking a product) keeps the previous page's scroll position.
@@ -38,13 +44,29 @@ export default function App() {
       <main className="flex-1">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/admin/*" element={<Admin />} />
+          <Route
+            path="/admin/*"
+            element={
+              <Suspense
+                fallback={
+                  <div className="container-x py-16 text-center text-sm text-text-secondary">
+                    Yükleniyor…
+                  </div>
+                }
+              >
+                <Admin />
+              </Suspense>
+            }
+          />
           <Route path="/hakkimizda" element={<About />} />
           <Route path="/iletisim" element={<Contact />} />
           <Route path="/kvkk" element={<Kvkk />} />
           <Route path="/mesafeli-satis" element={<MesafeliSatis />} />
           <Route path="/cerez-politikasi" element={<Cerez />} />
           <Route path="/on-bilgilendirme" element={<OnBilgilendirme />} />
+          <Route path="/sss" element={<Sss />} />
+          <Route path="/kargo" element={<Kargo />} />
+          <Route path="/iade-degisim" element={<IadeDegisim />} />
           <Route path="/kategoriler" element={<Categories />} />
           <Route path="/kategori/:slug" element={<CategoryPage />} />
           <Route path="/urunler" element={<Products />} />

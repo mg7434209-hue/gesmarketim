@@ -8,7 +8,7 @@
 // product references + quantities.
 
 import { Router, type Request, type Response, type NextFunction } from "express";
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, gte, inArray, sql } from "drizzle-orm";
 import { db } from "../db/index.js";
 import { products, orders, orderItems } from "../db/schema.js";
 import { getTenantId } from "../lib/tenant.js";
@@ -23,6 +23,7 @@ import {
 import { initCheckoutForm } from "../lib/payments/iyzico.js";
 import { sendOrderNotifications } from "../lib/notify/orderEmail.js";
 import { customerIdFromRequest } from "../lib/customerAuth.js";
+import { rateLimit } from "../lib/rateLimit.js";
 
 export const ordersRouter = Router();
 
@@ -42,7 +43,9 @@ interface IncomingItem {
 function parseItems(raw: unknown): IncomingItem[] | null {
   if (!Array.isArray(raw) || raw.length === 0) return null;
   if (raw.length > shopConfig.maxItemsPerOrder) return null;
-  const out: IncomingItem[] = [];
+  // Aynı ürün birden çok satırda gelirse miktarları birleştir — stok kontrolü
+  // ve satır kayıtları ürün başına tek toplam üzerinden yapılır.
+  const merged = new Map<string, number>();
   for (const entry of raw) {
     if (typeof entry !== "object" || entry === null) return null;
     const productId = (entry as Record<string, unknown>).productId;
@@ -50,7 +53,12 @@ function parseItems(raw: unknown): IncomingItem[] | null {
     if (typeof productId !== "string" || productId.length === 0) return null;
     const qty = Number(quantity);
     if (!Number.isInteger(qty) || qty < 1 || qty > shopConfig.maxQtyPerItem) return null;
-    out.push({ productId, quantity: qty });
+    merged.set(productId, (merged.get(productId) ?? 0) + qty);
+  }
+  const out: IncomingItem[] = [];
+  for (const [productId, quantity] of merged) {
+    if (quantity > shopConfig.maxQtyPerItem) return null;
+    out.push({ productId, quantity });
   }
   return out;
 }
@@ -63,9 +71,26 @@ function round2(n: number): number {
   return Math.round(n * 100) / 100;
 }
 
+// Transaction içindeki atomik stok düşümü başarısız olduğunda fırlatılır;
+// dışarıda 409'a çevrilir (eşzamanlı siparişlerde aşırı satışı engeller).
+class OutOfStockError extends Error {
+  constructor(
+    public productId: string,
+    public productName: string,
+  ) {
+    super("out_of_stock");
+  }
+}
+
+// Sipariş oluşturma: spam sipariş + e-posta bombardımanına karşı sıkı limit.
+const createOrderLimiter = rateLimit({ windowMs: 60_000, max: 5 });
+// Sipariş sorgulama: numara enumerasyonuna (PII sızıntısı) karşı limit.
+const lookupOrderLimiter = rateLimit({ windowMs: 60_000, max: 30 });
+
 // ---------- POST /api/orders ----------
 ordersRouter.post(
   "/orders",
+  createOrderLimiter,
   asyncHandler(async (req, res) => {
     const tenantId = await getTenantId();
     const body = (req.body ?? {}) as Record<string, unknown>;
@@ -143,12 +168,17 @@ ordersRouter.post(
         });
         return;
       }
-      const available = p.fulfillmentType === "dropship" || p.stockQty > 0;
-      if (!available) {
+      // Stoklu ürünlerde istenen miktarın tamamı karşılanabilmeli; dropship
+      // ürünler siparişe özel tedarik edildiği için stok kontrolüne girmez.
+      if (p.fulfillmentType !== "dropship" && p.stockQty < item.quantity) {
         res.status(409).json({
           error: "out_of_stock",
-          message: `"${p.name}" şu an stokta değil.`,
+          message:
+            p.stockQty > 0
+              ? `"${p.name}" için stokta yalnızca ${p.stockQty} adet var. Lütfen sepeti güncelleyin.`
+              : `"${p.name}" şu an stokta değil.`,
           productId: item.productId,
+          availableQty: p.stockQty,
         });
         return;
       }
@@ -168,62 +198,104 @@ ordersRouter.post(
     const shippingCost = shippingFor(subtotal);
     const total = round2(subtotal + shippingCost);
 
-    // --- persist (transaction: order + items together) ---
-    const created = await db.transaction(async (tx) => {
-      // Retry order-number generation on the (rare) unique collision.
-      let orderRow:
-        | { id: string; orderNumber: string; createdAt: Date }
-        | undefined;
-      for (let attempt = 0; attempt < 5; attempt++) {
-        const orderNumber = generateOrderNumber();
-        const inserted = await tx
-          .insert(orders)
-          .values({
-            tenantId,
-            orderNumber,
-            customerId,
-            customerName,
-            customerPhone,
-            customerEmail: customerEmail || null,
-            city,
-            district,
-            addressLine,
-            note: note || null,
-            status: "pending",
-            paymentMethod,
-            paymentStatus: paymentMethod === "card" ? "awaiting" : "unpaid",
-            subtotal: subtotal.toFixed(2),
-            shippingCost: shippingCost.toFixed(2),
-            total: total.toFixed(2),
-            currency: shopConfig.currency,
-          })
-          .onConflictDoNothing()
-          .returning({
-            id: orders.id,
-            orderNumber: orders.orderNumber,
-            createdAt: orders.createdAt,
-          });
-        if (inserted[0]) {
-          orderRow = inserted[0];
-          break;
+    // Stoklu ürünler: transaction içinde koşullu düşülecek satırlar.
+    const stockLines = items!.filter(
+      (i) => byId.get(i.productId)!.fulfillmentType !== "dropship",
+    );
+
+    // --- persist (transaction: order + items + stok düşümü birlikte) ---
+    let created: { id: string; orderNumber: string; createdAt: Date };
+    try {
+      created = await db.transaction(async (tx) => {
+        // Atomik stok düşümü: koşul (stock_qty >= qty) UPDATE'in kendisinde,
+        // böylece eşzamanlı iki sipariş aynı stoğu iki kez satamaz.
+        for (const item of stockLines) {
+          const decremented = await tx
+            .update(products)
+            .set({
+              stockQty: sql`${products.stockQty} - ${item.quantity}`,
+              updatedAt: new Date(),
+            })
+            .where(
+              and(
+                eq(products.tenantId, tenantId),
+                eq(products.id, item.productId),
+                gte(products.stockQty, item.quantity),
+              ),
+            )
+            .returning({ id: products.id });
+          if (decremented.length === 0) {
+            const p = byId.get(item.productId)!;
+            throw new OutOfStockError(item.productId, p.name);
+          }
         }
+
+        // Retry order-number generation on the (rare) unique collision.
+        let orderRow:
+          | { id: string; orderNumber: string; createdAt: Date }
+          | undefined;
+        for (let attempt = 0; attempt < 5; attempt++) {
+          const orderNumber = generateOrderNumber();
+          const inserted = await tx
+            .insert(orders)
+            .values({
+              tenantId,
+              orderNumber,
+              customerId,
+              customerName,
+              customerPhone,
+              customerEmail: customerEmail || null,
+              city,
+              district,
+              addressLine,
+              note: note || null,
+              status: "pending",
+              paymentMethod,
+              paymentStatus: paymentMethod === "card" ? "awaiting" : "unpaid",
+              subtotal: subtotal.toFixed(2),
+              shippingCost: shippingCost.toFixed(2),
+              total: total.toFixed(2),
+              currency: shopConfig.currency,
+            })
+            .onConflictDoNothing()
+            .returning({
+              id: orders.id,
+              orderNumber: orders.orderNumber,
+              createdAt: orders.createdAt,
+            });
+          if (inserted[0]) {
+            orderRow = inserted[0];
+            break;
+          }
+        }
+        if (!orderRow) throw new Error("order_number_generation_failed");
+
+        await tx.insert(orderItems).values(
+          lineValues.map((l) => ({
+            orderId: orderRow!.id,
+            productId: l.productId,
+            productName: l.productName,
+            productSlug: l.productSlug,
+            unitPrice: l.unitPrice.toFixed(2),
+            quantity: l.quantity,
+            lineTotal: l.lineTotal.toFixed(2),
+          })),
+        );
+
+        return orderRow;
+      });
+    } catch (err) {
+      // Eşzamanlı sipariş stoğu bizden önce tüketti → transaction geri alındı.
+      if (err instanceof OutOfStockError) {
+        res.status(409).json({
+          error: "out_of_stock",
+          message: `"${err.productName}" için stok yetersiz. Lütfen sepeti güncelleyin.`,
+          productId: err.productId,
+        });
+        return;
       }
-      if (!orderRow) throw new Error("order_number_generation_failed");
-
-      await tx.insert(orderItems).values(
-        lineValues.map((l) => ({
-          orderId: orderRow!.id,
-          productId: l.productId,
-          productName: l.productName,
-          productSlug: l.productSlug,
-          unitPrice: l.unitPrice.toFixed(2),
-          quantity: l.quantity,
-          lineTotal: l.lineTotal.toFixed(2),
-        })),
-      );
-
-      return orderRow;
-    });
+      throw err;
+    }
 
     const responseBody: Record<string, unknown> = {
       orderNumber: created.orderNumber,
@@ -297,29 +369,34 @@ ordersRouter.post(
 
     // Fire-and-forget order notifications (admin alert + customer copy).
     // Email failures must never break checkout, so we don't await the result.
-    void sendOrderNotifications({
-      orderNumber: created.orderNumber,
-      customerName,
-      customerEmail: customerEmail || null,
-      customerPhone,
-      city,
-      district,
-      addressLine,
-      note: note || null,
-      paymentMethod,
-      items: lineValues.map((l) => ({
-        name: l.productName,
-        quantity: l.quantity,
-        unitPrice: l.unitPrice,
-        lineTotal: l.lineTotal,
-      })),
-      subtotal,
-      shippingCost,
-      total,
-      currency: shopConfig.currency,
-    }).catch((err) => {
-      console.error("[orders] notification failed", err);
-    });
+    // Kart siparişlerinde e-postalar burada DEĞİL, iyzico callback'te ödeme
+    // gerçekten başarılı olunca gönderilir — terk edilen kart denemeleri
+    // müşteriye "siparişiniz alındı" maili ve admin'e sahte alarm üretmesin.
+    if (paymentMethod !== "card") {
+      void sendOrderNotifications({
+        orderNumber: created.orderNumber,
+        customerName,
+        customerEmail: customerEmail || null,
+        customerPhone,
+        city,
+        district,
+        addressLine,
+        note: note || null,
+        paymentMethod,
+        items: lineValues.map((l) => ({
+          name: l.productName,
+          quantity: l.quantity,
+          unitPrice: l.unitPrice,
+          lineTotal: l.lineTotal,
+        })),
+        subtotal,
+        shippingCost,
+        total,
+        currency: shopConfig.currency,
+      }).catch((err) => {
+        console.error("[orders] notification failed", err);
+      });
+    }
 
     res.status(201).json(responseBody);
   }),
@@ -328,6 +405,7 @@ ordersRouter.post(
 // ---------- GET /api/orders/:number ----------
 ordersRouter.get(
   "/orders/:number",
+  lookupOrderLimiter,
   asyncHandler(async (req, res) => {
     const tenantId = await getTenantId();
     const orderNumber = req.params.number;

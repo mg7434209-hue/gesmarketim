@@ -101,7 +101,10 @@ export default function Products() {
 
   useEffect(() => {
     let active = true;
-    setStatus('loading');
+    // İlk yüklemede skeleton göster; sonraki filtre/arama değişikliklerinde
+    // mevcut listeyi ekranda tut — her tuş vuruşunda grid'i boşaltıp skeleton'a
+    // düşmek göz yoruyor ve scroll konumunu kaybettiriyordu.
+    setStatus((s) => (s === 'ready' ? s : 'loading'));
     const handle = window.setTimeout(() => {
       const minPrice = filters.minPrice === '' ? undefined : Number(filters.minPrice);
       const maxPrice = filters.maxPrice === '' ? undefined : Number(filters.maxPrice);

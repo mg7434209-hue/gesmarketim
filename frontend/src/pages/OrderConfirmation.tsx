@@ -7,6 +7,7 @@ import {
   type OrderResult,
 } from '../lib/api';
 import { formatPrice } from '../components/product-ui';
+import { useCart } from '../cart/CartContext';
 import { useSeo } from '../lib/seo';
 
 type Status = 'loading' | 'ready' | 'notfound' | 'error';
@@ -55,6 +56,15 @@ export default function OrderConfirmation() {
 
   // Always fetch to enrich (bank details, latest payment status).
   useEffect(() => load(), [load]);
+
+  // Kart ödemesi iyzico dönüşüyle başarılı olduğunda sepet hâlâ doludur
+  // (checkout ödeme sayfasına yönlendirmeden önce temizleyemez — ödeme
+  // başarısız olursa sepet kaybolmasın). Başarı burada kesinleşir: temizle.
+  const { clear } = useCart();
+  useEffect(() => {
+    if (paymentResult === 'success') clear();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [paymentResult]);
 
   return (
     <div className="bg-surface">

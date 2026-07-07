@@ -1,4 +1,8 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+// VITE_API_URL ayrık frontend/backend deploy'unda backend'in adresini taşır.
+// Ayarlanmadığında same-origin ('') kullanılır: tek servisli production'da
+// backend SPA'yı zaten kendisi servis eder, dev'de ise Vite proxy'si /api'yi
+// localhost:3000'e yönlendirir. localhost'a sabitlemek prod'da sessizce kırılırdı.
+const API_URL = import.meta.env.VITE_API_URL || '';
 
 export type PublicCategory = {
   id: string;
@@ -197,6 +201,40 @@ export async function createOrder(payload: CheckoutPayload): Promise<OrderResult
     );
   }
   return (await res.json()) as OrderResult;
+}
+
+// ---------------------------------------------------------------------------
+// Contact form
+// ---------------------------------------------------------------------------
+
+export type ContactPayload = {
+  name: string;
+  email: string;
+  phone?: string;
+  subject: string;
+  message: string;
+};
+
+/** İletişim formunu gönderir; hata durumunda CheckoutError ile mesaj/fields taşır. */
+export async function sendContact(payload: ContactPayload): Promise<void> {
+  const res = await fetch(`${API_URL}/api/contact`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    let body: { message?: string; fields?: Record<string, string> } = {};
+    try {
+      body = await res.json();
+    } catch {
+      /* ignore */
+    }
+    throw new CheckoutError(
+      body.message ?? 'Mesaj gönderilemedi. Lütfen tekrar deneyin.',
+      res.status,
+      body.fields,
+    );
+  }
 }
 
 export async function getOrder(orderNumber: string): Promise<OrderDetail> {

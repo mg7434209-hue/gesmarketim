@@ -2,7 +2,7 @@ import LegalPage, { LegalSection, LegalList } from '../components/LegalPage';
 
 export default function OnBilgilendirme() {
   return (
-    <LegalPage title="Ön Bilgilendirme Formu" showDraftBadge>
+    <LegalPage title="Ön Bilgilendirme Formu">
       <p>
         İşbu Ön Bilgilendirme Formu, Mesafeli Sözleşmeler Yönetmeliği'nin 5. maddesi uyarınca
         ALICI'ya satış işleminin gerçekleşmesinden önce sunulan zorunlu bilgileri içerir.

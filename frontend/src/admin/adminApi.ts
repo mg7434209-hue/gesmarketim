@@ -1,7 +1,8 @@
 // Admin API client. All requests send the session cookie (credentials:'include').
 // A 401 throws AdminAuthError so the shell can bounce back to the login screen.
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+// Ayarlanmadığında same-origin; dev'de Vite proxy /api'yi backend'e yönlendirir.
+const API_URL = import.meta.env.VITE_API_URL || '';
 const BASE = `${API_URL}/api/admin`;
 
 export class AdminAuthError extends Error {

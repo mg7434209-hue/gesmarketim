@@ -18,7 +18,9 @@ export default defineConfig(function (_a) {
         },
         build: {
             outDir: 'dist',
-            sourcemap: true,
+            // Kaynak haritaları production'a gönderme: kaynak kodu ifşa eder ve
+            // deploy artefaktını şişirir. Geliştirmede Vite zaten inline üretir.
+            sourcemap: mode !== 'production',
         },
     };
 });
