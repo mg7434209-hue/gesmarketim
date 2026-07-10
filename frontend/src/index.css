@@ -1,5 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-
+/* Inter fontu index.html'de preconnect + <link> ile yüklenir (render-blocking
+   CSS @import yerine — ilk boyamayı hızlandırır). */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

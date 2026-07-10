@@ -128,6 +128,118 @@ const PRODUCTS: SeedProduct[] = [
     description: "Anodize alüminyum güneş paneli montaj rayı, 4.2 metre. Tüm standart kelepçelerle uyumlu.",
   },
   // -------------------------------------------------------------------------
+  // Örnek katalog genişletmesi — mağazanın dolu görünmesi için kategori başına
+  // temsili ürünler. Fiyatlar TEMSİLİDİR; gerçek tedarikçi fiyatı geldikçe
+  // admin panelinden güncellenmelidir.
+  // -------------------------------------------------------------------------
+
+  // --- Güneş panelleri ---
+  {
+    name: "Lexron 410W Half-Cut Monokristal Güneş Paneli",
+    category: "gunes-paneli", brand: "lexron", supplier: "lexron",
+    costPrice: 2450, markupPercent: 18, fulfillmentType: "stock", stockQty: 44,
+    description: "108 hücreli half-cut monokristal panel. Konut çatıları için dengeli güç/boyut oranı. 12 yıl ürün garantisi.",
+  },
+  {
+    name: "Lexron 285W 12V Güneş Paneli",
+    category: "gunes-paneli", brand: "lexron", supplier: "lexron",
+    costPrice: 1750, markupPercent: 20, fulfillmentType: "stock", stockQty: 30,
+    description: "12V akülü sistemler için monokristal panel. Bağ evi, karavan ve tekne kurulumlarında şarj kontrol cihazıyla doğrudan kullanım.",
+  },
+  {
+    name: "Lexron 205W 12V Güneş Paneli",
+    category: "gunes-paneli", brand: "lexron", supplier: "lexron",
+    costPrice: 1320, markupPercent: 20, fulfillmentType: "stock", stockQty: 25,
+    description: "Kompakt 12V panel. Küçük off-grid sistemler, sulama otomasyonu ve karavan için.",
+  },
+  {
+    name: "DEYE 580W N-Type Bifacial Güneş Paneli",
+    category: "gunes-paneli", brand: "deye", supplier: "acs-enerji",
+    costPrice: 3650, markupPercent: 17, fulfillmentType: "dropship", stockQty: 0,
+    description: "Çift yüzeyli (bifacial) N-Type panel; arka yüz kazancıyla arazi ve carport uygulamalarında ekstra üretim.",
+  },
+
+  // --- Bataryalar ---
+  {
+    name: "Lexron 12V 100Ah Jel Akü",
+    category: "batarya", brand: "lexron", supplier: "lexron",
+    costPrice: 4200, markupPercent: 22, fulfillmentType: "stock", stockQty: 28,
+    description: "Derin deşarj jel akü. Bakım gerektirmez; bağ evi ve küçük off-grid sistemlerin ekonomik depolama çözümü.",
+  },
+  {
+    name: "Lexron 12V 200Ah Jel Akü",
+    category: "batarya", brand: "lexron", supplier: "lexron",
+    costPrice: 7900, markupPercent: 22, fulfillmentType: "stock", stockQty: 16,
+    description: "Yüksek kapasiteli derin deşarj jel akü. Seri/paralel bağlantıyla 24V-48V banka kurulabilir.",
+  },
+  {
+    name: "Lexron 12.8V 100Ah LiFePO4 Lityum Akü",
+    category: "batarya", brand: "lexron", supplier: "lexron",
+    costPrice: 14500, markupPercent: 20, fulfillmentType: "dropship", stockQty: 0,
+    description: "Dahili BMS'li LiFePO4 akü. Jel aküye göre 4-6 kat çevrim ömrü, yarı ağırlık. Karavan ve off-grid sistemler için.",
+  },
+
+  // --- Solar kablo ---
+  {
+    name: "10mm² Solar Kablo - Siyah (100m)",
+    category: "solar-kablo", brand: "lexron", supplier: "lexron",
+    costPrice: 2400, markupPercent: 30, fulfillmentType: "stock", stockQty: 20,
+    description: "10mm² PV1-F solar DC kablo, 100 metre makara. Uzun DC hatlarında düşük gerilim düşümü için.",
+  },
+  {
+    name: "MC4 Uzatma Kablosu 6mm² (5m, çift)",
+    category: "solar-kablo", brand: "lexron", supplier: "lexron",
+    costPrice: 380, markupPercent: 40, fulfillmentType: "stock", stockQty: 50,
+    description: "Her iki ucu MC4 konnektörlü hazır uzatma kablosu çifti (+/-). 5 metre, 6mm² kesit.",
+  },
+
+  // --- Montaj aparatı ---
+  {
+    name: "Kiremit Çatı Montaj Kiti (4 Panel)",
+    category: "montaj-aparati", brand: "lexron", supplier: "enerji-pazari",
+    costPrice: 2150, markupPercent: 35, fulfillmentType: "stock", stockQty: 18,
+    description: "Kiremit çatılar için paslanmaz kanca ve alüminyum ray seti. 4 panel kapasiteli, sızdırmazlık contaları dahil.",
+  },
+  {
+    name: "Panel Kelepçe Seti (Orta + Uç, 4 Panel)",
+    category: "montaj-aparati", brand: "lexron", supplier: "enerji-pazari",
+    costPrice: 420, markupPercent: 40, fulfillmentType: "stock", stockQty: 60,
+    description: "30-35mm çerçeveli paneller için alüminyum orta ve uç kelepçe seti. Paslanmaz cıvatalarla.",
+  },
+  {
+    name: "Ayarlanabilir Üçgen Arazi Sehpası (Çift)",
+    category: "montaj-aparati", brand: "lexron", supplier: "enerji-pazari",
+    costPrice: 1480, markupPercent: 35, fulfillmentType: "dropship", stockQty: 0,
+    description: "15°-30° ayarlanabilir eğimli alüminyum arazi/düz çatı sehpası. Panel başına bir çift kullanılır.",
+  },
+
+  // --- Aksesuar ---
+  {
+    name: "Lexron 40A MPPT Şarj Kontrol Cihazı",
+    category: "aksesuar", brand: "lexron", supplier: "lexron",
+    costPrice: 3250, markupPercent: 25, fulfillmentType: "stock", stockQty: 14,
+    description: "12/24V otomatik, 40A MPPT şarj kontrol cihazı. LCD ekran, %98'e varan dönüşüm verimi.",
+  },
+  {
+    name: "MC4 Pense + Kablo Soyucu Takımı",
+    category: "aksesuar", brand: "lexron", supplier: "lexron",
+    costPrice: 680, markupPercent: 40, fulfillmentType: "stock", stockQty: 35,
+    description: "MC4 konnektör sıkma pensesi, kablo soyucu ve anahtar takımı. Solar kurulumun temel el aleti seti.",
+  },
+  {
+    name: "Batarya Bağlantı Kablosu 25mm² (Çift, 50cm)",
+    category: "aksesuar", brand: "lexron", supplier: "lexron",
+    costPrice: 460, markupPercent: 40, fulfillmentType: "stock", stockQty: 40,
+    description: "Kalaylı bakır 25mm² akü bağlantı kablosu çifti. Pabuçlar basılı, ısı büzüşmeli izolasyon.",
+  },
+  {
+    name: "AC Enerji Analizörü (Tek Faz, WiFi)",
+    category: "aksesuar", brand: "deye", supplier: "acs-enerji",
+    costPrice: 1850, markupPercent: 30, fulfillmentType: "dropship", stockQty: 0,
+    description: "Üretim/tüketim izleme için tek faz enerji analizörü. WiFi üzerinden uygulama desteği.",
+  },
+
+  // -------------------------------------------------------------------------
   // İnverter kataloğu — tedarikçi listesinden (Temmuz 2026). Fiyatlar listede
   // KDV dahil satış fiyatı olarak verildiği için costPrice=liste, markup=%0 →
   // finalPrice birebir liste fiyatı. Marj eklemek isterseniz admin panelinden

@@ -340,6 +340,8 @@ export const orders = pgTable(
     ),
     tenantStatusIdx: index("orders_tenant_status_idx").on(t.tenantId, t.status),
     createdAtIdx: index("orders_created_at_idx").on(t.createdAt),
+    // Müşteri sipariş geçmişi sorgusu (GET /api/account/orders) için.
+    customerIdx: index("orders_customer_idx").on(t.tenantId, t.customerId),
   }),
 );
 
