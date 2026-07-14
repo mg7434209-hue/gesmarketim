@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { eq, and } from "drizzle-orm";
+import { eq, and, sql } from "drizzle-orm";
 import { db } from "./index.js";
 import { tenants, suppliers, categories, brands, products } from "./schema.js";
 import { computeFinalPrice } from "./pricing.js";
@@ -52,6 +52,42 @@ const BRANDS = [
   { name: "HUAWEI", slug: "huawei" },
   { name: "SOROTEC", slug: "sorotec" },
 ];
+
+// Ürün görselleri repoda frontend/public/img/products/<slug>.jpg altında durur
+// ve frontend servisi tarafından statik sunulur (dış siteye hotlink yok).
+// Yeni bir ürün görseli eklerken dosyayı oraya koyup slug'ını bu listeye ekle.
+const PRODUCT_IMAGE_SLUGS = new Set<string>([
+  "lexron-2000w-24v-modifiye-sinus-inverter",
+  "lexron-2000w-12v-modifiye-sinus-inverter",
+  "lexron-1200w-24v-modifiye-sinus-inverter",
+  "lexron-1200w-12v-modifiye-sinus-inverter",
+  "lexron-600w-12v-modifiye-sinus-inverter",
+  "lexron-300w-12v-modifiye-sinus-inverter",
+  "lexron-1-6kw-hv-mppt-akilli-inverter-12v",
+  "lexron-1kw-mppt-plus-akilli-inverter-12v",
+  "lexron-off-grid-inverter-datalogger",
+  "deye-5kw-hibrit-monofaze-inverter-lv",
+  "deye-8kw-hibrit-monofaze-inverter-lv",
+  "deye-10kw-hibrit-monofaze-inverter-lv",
+  "deye-16kw-hibrit-monofaze-inverter-lv",
+  "deye-8kw-hibrit-trifaze-inverter-lv",
+  "deye-12kw-hibrit-trifaze-inverter-lv",
+  "deye-15kw-hibrit-trifaze-inverter-lv",
+  "deye-20kw-hibrit-trifaze-inverter-lv",
+  "deye-20kw-hibrit-trifaze-inverter-hv",
+  "deye-25kw-hibrit-trifaze-inverter-hv",
+  "deye-30kw-hibrit-trifaze-inverter-hv",
+  "deye-40kw-hibrit-trifaze-inverter-hv",
+  "deye-50kw-hibrit-trifaze-inverter-hv",
+  "deye-60kw-hibrit-trifaze-inverter-hv",
+  "deye-80kw-hibrit-trifaze-inverter-hv",
+]);
+
+function imagesFor(slug: string, name: string) {
+  return PRODUCT_IMAGE_SLUGS.has(slug)
+    ? [{ url: `/img/products/${slug}.jpg`, alt: name, isPrimary: true }]
+    : [];
+}
 
 const PRODUCTS: SeedProduct[] = [
   {
@@ -597,6 +633,7 @@ export async function seedDatabase() {
 
   // 5) Products (finalPrice computed via the pricing engine)
   let created = 0;
+  let backfilled = 0;
   for (const p of PRODUCTS) {
     const slug = slugify(p.name);
     const existing = await db
@@ -604,7 +641,26 @@ export async function seedDatabase() {
       .from(products)
       .where(and(eq(products.tenantId, tenantId), eq(products.slug, slug)))
       .limit(1);
-    if (existing.length > 0) continue;
+    if (existing.length > 0) {
+      // Görsel backfill: daha önce görselsiz seed'lenmiş üründe artık repo
+      // görseli varsa doldur. Yalnızca images boşken yazar — admin'in
+      // yüklediği görsellerin üzerine asla yazmaz.
+      if (PRODUCT_IMAGE_SLUGS.has(slug)) {
+        const updated = await db
+          .update(products)
+          .set({ images: imagesFor(slug, p.name), updatedAt: new Date() })
+          .where(
+            and(
+              eq(products.tenantId, tenantId),
+              eq(products.slug, slug),
+              sql`jsonb_array_length(${products.images}) = 0`,
+            ),
+          )
+          .returning({ id: products.id });
+        if (updated.length > 0) backfilled++;
+      }
+      continue;
+    }
 
     let finalPrice: number;
     let markupPercent: number;
@@ -635,12 +691,14 @@ export async function seedDatabase() {
       currency: "TRY",
       fulfillmentType: p.fulfillmentType,
       stockQty: p.stockQty,
-      images: [],
+      images: imagesFor(slug, p.name),
       status: p.status ?? "active",
     });
     created++;
   }
-  console.log(`✓ products: ${created} eklendi (${PRODUCTS.length - created} zaten vardı)`);
+  console.log(
+    `✓ products: ${created} eklendi (${PRODUCTS.length - created} zaten vardı, ${backfilled} görsel backfill)`,
+  );
 
   console.log("Seed tamamlandı ✅");
 }
