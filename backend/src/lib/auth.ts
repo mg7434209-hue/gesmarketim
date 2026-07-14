@@ -16,11 +16,17 @@ const SECRET = process.env.ADMIN_SESSION_SECRET ?? DEFAULT_PLACEHOLDER;
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME ?? "admin";
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? DEFAULT_PLACEHOLDER;
 
-// Prod'da placeholder şifre/secret ile admin girişi tamamen kapatılır: aksi
-// halde env ayarlanmadan yapılan bir deploy, paneli herkese açık bırakır ve
-// bilinen secret ile oturum çerezi dışarıda üretilebilir (cookie forgery).
+// Placeholder şifre/secret ile admin girişi kapatılır: aksi halde env
+// ayarlanmadan yapılan bir deploy, paneli herkese açık bırakır ve bilinen
+// secret ile oturum çerezi dışarıda üretilebilir (cookie forgery).
+// Güvenli varsayılan: yalnızca NODE_ENV açıkça 'development'/'test' iken
+// muaf tutulur — NODE_ENV'i eksik bırakılmış bir CANLI deploy korunur.
+// (Yerelde şifresiz çalışmak için: NODE_ENV=development ya da ADMIN_PASSWORD
+// ve ADMIN_SESSION_SECRET env'lerini ayarlayın.)
+const DEV_ENV =
+  process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test";
 const INSECURE_DEFAULTS =
-  process.env.NODE_ENV === "production" &&
+  !DEV_ENV &&
   (ADMIN_PASSWORD === DEFAULT_PLACEHOLDER || SECRET === DEFAULT_PLACEHOLDER);
 if (INSECURE_DEFAULTS) {
   console.error(

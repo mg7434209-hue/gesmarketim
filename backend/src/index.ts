@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import express, { type Request, type Response, type NextFunction } from 'express';
 import cors from 'cors';
+import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { healthRouter } from './routes/health.js';
@@ -66,17 +67,24 @@ app.use('/api', contactRouter);
 // ---------- SEO (served at site root, before the SPA fallback) ----------
 app.use('/', seoRouter);
 
-// ---------- static frontend (production) ----------
-// In production the backend serves the built React app from frontend/dist.
-// In dev, Vite runs on :5173 and proxies /api → this server, so we skip this.
-if (NODE_ENV === 'production') {
-  const frontendDist = path.resolve(__dirname, '../../frontend/dist');
+// ---------- static frontend ----------
+// frontend/dist mevcutsa SPA'yı servis et. Bunu NODE_ENV'e BAĞLAMIYORUZ:
+// deploy ortamında NODE_ENV eksik/farklı olduğunda SPA fallback'i devreden
+// çıkıp tüm sayfa rotaları "Cannot GET /..." veriyordu. Ölçüt artık build
+// çıktısının varlığı — dev'de Vite (5173) kullanıldığından blok zararsızdır.
+const frontendDist = path.resolve(__dirname, '../../frontend/dist');
+const hasFrontendBuild = fs.existsSync(path.join(frontendDist, 'index.html'));
+if (hasFrontendBuild) {
   app.use(express.static(frontendDist));
 
   // SPA fallback: any non-/api GET serves index.html so client-side routing works.
   app.get(/^\/(?!api\/).*/, (_req, res) => {
     res.sendFile(path.join(frontendDist, 'index.html'));
   });
+} else {
+  console.warn(
+    '[gesmarketim] frontend/dist bulunamadı — SPA servis edilmiyor (API-only mod). `npm run build:frontend` çalıştı mı?',
+  );
 }
 
 // ---------- root info (API-only deployments) ----------
