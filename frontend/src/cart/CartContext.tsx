@@ -1,12 +1,14 @@
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from 'react';
-import type { PublicProduct } from '../lib/api';
+import { getProduct, NotFoundError, type PublicProduct } from '../lib/api';
 
 export type CartItem = {
   id: string;
@@ -18,6 +20,13 @@ export type CartItem = {
   quantity: number;
 };
 
+export type CartRefreshResult = {
+  /** En az bir ürünün fiyatı değişti. */
+  priceChanged: boolean;
+  /** Artık satışta olmadığı için sepetten çıkarılan ürün adları. */
+  removedNames: string[];
+};
+
 type CartContextValue = {
   items: CartItem[];
   count: number;
@@ -26,6 +35,8 @@ type CartContextValue = {
   setQuantity: (id: string, quantity: number) => void;
   remove: (id: string) => void;
   clear: () => void;
+  /** Sepetteki fiyat/isim/görselleri sunucudan tazeler; kaldırılanları bildirir. */
+  refresh: () => Promise<CartRefreshResult>;
 };
 
 const STORAGE_KEY = 'gm_cart_v1';
@@ -40,14 +51,21 @@ function loadInitial(): CartItem[] {
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
-    return parsed.filter(
-      (i): i is CartItem =>
-        i &&
-        typeof i.id === 'string' &&
-        typeof i.name === 'string' &&
-        typeof i.price === 'number' &&
-        typeof i.quantity === 'number',
-    );
+    return parsed
+      .filter(
+        (i): i is CartItem =>
+          i &&
+          typeof i.id === 'string' &&
+          typeof i.slug === 'string' &&
+          i.slug.length > 0 &&
+          typeof i.name === 'string' &&
+          typeof i.price === 'number' &&
+          Number.isFinite(i.price) &&
+          i.price >= 0 &&
+          typeof i.quantity === 'number' &&
+          (i.fulfillmentType === 'stock' || i.fulfillmentType === 'dropship'),
+      )
+      .map((i) => ({ ...i, quantity: clampQty(i.quantity) }));
   } catch {
     return [];
   }
@@ -60,6 +78,9 @@ function clampQty(q: number): number {
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>(loadInitial);
+  // refresh() async çalışır; güncel listeye state üzerinden değil ref'ten ulaşır.
+  const itemsRef = useRef(items);
+  itemsRef.current = items;
 
   useEffect(() => {
     try {
@@ -68,6 +89,50 @@ export function CartProvider({ children }: { children: ReactNode }) {
       /* storage full / unavailable — non-fatal */
     }
   }, [items]);
+
+  const refresh = useCallback(async (): Promise<CartRefreshResult> => {
+    const current = itemsRef.current;
+    if (current.length === 0) return { priceChanged: false, removedNames: [] };
+
+    const results = await Promise.all(
+      current.map(async (item) => {
+        try {
+          const p = await getProduct(item.slug);
+          return { item, product: p, removed: false };
+        } catch (err) {
+          // Ürün yayından kalkmış → sepetten çıkar. Ağ hatasında mevcut
+          // veriyi koru (yanlışlıkla sepet boşaltma).
+          return { item, product: null, removed: err instanceof NotFoundError };
+        }
+      }),
+    );
+
+    let priceChanged = false;
+    const removedNames: string[] = [];
+    const next: CartItem[] = [];
+    for (const r of results) {
+      if (r.removed) {
+        removedNames.push(r.item.name);
+        continue;
+      }
+      if (!r.product) {
+        next.push(r.item);
+        continue;
+      }
+      if (r.product.price !== r.item.price) priceChanged = true;
+      const primary =
+        r.product.images.find((img) => img.isPrimary) ?? r.product.images[0];
+      next.push({
+        ...r.item,
+        name: r.product.name,
+        price: r.product.price,
+        image: primary?.url ?? r.item.image,
+        fulfillmentType: r.product.fulfillmentType,
+      });
+    }
+    setItems(next);
+    return { priceChanged, removedNames };
+  }, []);
 
   const value = useMemo<CartContextValue>(() => {
     const add: CartContextValue['add'] = (product, quantity = 1) => {
@@ -111,8 +176,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
     const count = items.reduce((n, i) => n + i.quantity, 0);
     const subtotal = items.reduce((s, i) => s + i.price * i.quantity, 0);
 
-    return { items, count, subtotal, add, setQuantity, remove, clear };
-  }, [items]);
+    return { items, count, subtotal, add, setQuantity, remove, clear, refresh };
+  }, [items, refresh]);
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }

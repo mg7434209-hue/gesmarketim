@@ -2,7 +2,7 @@ import LegalPage, { LegalSection, LegalList } from '../components/LegalPage';
 
 export default function Cerez() {
   return (
-    <LegalPage title="Çerez Politikası" showDraftBadge>
+    <LegalPage title="Çerez Politikası">
       <p>
         Bu Çerez Politikası, GES MARKETİM'in www.gesmarketim.com web sitesinde kullandığı
         çerez ("cookie") teknolojilerini ve bunlar üzerindeki tercihlerinizi nasıl

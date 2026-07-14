@@ -114,8 +114,8 @@ function shell(title: string, body: string): string {
   </body></html>`;
 }
 
-/** Recipients for the internal new-order alert. */
-function adminRecipients(): string[] {
+/** Recipients for internal alerts (new order, contact form). */
+export function adminRecipients(): string[] {
   const raw =
     process.env.ORDER_NOTIFY_EMAIL?.trim() ||
     process.env.MAIL_FROM?.trim() ||

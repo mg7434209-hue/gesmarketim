@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../cart/CartContext';
 import { formatPrice, FulfillmentBadge } from '../components/product-ui';
@@ -6,7 +7,28 @@ import { useSeo } from '../lib/seo';
 
 export default function Cart() {
   useSeo({ title: 'Sepetim', path: '/sepet', noindex: true });
-  const { items, subtotal, setQuantity, remove } = useCart();
+  const { items, subtotal, setQuantity, remove, refresh } = useCart();
+  const [notice, setNotice] = useState<string | null>(null);
+
+  // Sepet açılınca fiyat/isim/stok bilgisini tazele: localStorage'daki bayat
+  // fiyat, sunucunun keseceği tutardan farklıysa kullanıcı burada görür.
+  useEffect(() => {
+    let active = true;
+    refresh().then(({ priceChanged, removedNames }) => {
+      if (!active) return;
+      const parts: string[] = [];
+      if (removedNames.length > 0)
+        parts.push(
+          `${removedNames.join(', ')} artık satışta olmadığı için sepetten çıkarıldı.`,
+        );
+      if (priceChanged) parts.push('Bazı ürünlerin fiyatı güncellendi.');
+      if (parts.length > 0) setNotice(parts.join(' '));
+    });
+    return () => {
+      active = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const shipping = shippingFor(subtotal);
   const total = subtotal + shipping;
@@ -34,6 +56,15 @@ export default function Cart() {
         <h1 className="mt-6 text-3xl font-bold tracking-tight text-primary md:text-4xl">
           Sepetim
         </h1>
+
+        {notice && (
+          <p
+            role="status"
+            className="mt-4 rounded-lg bg-accent/10 px-4 py-3 text-sm font-semibold text-primary"
+          >
+            {notice}
+          </p>
+        )}
 
         {items.length === 0 ? (
           <EmptyCart />

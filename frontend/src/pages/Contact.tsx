@@ -1,6 +1,7 @@
 import { FormEvent, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { WHATSAPP_URL, WHATSAPP_DISPLAY } from '../config';
+import { sendContact, CheckoutError } from '../lib/api';
 import { useSeo } from '../lib/seo';
 
 const SUBJECTS = [
@@ -35,15 +36,40 @@ export default function Contact() {
     path: '/iletisim',
   });
   const [form, setForm] = useState<FormState>(INITIAL_STATE);
+  const [sending, setSending] = useState(false);
+  const [result, setResult] = useState<
+    { ok: true } | { ok: false; message: string } | null
+  >(null);
 
   function handleChange<K extends keyof FormState>(field: K, value: FormState[K]) {
     setForm((prev) => ({ ...prev, [field]: value }));
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    window.alert('Mesajınız alındı. Hızlı yanıt için WhatsApp da kullanabilirsiniz.');
-    setForm(INITIAL_STATE);
+    setSending(true);
+    setResult(null);
+    try {
+      await sendContact({
+        name: form.name,
+        email: form.email,
+        phone: form.phone || undefined,
+        subject: form.subject,
+        message: form.message,
+      });
+      setResult({ ok: true });
+      setForm(INITIAL_STATE);
+    } catch (err) {
+      setResult({
+        ok: false,
+        message:
+          err instanceof CheckoutError
+            ? err.message
+            : 'Mesaj gönderilemedi. Lütfen tekrar deneyin veya WhatsApp kullanın.',
+      });
+    } finally {
+      setSending(false);
+    }
   }
 
   return (
@@ -169,11 +195,27 @@ export default function Contact() {
                 />
               </div>
 
+              {result && (
+                <p
+                  role="alert"
+                  className={`rounded-lg px-3 py-2 text-sm font-semibold ${
+                    result.ok
+                      ? 'bg-success/10 text-success'
+                      : 'bg-danger/10 text-danger'
+                  }`}
+                >
+                  {result.ok
+                    ? 'Mesajınız iletildi. En kısa sürede dönüş yapacağız.'
+                    : result.message}
+                </p>
+              )}
+
               <button
                 type="submit"
-                className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-accent px-6 py-3 text-sm font-bold text-primary shadow-sm transition-colors hover:bg-accent-dark focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2"
+                disabled={sending}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-accent px-6 py-3 text-sm font-bold text-primary shadow-sm transition-colors hover:bg-accent-dark focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                Gönder
+                {sending ? 'Gönderiliyor…' : 'Gönder'}
               </button>
 
               <p className="text-xs leading-relaxed text-text-secondary">

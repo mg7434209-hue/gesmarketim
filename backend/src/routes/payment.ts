@@ -17,6 +17,7 @@ import {
   paymentConfig,
 } from "../lib/shopConfig.js";
 import { retrieveCheckoutResult } from "../lib/payments/iyzico.js";
+import { sendOrderNotifications } from "../lib/notify/orderEmail.js";
 import { siteBaseUrl } from "../lib/siteUrl.js";
 
 export const paymentRouter = Router();
@@ -75,7 +76,39 @@ paymentRouter.post(
     }
 
     const tenantId = await getTenantId();
-    const paid = result.status === "success" && result.paymentStatus === "SUCCESS";
+    const order = await db.query.orders.findFirst({
+      where: and(
+        eq(orders.tenantId, tenantId),
+        eq(orders.orderNumber, orderNumber),
+      ),
+      columns: { id: true, paymentStatus: true, total: true },
+    });
+    if (!order) {
+      fail();
+      return;
+    }
+
+    // Idempotens: ödeme zaten kesinleşmiş bir siparişi callback tekrarı
+    // (yenileme/replay) failed'a geri çeviremez.
+    if (order.paymentStatus === "paid") {
+      res.redirect(303, `${base}/siparis/${orderNumber}?payment=success`);
+      return;
+    }
+
+    let paid = result.status === "success" && result.paymentStatus === "SUCCESS";
+
+    // Tutar doğrulama: iyzico'nun tahsil ettiği tutar sipariş toplamından
+    // farklıysa siparişi otomatik onaylama — manuel inceleme gerekir.
+    if (paid && result.paidPrice !== undefined) {
+      const paidAmount = Number(result.paidPrice);
+      const expected = Number(order.total);
+      if (!Number.isFinite(paidAmount) || Math.abs(paidAmount - expected) > 0.01) {
+        console.error(
+          `[payment] amount mismatch on ${orderNumber}: paid=${result.paidPrice} expected=${order.total} — manuel inceleme gerekli`,
+        );
+        paid = false;
+      }
+    }
 
     await db
       .update(orders)
@@ -85,14 +118,44 @@ paymentRouter.post(
         paymentRef: result.paymentId ?? token,
         updatedAt: new Date(),
       })
-      .where(
-        and(eq(orders.tenantId, tenantId), eq(orders.orderNumber, orderNumber)),
-      );
+      .where(eq(orders.id, order.id));
+
+    // Kart siparişinin bildirimleri checkout'ta değil burada, ödeme gerçekten
+    // tahsil edilince gönderilir (admin alarmı + müşteri onayı).
+    if (paid) {
+      void (async () => {
+        const full = await db.query.orders.findFirst({
+          where: eq(orders.id, order.id),
+          with: { items: true },
+        });
+        if (!full) return;
+        await sendOrderNotifications({
+          orderNumber: full.orderNumber,
+          customerName: full.customerName,
+          customerEmail: full.customerEmail,
+          customerPhone: full.customerPhone,
+          city: full.city,
+          district: full.district,
+          addressLine: full.addressLine,
+          note: full.note,
+          paymentMethod: full.paymentMethod,
+          items: full.items.map((i) => ({
+            name: i.productName,
+            quantity: i.quantity,
+            unitPrice: Number(i.unitPrice),
+            lineTotal: Number(i.lineTotal),
+          })),
+          subtotal: Number(full.subtotal),
+          shippingCost: Number(full.shippingCost),
+          total: Number(full.total),
+          currency: full.currency,
+        });
+      })().catch((err) => console.error("[payment] notification failed", err));
+    }
 
     res.redirect(
       303,
-      `${base}/siparis/${orderNumber}?payment=${paid ? "success" : "failed"}` ||
-        "/",
+      `${base}/siparis/${orderNumber}?payment=${paid ? "success" : "failed"}`,
     );
   }),
 );

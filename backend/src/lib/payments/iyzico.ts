@@ -51,6 +51,7 @@ export interface RetrieveResult {
   paymentStatus?: string; // "SUCCESS" when paid
   paymentId?: string;
   conversationId?: string;
+  paidPrice?: string; // tahsil edilen tutar (decimal string) — sipariş toplamıyla doğrulanır
   errorMessage?: string;
 }
 
@@ -170,6 +171,7 @@ export async function retrieveCheckoutResult(token: string): Promise<RetrieveRes
       paymentStatus?: string;
       paymentId?: string;
       conversationId?: string;
+      paidPrice?: string | number;
       errorMessage?: string;
     }>(uriPath, { locale: "tr", token });
     return {
@@ -177,6 +179,8 @@ export async function retrieveCheckoutResult(token: string): Promise<RetrieveRes
       paymentStatus: result.paymentStatus,
       paymentId: result.paymentId,
       conversationId: result.conversationId,
+      paidPrice:
+        result.paidPrice !== undefined ? String(result.paidPrice) : undefined,
       errorMessage: result.errorMessage,
     };
   } catch (err) {

@@ -9,6 +9,7 @@ import { ordersRouter } from './routes/orders.js';
 import { adminRouter } from './routes/admin.js';
 import { paymentRouter } from './routes/payment.js';
 import { accountRouter } from './routes/account.js';
+import { contactRouter } from './routes/contact.js';
 import { seoRouter } from './routes/seo.js';
 import { startSyncScheduler } from './lib/sync/scheduler.js';
 import { runMigrations, isAutoMigrateEnabled } from './db/runMigrations.js';
@@ -23,7 +24,24 @@ const NODE_ENV = process.env.NODE_ENV ?? 'development';
 const CORS_ORIGIN = process.env.CORS_ORIGIN ?? 'http://localhost:5173';
 
 // ---------- middleware ----------
-app.use(express.json({ limit: '1mb' }));
+// Railway/reverse proxy arkasında gerçek istemci IP'si X-Forwarded-For'da gelir;
+// rate limiter'ın doğru anahtar kullanması için ilk proxy'ye güven.
+app.set('trust proxy', 1);
+// Global JSON limiti 1 MB — ancak büyük gövde bekleyen rotalar (görsel upload
+// 12 MB, tedarikçi CSV 8 MB) kendi route-level parser'larını kullanır; global
+// parser burada devreye girerse onların limitleri hiç çalışmaz.
+const LARGE_BODY_ROUTES = [
+  /^\/api\/admin\/uploads$/,
+  /^\/api\/admin\/suppliers\/[^/]+\/sync\/csv$/,
+];
+const jsonParser = express.json({ limit: '1mb' });
+app.use((req, res, next) => {
+  if (req.method === 'POST' && LARGE_BODY_ROUTES.some((r) => r.test(req.path))) {
+    next();
+    return;
+  }
+  jsonParser(req, res, next);
+});
 // Payment provider callbacks (iyzico) post application/x-www-form-urlencoded.
 app.use(express.urlencoded({ extended: false }));
 const corsOrigins = CORS_ORIGIN.split(',')
@@ -43,6 +61,7 @@ app.use('/api', catalogRouter);
 app.use('/api', ordersRouter);
 app.use('/api', paymentRouter);
 app.use('/api', accountRouter);
+app.use('/api', contactRouter);
 
 // ---------- SEO (served at site root, before the SPA fallback) ----------
 app.use('/', seoRouter);

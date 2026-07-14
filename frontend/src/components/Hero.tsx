@@ -59,9 +59,9 @@ export default function Hero() {
             <dl className="mt-10 grid max-w-md grid-cols-3 gap-6 border-t border-white/10 pt-6">
               <div>
                 <dt className="text-xs font-medium uppercase tracking-wider text-white/60">
-                  Ürün çeşidi
+                  Destek
                 </dt>
-                <dd className="mt-1 text-2xl font-extrabold text-white">500+</dd>
+                <dd className="mt-1 text-2xl font-extrabold text-white">WhatsApp</dd>
               </div>
               <div>
                 <dt className="text-xs font-medium uppercase tracking-wider text-white/60">KDV</dt>

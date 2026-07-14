@@ -1,0 +1,1 @@
+CREATE INDEX IF NOT EXISTS "orders_customer_idx" ON "orders" USING btree ("tenant_id","customer_id");

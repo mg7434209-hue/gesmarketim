@@ -2,7 +2,7 @@ import LegalPage, { LegalSection, LegalList } from '../components/LegalPage';
 
 export default function MesafeliSatis() {
   return (
-    <LegalPage title="Mesafeli Satış Sözleşmesi" showDraftBadge>
+    <LegalPage title="Mesafeli Satış Sözleşmesi">
       <p>
         İşbu sözleşme, 6502 sayılı Tüketicinin Korunması Hakkında Kanun ve Mesafeli
         Sözleşmeler Yönetmeliği hükümlerine uygun olarak düzenlenmiştir.

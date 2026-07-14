@@ -50,3 +50,7 @@ drizzle/
 # Misc
 .cache/
 *.tsbuildinfo
+
+# Gerçek bağlantı bilgileri asla repoya girmez
+.env.txt
+backend/.env.txt
