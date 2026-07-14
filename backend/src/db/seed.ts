@@ -22,6 +22,11 @@ type SeedProduct = {
   description: string;
   // Fiyatı henüz bilinmeyen ürünler "draft" eklenir; admin fiyat girip yayınlar.
   status?: "active" | "draft";
+  // Verilirse finalPrice birebir bu satış fiyatı yazılır ve markupPercent
+  // (sellPrice/costPrice - 1) üzerinden hesaplanır — markup motorunun 2 ondalık
+  // yuvarlamasından doğan kuruş kaymalarını önler (tedarikçi liste fiyatını
+  // birebir korumak için).
+  sellPrice?: number;
 };
 
 const SUPPLIERS = [
@@ -66,24 +71,6 @@ const PRODUCTS: SeedProduct[] = [
     category: "gunes-paneli", brand: "lexron", supplier: "lexron",
     costPrice: 2650, markupPercent: 18, fulfillmentType: "stock", stockQty: 60,
     description: "Kompakt çatılar için 450W monokristal panel. Dengeli fiyat/performans.",
-  },
-  {
-    name: "DEYE SUN-5K-SG04LP3 5kW Hibrit İnverter",
-    category: "inverter", brand: "deye", supplier: "mexxsun",
-    costPrice: 18500, markupPercent: 20, fulfillmentType: "stock", stockQty: 12,
-    description: "Tek faz 5kW hibrit inverter. Akü entegrasyonu, WiFi izleme, MPPT çift giriş.",
-  },
-  {
-    name: "DEYE SUN-12K-SG04LP3 12kW Trifaze Hibrit İnverter",
-    category: "inverter", brand: "deye", supplier: "mexxsun",
-    costPrice: 42000, markupPercent: 19, fulfillmentType: "dropship", stockQty: 0,
-    description: "Trifaze 12kW hibrit inverter. Yüksek güçlü konut ve işletmeler için. Paralel bağlama desteği.",
-  },
-  {
-    name: "HUAWEI SUN2000-5KTL-L1 5kW İnverter",
-    category: "inverter", brand: "huawei", supplier: "enerji-pazari",
-    costPrice: 24500, markupPercent: 18, fulfillmentType: "dropship", stockQty: 0,
-    description: "Huawei akıllı string inverter. AFCI ark koruması, FusionSolar uygulama desteği.",
   },
   {
     name: "EVE 280Ah LiFePO4 Lityum Batarya Hücresi",
@@ -240,51 +227,170 @@ const PRODUCTS: SeedProduct[] = [
   },
 
   // -------------------------------------------------------------------------
-  // İnverter kataloğu — tedarikçi listesinden (Temmuz 2026). Fiyatlar listede
-  // KDV dahil satış fiyatı olarak verildiği için costPrice=liste, markup=%0 →
-  // finalPrice birebir liste fiyatı. Marj eklemek isterseniz admin panelinden
-  // markupPercent güncelleyin. Fiyatı listede görünmeyenler "draft" durumunda.
+  // İnverter kataloğu — Temmuz 2026.
+  // costPrice = firmanın tedarikçiden ALIŞ fiyatı (bayi listesi, RTF).
+  // sellPrice = tedarikçinin herkese açık KDV dahil perakende liste fiyatı;
+  // site "tedarikçi fiyatına" konumlandığı için satış fiyatı olarak bu
+  // kullanılır (marj = bayi iskontosu). sellPrice bilinmeyen yeni ürünlerde
+  // alış + %20 markup uygulanır — admin panelinden ayarlanabilir.
   // -------------------------------------------------------------------------
 
-  // --- LEXRON modifiye sinüs inverterler ---
+  // --- LEXRON modifiye sinüs inverterler (alış fiyatları bayi listesinden) ---
   {
     name: "Lexron 2000W-24V Modifiye Sinüs İnverter",
     category: "inverter", brand: "lexron", supplier: "lexron",
-    costPrice: 11044.80, markupPercent: 0, fulfillmentType: "dropship", stockQty: 0,
+    costPrice: 5005.44, sellPrice: 11044.80, markupPercent: 0, fulfillmentType: "dropship", stockQty: 0,
     description: "2000W sürekli güç, 24V giriş modifiye sinüs inverter. Karavan, tekne ve şantiye kullanımına uygun. USB çıkışı ve aşırı yük koruması.",
   },
   {
     name: "Lexron 2000W-12V Modifiye Sinüs İnverter",
     category: "inverter", brand: "lexron", supplier: "lexron",
-    costPrice: 11044.80, markupPercent: 0, fulfillmentType: "dropship", stockQty: 0,
+    costPrice: 5005.44, sellPrice: 11044.80, markupPercent: 0, fulfillmentType: "dropship", stockQty: 0,
     description: "2000W sürekli güç, 12V giriş modifiye sinüs inverter. Karavan, tekne ve şantiye kullanımına uygun. USB çıkışı ve aşırı yük koruması.",
   },
   {
     name: "Lexron 1200W-24V Modifiye Sinüs İnverter",
     category: "inverter", brand: "lexron", supplier: "lexron",
-    costPrice: 5154.24, markupPercent: 0, fulfillmentType: "dropship", stockQty: 0,
+    costPrice: 2332.08, sellPrice: 5154.24, markupPercent: 0, fulfillmentType: "dropship", stockQty: 0,
     description: "1200W sürekli güç, 24V giriş modifiye sinüs inverter. Kompakt boyut, sessiz fan, kısa devre ve düşük voltaj koruması.",
   },
   {
     name: "Lexron 1200W-12V Modifiye Sinüs İnverter",
     category: "inverter", brand: "lexron", supplier: "lexron",
-    costPrice: 5154.24, markupPercent: 0, fulfillmentType: "dropship", stockQty: 0,
+    costPrice: 2332.08, sellPrice: 5154.24, markupPercent: 0, fulfillmentType: "dropship", stockQty: 0,
     description: "1200W sürekli güç, 12V giriş modifiye sinüs inverter. Kompakt boyut, sessiz fan, kısa devre ve düşük voltaj koruması.",
   },
   {
     name: "Lexron 600W-12V Modifiye Sinüs İnverter",
     category: "inverter", brand: "lexron", supplier: "lexron",
-    costPrice: 0, markupPercent: 0, fulfillmentType: "dropship", stockQty: 0, status: "draft",
+    // Perakende listesi bu modelde görünmüyordu; aile çarpanı (~×2,21) uygulandı.
+    costPrice: 1308.24, sellPrice: 2891.21, markupPercent: 0, fulfillmentType: "dropship", stockQty: 0,
     description: "600W sürekli güç, 12V giriş modifiye sinüs inverter. Küçük cihazlar ve mobil kullanım için ekonomik çözüm.",
   },
   {
     name: "Lexron 300W-12V Modifiye Sinüs İnverter",
     category: "inverter", brand: "lexron", supplier: "lexron",
-    costPrice: 0, markupPercent: 0, fulfillmentType: "dropship", stockQty: 0, status: "draft",
+    costPrice: 910.08, sellPrice: 2011.28, markupPercent: 0, fulfillmentType: "dropship", stockQty: 0,
     description: "300W sürekli güç, 12V giriş modifiye sinüs inverter. Araç içi ve kamp kullanımı için giriş seviyesi model.",
   },
 
+  // --- LEXRON MPPT akıllı inverterler — yeni modeller (alış + %20) ---
+  {
+    name: "Lexron 1.6kW HV MPPT Akıllı İnverter 12V",
+    category: "inverter", brand: "lexron", supplier: "lexron",
+    costPrice: 8247.60, markupPercent: 20, fulfillmentType: "dropship", stockQty: 0,
+    description: "1.6kW off-grid akıllı inverter, yüksek voltaj MPPT girişli, 12V akü. Kompakt sistemler için yeni nesil model.",
+  },
+  {
+    name: "Lexron 1kW MPPT Plus Akıllı İnverter 12V",
+    category: "inverter", brand: "lexron", supplier: "lexron",
+    costPrice: 7678.80, markupPercent: 20, fulfillmentType: "dropship", stockQty: 0,
+    description: "1kW off-grid akıllı inverter (Plus serisi), MPPT şarj kontrollü, 12V akü. Kamp, karavan ve küçük sistemler için.",
+  },
+  {
+    name: "Lexron Off-Grid İnverter Datalogger",
+    category: "aksesuar", brand: "lexron", supplier: "lexron",
+    costPrice: 2844.00, markupPercent: 20, fulfillmentType: "dropship", stockQty: 0,
+    description: "Lexron off-grid inverterler için WiFi datalogger. Üretim ve tüketimi uygulama üzerinden uzaktan izleme.",
+  },
+
+  // --- DEYE hibrit inverterler (dahili WiFi + limiter; alış + %20) ---
+  {
+    name: "DEYE 5kW Hibrit Monofaze İnverter LV",
+    category: "inverter", brand: "deye", supplier: "acs-enerji",
+    costPrice: 54604.80, markupPercent: 20, fulfillmentType: "dropship", stockQty: 0,
+    description: "5kW hibrit monofaze inverter, 48V düşük voltaj akü. Dahili WiFi ve limiter. Konut depolamalı GES sistemleri için.",
+  },
+  {
+    name: "DEYE 8kW Hibrit Monofaze İnverter LV",
+    category: "inverter", brand: "deye", supplier: "acs-enerji",
+    costPrice: 82476.00, markupPercent: 20, fulfillmentType: "dropship", stockQty: 0,
+    description: "8kW hibrit monofaze inverter, 48V akü. Dahili WiFi ve limiter. Yüksek tüketimli konutlar için.",
+  },
+  {
+    name: "DEYE 10kW Hibrit Monofaze İnverter LV",
+    category: "inverter", brand: "deye", supplier: "acs-enerji",
+    costPrice: 106934.40, markupPercent: 20, fulfillmentType: "dropship", stockQty: 0,
+    description: "10kW hibrit monofaze inverter, 48V akü. Dahili WiFi ve limiter. Monofaze şebekede maksimum güç.",
+  },
+  {
+    name: "DEYE 16kW Hibrit Monofaze İnverter LV",
+    category: "inverter", brand: "deye", supplier: "acs-enerji",
+    costPrice: 145044.00, markupPercent: 20, fulfillmentType: "dropship", stockQty: 0,
+    description: "16kW hibrit monofaze inverter, 48V akü. Dahili WiFi ve limiter. Büyük monofaze tesisatlar için.",
+  },
+  {
+    name: "DEYE 8kW Hibrit Trifaze İnverter LV",
+    category: "inverter", brand: "deye", supplier: "acs-enerji",
+    costPrice: 113475.60, markupPercent: 20, fulfillmentType: "dropship", stockQty: 0,
+    description: "8kW hibrit trifaze inverter, 48V akü. Dahili WiFi ve limiter. Trifaze konut ve küçük işletmeler için.",
+  },
+  {
+    name: "DEYE 12kW Hibrit Trifaze İnverter LV",
+    category: "inverter", brand: "deye", supplier: "acs-enerji",
+    costPrice: 116604.00, markupPercent: 20, fulfillmentType: "dropship", stockQty: 0,
+    description: "12kW hibrit trifaze inverter, 48V akü. Dahili WiFi ve limiter. Depolamalı trifaze sistemler için.",
+  },
+  {
+    name: "DEYE 15kW Hibrit Trifaze İnverter LV",
+    category: "inverter", brand: "deye", supplier: "acs-enerji",
+    costPrice: 141915.60, markupPercent: 20, fulfillmentType: "dropship", stockQty: 0,
+    description: "15kW hibrit trifaze inverter, 48V akü. Dahili WiFi ve limiter. İşletme ölçekli depolamalı sistemler için.",
+  },
+  {
+    name: "DEYE 20kW Hibrit Trifaze İnverter LV",
+    category: "inverter", brand: "deye", supplier: "acs-enerji",
+    costPrice: 187704.00, markupPercent: 20, fulfillmentType: "dropship", stockQty: 0,
+    description: "20kW hibrit trifaze inverter, 48V akü. Dahili WiFi ve limiter. Düşük voltaj akü bankalı ticari sistemler için.",
+  },
+  {
+    name: "DEYE 20kW Hibrit Trifaze İnverter HV",
+    category: "inverter", brand: "deye", supplier: "acs-enerji",
+    costPrice: 127980.00, markupPercent: 20, fulfillmentType: "dropship", stockQty: 0,
+    description: "20kW hibrit trifaze inverter, yüksek voltaj akü. Dahili WiFi ve limiter. Ticari depolamalı GES için.",
+  },
+  {
+    name: "DEYE 25kW Hibrit Trifaze İnverter HV",
+    category: "inverter", brand: "deye", supplier: "acs-enerji",
+    costPrice: 170071.20, markupPercent: 20, fulfillmentType: "dropship", stockQty: 0,
+    description: "25kW hibrit trifaze inverter, yüksek voltaj akü. Dahili WiFi ve limiter.",
+  },
+  {
+    name: "DEYE 30kW Hibrit Trifaze İnverter HV",
+    category: "inverter", brand: "deye", supplier: "acs-enerji",
+    costPrice: 213300.00, markupPercent: 20, fulfillmentType: "dropship", stockQty: 0,
+    description: "30kW hibrit trifaze inverter, yüksek voltaj akü. Dahili WiFi ve limiter.",
+  },
+  {
+    name: "DEYE 40kW Hibrit Trifaze İnverter HV",
+    category: "inverter", brand: "deye", supplier: "acs-enerji",
+    costPrice: 294069.60, markupPercent: 20, fulfillmentType: "dropship", stockQty: 0,
+    description: "40kW hibrit trifaze inverter, yüksek voltaj akü. Dahili WiFi ve limiter. Sanayi ölçekli depolama için.",
+  },
+  {
+    name: "DEYE 50kW Hibrit Trifaze İnverter HV",
+    category: "inverter", brand: "deye", supplier: "acs-enerji",
+    costPrice: 340711.20, markupPercent: 20, fulfillmentType: "dropship", stockQty: 0,
+    description: "50kW hibrit trifaze inverter, yüksek voltaj akü. Dahili WiFi ve limiter. Sanayi ölçekli depolama için.",
+  },
+  {
+    name: "DEYE 60kW Hibrit Trifaze İnverter HV",
+    category: "inverter", brand: "deye", supplier: "acs-enerji",
+    costPrice: 369720.00, markupPercent: 20, fulfillmentType: "dropship", stockQty: 0,
+    description: "60kW hibrit trifaze inverter, yüksek voltaj akü. Dahili WiFi ve limiter. Büyük ticari santraller için.",
+  },
+  {
+    name: "DEYE 80kW Hibrit Trifaze İnverter HV",
+    category: "inverter", brand: "deye", supplier: "acs-enerji",
+    costPrice: 401004.00, markupPercent: 20, fulfillmentType: "dropship", stockQty: 0,
+    description: "80kW hibrit trifaze inverter, yüksek voltaj akü. Dahili WiFi ve limiter. Büyük ticari ve sanayi santralleri için.",
+  },
+
   // --- LEXRON tam sinüs inverterler ---
+  // NOT: Bu bölümden itibaren (tam sinüs, akıllı MPPT, Sorotec, Deye on-grid)
+  // costPrice olarak tedarikçinin PERAKENDE liste fiyatı yazılıdır (markup %0,
+  // satış = liste). Bayi ALIŞ fiyatları geldiğinde modifiye sinüs bölümündeki
+  // gibi costPrice/sellPrice ayrımına geçirilmelidir.
   {
     name: "Lexron 2000W-12V Tam Sinüs İnverter (UPS)",
     category: "inverter", brand: "lexron", supplier: "lexron",
@@ -500,12 +606,20 @@ export async function seedDatabase() {
       .limit(1);
     if (existing.length > 0) continue;
 
-    const { finalPrice } = computeFinalPrice({
-      costPrice: p.costPrice,
-      productMarkupPct: p.markupPercent,
-      supplierMarkupPct: null,
-      categoryMarkupPct: null,
-    });
+    let finalPrice: number;
+    let markupPercent: number;
+    if (p.sellPrice !== undefined && p.costPrice > 0) {
+      finalPrice = p.sellPrice;
+      markupPercent = Math.round((p.sellPrice / p.costPrice - 1) * 10000) / 100;
+    } else {
+      markupPercent = p.markupPercent;
+      finalPrice = computeFinalPrice({
+        costPrice: p.costPrice,
+        productMarkupPct: p.markupPercent,
+        supplierMarkupPct: null,
+        categoryMarkupPct: null,
+      }).finalPrice;
+    }
 
     await db.insert(products).values({
       tenantId,
@@ -516,7 +630,7 @@ export async function seedDatabase() {
       categoryId: catId.get(p.category) ?? null,
       supplierId: supId.get(p.supplier) ?? null,
       costPrice: String(p.costPrice),
-      markupPercent: String(p.markupPercent),
+      markupPercent: String(markupPercent),
       finalPrice: finalPrice.toFixed(2),
       currency: "TRY",
       fulfillmentType: p.fulfillmentType,
