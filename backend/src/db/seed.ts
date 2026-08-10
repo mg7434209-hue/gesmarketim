@@ -16,16 +16,16 @@ type SeedProduct = {
   brand: string; // brand slug
   supplier: string; // supplier slug
   costPrice: number;
+  // SABİT %22 DÖNEMİ: markupPercent/sellPrice alanları artık seed'de
+  // KULLANILMAZ (tarihsel değerler belgelenmiş olarak listede duruyor) —
+  // tüm ürünler tenant.defaultMarkup (%22) ile fiyatlanır. Kademeye dönüşte
+  // bu değerler yeniden devreye alınabilir.
   markupPercent: number;
   fulfillmentType: "stock" | "dropship";
   stockQty: number;
   description: string;
   // Fiyatı henüz bilinmeyen ürünler "draft" eklenir; admin fiyat girip yayınlar.
   status?: "active" | "draft";
-  // Verilirse finalPrice birebir bu satış fiyatı yazılır ve markupPercent
-  // (sellPrice/costPrice - 1) üzerinden hesaplanır — markup motorunun 2 ondalık
-  // yuvarlamasından doğan kuruş kaymalarını önler (tedarikçi liste fiyatını
-  // birebir korumak için).
   sellPrice?: number;
 };
 
@@ -595,6 +595,8 @@ export async function seedDatabase() {
   console.log("✓ tenant:", tenant.slug);
 
   // 2) Suppliers (admin-only, müşteriye görünmez)
+  // Sabit %22 dönemi: kademeli marj BOŞ seed'lenir (defaultMarkupPercent:
+  // null) — listedeki tarihsel değerler kademeye dönüş için belge niteliğinde.
   await db
     .insert(suppliers)
     .values(
@@ -602,17 +604,25 @@ export async function seedDatabase() {
         tenantId,
         name: s.name,
         slug: s.slug,
-        defaultMarkupPercent: s.defaultMarkupPercent,
+        defaultMarkupPercent: null,
         isVisibleToCustomer: false,
       })),
     )
     .onConflictDoNothing();
   console.log(`✓ suppliers: ${SUPPLIERS.length}`);
 
-  // 3) Categories
+  // 3) Categories — kademeli marj boş (bkz. suppliers notu)
   await db
     .insert(categories)
-    .values(CATEGORIES.map((c) => ({ tenantId, ...c })))
+    .values(
+      CATEGORIES.map((c) => ({
+        tenantId,
+        name: c.name,
+        slug: c.slug,
+        defaultMarkupPercent: null,
+        sortOrder: c.sortOrder,
+      })),
+    )
     .onConflictDoNothing();
   console.log(`✓ categories: ${CATEGORIES.length}`);
 
@@ -662,20 +672,22 @@ export async function seedDatabase() {
       continue;
     }
 
-    let finalPrice: number;
-    let markupPercent: number;
-    if (p.sellPrice !== undefined && p.costPrice > 0) {
-      finalPrice = p.sellPrice;
-      markupPercent = Math.round((p.sellPrice / p.costPrice - 1) * 10000) / 100;
-    } else {
-      markupPercent = p.markupPercent;
-      finalPrice = computeFinalPrice({
+    // Sabit %22 dönemi: ürün seviyesinde marj override YAZILMAZ; fiyat
+    // tenant.defaultMarkup üzerinden hesaplanır (kademeler boş → %22).
+    const { finalPrice } = computeFinalPrice(
+      {
         costPrice: p.costPrice,
-        productMarkupPct: p.markupPercent,
+        productMarkupPct: null,
         supplierMarkupPct: null,
         categoryMarkupPct: null,
-      }).finalPrice;
-    }
+      },
+      {
+        defaultMarkup: tenant.defaultMarkup,
+        fxUsdTry: tenant.fxUsdTry,
+        fxBufferPct: tenant.fxBufferPct,
+        minProfitPct: tenant.minProfitPct,
+      },
+    );
 
     await db.insert(products).values({
       tenantId,
@@ -686,7 +698,7 @@ export async function seedDatabase() {
       categoryId: catId.get(p.category) ?? null,
       supplierId: supId.get(p.supplier) ?? null,
       costPrice: String(p.costPrice),
-      markupPercent: String(markupPercent),
+      markupPercent: null,
       finalPrice: finalPrice.toFixed(2),
       currency: "TRY",
       fulfillmentType: p.fulfillmentType,

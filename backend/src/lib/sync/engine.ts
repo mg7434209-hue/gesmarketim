@@ -4,26 +4,36 @@
 // create missing products as drafts. Returns a per-run summary.
 //
 // Accepted column headers (case-insensitive, TR/EN aliases):
-//   sku|stok_kodu|supplier_sku   (required)
+//   sku|stok_kodu|supplier_sku   (yoksa slugify(name) anahtar olur)
 //   name|ad|urun
-//   cost|maliyet|alis|fiyat|price
+//   cost|maliyet|alis|fiyat|price       (₺ maliyet)
+//   cost_usd|maliyet_usd                ($ maliyet — doluysa ₺ cost YOK SAYILIR;
+//                                        satış fiyatını motor kendisi hesaplar)
+//   sale_usd, sale_tl*                  (SADECE doğrulama — asla fiyat kaynağı
+//                                        değildir; sale_usd sapması not düşülür)
 //   markup|marj
 //   stock|stok|adet
-//   category|kategori            (category slug)
-//   brand|marka                  (brand slug)
-//   image|gorsel|resim           (image URL)
-//   status|durum                 (draft|active|archived)
+//   stock_status|stok_durumu            (in_stock|out_of_stock|stokta|tükendi)
+//   category|kategori                   (slug ya da ad — createMissing ile oluşur)
+//   brand|marka                         (slug ya da ad — createMissing ile oluşur)
+//   image|gorsel|resim                  (image URL)
+//   status|durum                        (draft|active|archived)
+//
+// Fiyatı olmayan YENİ ürün satırı atlanır ve loglanır (summary.errors +
+// console.warn) — mevcut ürünler fiyatsız satırla yalnız stok güncelleyebilir.
 
 import { and, eq } from "drizzle-orm";
 import { db } from "../../db/index.js";
 import { products, categories, brands } from "../../db/schema.js";
-import { resolveFinalPrice } from "../../db/resolvePrice.js";
+import { resolvePrices } from "../../db/resolvePrice.js";
 import { slugify } from "../util.js";
 import { parseNumber } from "./csv.js";
 
 export interface SyncOptions {
   createMissing: boolean;
   defaultCategoryId?: string | null;
+  /** createMissing ile oluşturulan ürünlerin tedarik modeli (varsayılan "stock"). */
+  defaultFulfillment?: "stock" | "dropship";
   dryRun: boolean;
 }
 
@@ -42,6 +52,15 @@ function pick(row: Record<string, string>, keys: string[]): string | undefined {
   for (const k of keys) {
     if (row[k] !== undefined && row[k] !== "") return row[k];
   }
+  return undefined;
+}
+
+/** stock_status kolonunu normalize et: "in" | "out" | undefined. */
+function parseStockStatus(raw: string | undefined): "in" | "out" | undefined {
+  if (!raw) return undefined;
+  const v = slugify(raw);
+  if (["in-stock", "instock", "stokta", "var", "mevcut"].includes(v)) return "in";
+  if (["out-of-stock", "outofstock", "oos", "stok-yok", "yok", "tukendi"].includes(v)) return "out";
   return undefined;
 }
 
@@ -70,22 +89,73 @@ export async function runCsvSync(
   const catBySlug = new Map(catRows.map((c) => [c.slug, c.id]));
   const brandBySlug = new Map(brandRows.map((b) => [b.slug, b.id]));
 
+  // Kategori/marka "slug ya da ad" olarak gelebilir; ad geldiyse slug'ına
+  // indirger, eşleşme yoksa (createMissing + yazma modunda) oluşturur.
+  // Kademeli marj boş bırakılır — fiyat tenant default marjından çözülür.
+  async function resolveCategoryId(raw: string | undefined): Promise<string | null> {
+    if (!raw) return null;
+    const slug = catBySlug.has(raw) ? raw : slugify(raw);
+    const hit = catBySlug.get(slug);
+    if (hit) return hit;
+    if (!options.createMissing || options.dryRun) return null;
+    const [created] = await db
+      .insert(categories)
+      .values({ tenantId, name: raw.trim(), slug })
+      .onConflictDoNothing()
+      .returning({ id: categories.id });
+    if (created) {
+      catBySlug.set(slug, created.id);
+      return created.id;
+    }
+    return null;
+  }
+
+  async function resolveBrandId(raw: string | undefined): Promise<string | null> {
+    if (!raw) return null;
+    const slug = brandBySlug.has(raw) ? raw : slugify(raw);
+    const hit = brandBySlug.get(slug);
+    if (hit) return hit;
+    if (!options.createMissing || options.dryRun) return null;
+    const [created] = await db
+      .insert(brands)
+      .values({ tenantId, name: raw.trim(), slug })
+      .onConflictDoNothing()
+      .returning({ id: brands.id });
+    if (created) {
+      brandBySlug.set(slug, created.id);
+      return created.id;
+    }
+    return null;
+  }
+
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i];
     const rowNo = i + 2; // +1 header, +1 to 1-index
-    const sku = pick(row, ["sku", "stok_kodu", "supplier_sku", "stokkodu"]);
+    const name = pick(row, ["name", "ad", "urun", "ürün"]);
+    // SKU yoksa (yeni fiyat listesi formatı) ürün adı slug'ı anahtar olur —
+    // aynı tedarikçide ad sabit kaldıkça sonraki import'lar da eşleşir.
+    const sku =
+      pick(row, ["sku", "stok_kodu", "supplier_sku", "stokkodu"]) ??
+      (name ? slugify(name) : undefined);
     if (!sku) {
       summary.skipped++;
-      summary.errors.push({ row: rowNo, sku: "", reason: "SKU eksik" });
+      summary.errors.push({ row: rowNo, sku: "", reason: "SKU ve ürün adı eksik" });
       continue;
     }
 
-    const name = pick(row, ["name", "ad", "urun", "ürün"]);
-    const cost = parseNumber(pick(row, ["cost", "maliyet", "alis", "alış", "fiyat", "price"]));
+    const costUsd = parseNumber(pick(row, ["cost_usd", "maliyet_usd", "usd_maliyet"]));
+    // USD maliyet varken ₺ cost kolonu YOK SAYILIR — fiyatı motor hesaplar.
+    const cost =
+      costUsd !== null
+        ? null
+        : parseNumber(pick(row, ["cost", "maliyet", "alis", "alış", "fiyat", "price"]));
+    // sale_* kolonları yalnız doğrulama içindir; fiyat kaynağı DEĞİLDİR.
+    const saleUsdCsv = parseNumber(pick(row, ["sale_usd", "satis_usd", "satış_usd"]));
     const markup = parseNumber(pick(row, ["markup", "marj"]));
     const stock = parseNumber(pick(row, ["stock", "stok", "adet"]));
-    const categorySlug = pick(row, ["category", "kategori"]);
-    const brandSlug = pick(row, ["brand", "marka"]);
+    const stockStatus = parseStockStatus(pick(row, ["stock_status", "stok_durumu"]));
+    const categoryRaw = pick(row, ["category", "kategori"]);
+    const brandRaw = pick(row, ["brand", "marka"]);
     const image = pick(row, ["image", "gorsel", "görsel", "resim"]);
     const statusRaw = pick(row, ["status", "durum"]);
     const status =
@@ -93,10 +163,10 @@ export async function runCsvSync(
         ? statusRaw
         : undefined;
 
-    const categoryId = categorySlug ? catBySlug.get(categorySlug) ?? null : null;
-    const brandId = brandSlug ? brandBySlug.get(brandSlug) ?? null : null;
-
     try {
+      const categoryId = await resolveCategoryId(categoryRaw);
+      const brandId = await resolveBrandId(brandRaw);
+
       const [existing] = await db
         .select()
         .from(products)
@@ -115,6 +185,13 @@ export async function runCsvSync(
 
         if (cost !== null && Number(existing.costPrice) !== cost) {
           update.costPrice = cost.toFixed(2);
+          changed = true;
+        }
+        if (
+          costUsd !== null &&
+          (existing.costUsd === null || Number(existing.costUsd) !== costUsd)
+        ) {
+          update.costUsd = costUsd.toFixed(2);
           changed = true;
         }
         if (markup !== null && (existing.markupPercent === null || Number(existing.markupPercent) !== markup)) {
@@ -138,33 +215,51 @@ export async function runCsvSync(
           changed = true;
         }
 
-        // Recompute snapshot price when pricing inputs changed.
-        if ("costPrice" in update || "markupPercent" in update || "categoryId" in update) {
-          update.finalPrice = await resolveFinalPrice({
+        // Recompute snapshot prices when pricing inputs changed.
+        let computedSaleUsd: string | null = null;
+        if (
+          "costPrice" in update ||
+          "costUsd" in update ||
+          "markupPercent" in update ||
+          "categoryId" in update
+        ) {
+          const prices = await resolvePrices({
             tenantId,
             costPrice: (update.costPrice as string | undefined) ?? existing.costPrice,
+            costUsd: (update.costUsd as string | undefined) ?? existing.costUsd,
+            competitorPrice: existing.competitorPrice,
             markupPercent:
               "markupPercent" in update ? (update.markupPercent as string) : existing.markupPercent,
             categoryId: ("categoryId" in update ? update.categoryId : existing.categoryId) as string | null,
             supplierId,
           });
+          update.finalPrice = prices.finalPrice;
+          update.saleUsd = prices.saleUsd;
+          computedSaleUsd = prices.saleUsd;
         }
 
-        // Stock-driven availability.
+        // Stock-driven availability. Tedarikçinin stock_status kolonu sayısal
+        // stok gibi davranır: out → stok yok, in → satışta.
         const effectiveStock = stock !== null ? stock : existing.stockQty;
+        const supplierOos =
+          stockStatus === "out" ||
+          (stockStatus === undefined && effectiveStock === 0 && existing.fulfillmentType === "stock");
         let syncStatus: "ok" | "price_changed" | "out_of_stock" = "ok";
-        if (effectiveStock === 0 && existing.fulfillmentType === "stock") {
+        if (supplierOos) {
           syncStatus = "out_of_stock";
           if (existing.autoDisableOnOos && existing.status === "active") {
             update.status = "archived";
             changed = true;
           }
-        } else if ("costPrice" in update) {
+        } else if ("costPrice" in update || "costUsd" in update) {
           syncStatus = "price_changed";
         }
         // Re-activate an OOS-archived product when stock returns.
+        const supplierBack =
+          stockStatus === "in" || (stockStatus === undefined && effectiveStock > 0);
         if (
-          effectiveStock > 0 &&
+          supplierBack &&
+          !supplierOos &&
           existing.status === "archived" &&
           existing.autoDisableOnOos &&
           status === undefined
@@ -186,7 +281,12 @@ export async function runCsvSync(
 
         if (changed) {
           summary.updated++;
-          summary.details.push({ row: rowNo, sku, action: "updated", note: syncStatus });
+          summary.details.push({
+            row: rowNo,
+            sku,
+            action: "updated",
+            note: appendDriftNote(syncStatus, computedSaleUsd, saleUsdCsv),
+          });
         } else {
           summary.unchanged++;
         }
@@ -199,20 +299,33 @@ export async function runCsvSync(
         summary.details.push({ row: rowNo, sku, action: "skipped", note: "eşleşme yok" });
         continue;
       }
-      if (!name || cost === null) {
+      if (!name || (cost === null && costUsd === null)) {
+        // Fiyatı olmayan ürün atlanır ve loglanır (spec B2 kuralı).
+        const reason = !name
+          ? "Yeni ürün için ad gerekli"
+          : "Fiyat yok (cost_usd/maliyet boş) — atlandı";
         summary.skipped++;
-        summary.errors.push({ row: rowNo, sku, reason: "Yeni ürün için ad ve maliyet gerekli" });
+        summary.errors.push({ row: rowNo, sku, reason });
+        console.warn(`[sync] satır ${rowNo} (${sku}): ${reason}`);
         continue;
       }
 
       const resolvedCategory = categoryId ?? options.defaultCategoryId ?? null;
-      const finalPrice = await resolveFinalPrice({
+      const prices = await resolvePrices({
         tenantId,
-        costPrice: cost.toFixed(2),
+        costPrice: cost !== null ? cost.toFixed(2) : null,
+        costUsd: costUsd !== null ? costUsd.toFixed(2) : null,
         markupPercent: markup !== null ? markup.toFixed(2) : null,
         categoryId: resolvedCategory,
         supplierId,
       });
+
+      // Yeni üründe stock_status=in iken sayısal stok bilinmiyorsa "stock"
+      // modelinde ürün stoksuz görünmesin diye dropship önerilir; karar
+      // çağırana bırakılır (defaultFulfillment).
+      const fulfillment = options.defaultFulfillment ?? "stock";
+      const createdStatus =
+        status ?? (stockStatus === "out" ? "archived" : "draft");
 
       if (!options.dryRun) {
         await insertWithUniqueSlug(tenantId, slugify(name), sku, {
@@ -222,19 +335,26 @@ export async function runCsvSync(
           supplierSku: sku,
           categoryId: resolvedCategory,
           brandId,
-          costPrice: cost.toFixed(2),
+          costPrice: cost !== null ? cost.toFixed(2) : "0.00",
+          costUsd: costUsd !== null ? costUsd.toFixed(2) : null,
           markupPercent: markup !== null ? markup.toFixed(2) : null,
-          finalPrice,
+          finalPrice: prices.finalPrice,
+          saleUsd: prices.saleUsd,
           stockQty: stock ?? 0,
           images: image ? [{ url: image, isPrimary: true }] : [],
-          status: status ?? "draft",
-          fulfillmentType: "stock",
+          status: createdStatus,
+          fulfillmentType: fulfillment,
           lastSyncedAt: new Date(),
-          syncStatus: "ok",
+          syncStatus: stockStatus === "out" ? "out_of_stock" : "ok",
         });
       }
       summary.created++;
-      summary.details.push({ row: rowNo, sku, action: "created" });
+      summary.details.push({
+        row: rowNo,
+        sku,
+        action: "created",
+        note: appendDriftNote(undefined, prices.saleUsd, saleUsdCsv),
+      });
     } catch (err) {
       summary.skipped++;
       summary.errors.push({
@@ -246,6 +366,20 @@ export async function runCsvSync(
   }
 
   return summary;
+}
+
+// CSV'nin sale_usd doğrulama kolonu ile motorun hesabı 1 kuruştan fazla
+// ayrışırsa nota düşülür — fiyat kaynağı yine motor hesabıdır.
+function appendDriftNote(
+  base: string | undefined,
+  computedSaleUsd: string | null,
+  saleUsdCsv: number | null,
+): string | undefined {
+  if (computedSaleUsd === null || saleUsdCsv === null) return base;
+  const drift = Math.abs(Number(computedSaleUsd) - saleUsdCsv);
+  if (drift <= 0.01) return base;
+  const note = `sale_usd doğrulama: CSV=${saleUsdCsv.toFixed(2)} hesap=${computedSaleUsd}`;
+  return base ? `${base}; ${note}` : note;
 }
 
 // Insert a product, retrying with a sku-suffixed slug on unique collision.

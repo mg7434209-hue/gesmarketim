@@ -4,9 +4,11 @@
 // SECURITY: This function is an allowlist. It explicitly constructs the output
 // object field-by-field and NEVER spreads the raw row. The following fields must
 // never reach the customer and are intentionally absent here:
-//   costPrice, markupPercent, supplierId, supplierSku, sourceUrl,
-//   lastSyncedAt, syncStatus, and any other internal/sync metadata.
-// Only the sale price (finalPrice) and safe presentation fields are exposed.
+//   costPrice, costUsd, markupPercent, competitorPrice, supplierId,
+//   supplierSku, sourceUrl, lastSyncedAt, syncStatus, and any other
+//   internal/sync metadata.
+// Only the sale prices (finalPrice ₺ + saleUsd $ — both SELLING prices, never
+// cost) and safe presentation fields are exposed.
 
 import type { Product, ProductImage } from '../db/schema.js';
 
@@ -34,6 +36,8 @@ export interface PublicProduct {
   name: string;
   description: string | null;
   price: number;
+  /** Bilgi amaçlı $ satış fiyatı (saleUsd snapshot'ı) — maliyet DEĞİLDİR. */
+  priceUsd: number | null;
   currency: string;
   fulfillmentType: 'stock' | 'dropship';
   inStock: boolean;
@@ -60,6 +64,7 @@ export function toPublicProduct({
     name: product.name,
     description: product.description,
     price: Number(product.finalPrice),
+    priceUsd: product.saleUsd === null ? null : Number(product.saleUsd),
     currency: product.currency,
     fulfillmentType: product.fulfillmentType,
     inStock,

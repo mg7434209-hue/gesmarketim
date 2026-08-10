@@ -5,10 +5,22 @@
 //   effectiveMarkup = product.markupPercent
 //                     ?? supplier.defaultMarkupPercent
 //                     ?? category.defaultMarkupPercent
-//   finalPrice = round(costPrice * (1 + effectiveMarkup / 100))   // snapshot
+//                     ?? tenant.defaultMarkup × 100
 //
-// finalPrice DB'ye snapshot olarak yazılır (cost/markup değişince yeniden
-// hesaplanır). Pricing helper'ı endpoint adımında ekleyeceğiz.
+// Sabit %22 dönemi: kademeli (tiered) kayıtlar migration 0005 ile NULL'a
+// çekildi, tablo yapıları duruyor — bir kademeye değer yazmak o kademeyi
+// yeniden devreye alır.
+//
+// Fiyat hesabı (USD maliyetli ürünler — costUsd dolu):
+//   saleUSD  = round2(costUsd × (1 + markup))
+//   saleTRY  = round2(saleUSD × tenant.fxUsdTry × (1 + fxBufferPct/100))
+//   tavan    : competitorPrice (₺, doluysa) üstü kırpılır
+//   taban    : costUsd × kur × (1 + minProfitPct/100) altına inilmez
+// TRY maliyetli ürünlerde (costUsd boş) eski yol: costPrice × (1 + markup),
+// tavan/taban kuralları orada da uygulanır.
+//
+// finalPrice (ve saleUsd) DB'ye snapshot olarak yazılır (cost/markup/kur
+// değişince `npm run db:recompute` ile yeniden hesaplanır).
 //
 // Multi-tenant: her satırda tenantId var (Gespa OS planına uygun).
 // Para birimi: numeric(12,2), exact decimal — float yok.
@@ -87,6 +99,26 @@ export const tenants = pgTable("tenants", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),
   slug: text("slug").notNull().unique(),
+  // Sabit kâr marjı — ORAN olarak (0.22 = %22). Kademeli kayıtlar boşken tüm
+  // ürünler bu marja düşer.
+  defaultMarkup: numeric("default_markup", { precision: 6, scale: 4 })
+    .notNull()
+    .default("0.22"),
+  // USD/TRY kuru — USD maliyetli ürünlerin ₺ satış fiyatı bu kurdan üretilir.
+  // Kur değişince PATCH /api/admin/pricing (recompute:true) ya da
+  // `npm run db:recompute` ile snapshot'lar tazelenir.
+  fxUsdTry: numeric("fx_usd_try", { precision: 12, scale: 4 })
+    .notNull()
+    .default("47.20"),
+  // Kur tamponu (%) — saleTRY hesabına çarpan olarak girer (%2 varsayılan).
+  fxBufferPct: numeric("fx_buffer_pct", { precision: 6, scale: 2 })
+    .notNull()
+    .default("2.00"),
+  // Maliyet + minimum kâr tabanı (%) — rakip tavanı fiyatı ne kadar aşağı
+  // çekerse çeksin satış fiyatı maliyetin bu kadar üstünde kalır.
+  minProfitPct: numeric("min_profit_pct", { precision: 6, scale: 2 })
+    .notNull()
+    .default("10.00"),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
@@ -172,13 +204,12 @@ export const categories = pgTable(
       .references(() => tenants.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
     slug: text("slug").notNull(),
-    // kategori seviyesi varsayılan marj (en alt fallback)
+    // kategori seviyesi varsayılan marj — null = kademe boş, tenant
+    // default'una düşülür (sabit %22 dönemi; 0005 migration'ı boşalttı)
     defaultMarkupPercent: numeric("default_markup_percent", {
       precision: 6,
       scale: 2,
-    })
-      .notNull()
-      .default("0"),
+    }),
     sortOrder: integer("sort_order").notNull().default(0),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
@@ -228,11 +259,20 @@ export const products = pgTable(
     // --- KAR MARJI MOTORU ---
     costPrice: numeric("cost_price", { precision: 12, scale: 2 })
       .notNull()
-      .default("0"), // bayi alış fiyatı (asla müşteriye gösterilmez)
+      .default("0"), // bayi alış fiyatı ₺ (asla müşteriye gösterilmez)
+    // USD maliyet — doluysa fiyat USD yolundan hesaplanır (asla müşteriye
+    // gösterilmez); costPrice ₺ alanı bu ürünlerde kullanılmaz.
+    costUsd: numeric("cost_usd", { precision: 12, scale: 2 }),
     markupPercent: numeric("markup_percent", { precision: 6, scale: 2 }), // null = override yok
     finalPrice: numeric("final_price", { precision: 12, scale: 2 })
       .notNull()
-      .default("0"), // snapshot — müşteriye gösterilen
+      .default("0"), // snapshot ₺ — müşteriye gösterilen
+    // USD satış snapshot'ı (costUsd × (1+marj)) — bilgi amaçlı müşteriye de
+    // gösterilebilir (maliyet DEĞİLDİR, satış fiyatıdır).
+    saleUsd: numeric("sale_usd", { precision: 12, scale: 2 }),
+    // Rakip fiyat tavanı ₺ — doluysa finalPrice bunun üstüne çıkmaz
+    // (maliyet+min kâr tabanı yine de korunur).
+    competitorPrice: numeric("competitor_price", { precision: 12, scale: 2 }),
     currency: text("currency").notNull().default("TRY"),
 
     // --- HİBRİT MODEL + STOK ---

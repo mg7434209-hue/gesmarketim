@@ -31,10 +31,12 @@ import {
   products,
   orders,
   orderItems,
+  tenants,
   type ProductImage,
 } from "../db/schema.js";
 import { getTenantId } from "../lib/tenant.js";
-import { resolveFinalPrice } from "../db/resolvePrice.js";
+import { resolvePrices, invalidateTenantPricing } from "../db/resolvePrice.js";
+import { recomputeTenantPrices } from "../db/recomputePrices.js";
 import { slugify } from "../lib/util.js";
 import { isUploadConfigured, uploadImage, activeProvider, UploadError } from "../lib/storage/index.js";
 import { parseCsv } from "../lib/sync/csv.js";
@@ -250,6 +252,126 @@ adminRouter.post(
 );
 
 // ===========================================================================
+// PRICING SETTINGS — sabit marj, kur, tampon, taban (tenants tablosunda)
+// ===========================================================================
+//   GET   /api/admin/pricing              mevcut ayarlar
+//   PATCH /api/admin/pricing              { defaultMarkup?, fxUsdTry?,
+//                                           fxBufferPct?, minProfitPct?,
+//                                           recompute? }
+// recompute:true → tüm finalPrice/saleUsd snapshot'ları yeniden hesaplanır
+// (günlük kur güncelleme akışı: kur PATCH'le + recompute:true).
+
+function pricingView(row: {
+  defaultMarkup: string;
+  fxUsdTry: string;
+  fxBufferPct: string;
+  minProfitPct: string;
+}) {
+  return {
+    defaultMarkup: Number(row.defaultMarkup), // oran: 0.22 = %22
+    fxUsdTry: Number(row.fxUsdTry),
+    fxBufferPct: Number(row.fxBufferPct),
+    minProfitPct: Number(row.minProfitPct),
+  };
+}
+
+adminRouter.get(
+  "/pricing",
+  asyncHandler(async (_req, res) => {
+    const tenantId = await getTenantId();
+    const [row] = await db
+      .select({
+        defaultMarkup: tenants.defaultMarkup,
+        fxUsdTry: tenants.fxUsdTry,
+        fxBufferPct: tenants.fxBufferPct,
+        minProfitPct: tenants.minProfitPct,
+      })
+      .from(tenants)
+      .where(eq(tenants.id, tenantId))
+      .limit(1);
+    if (!row) {
+      res.status(404).json({ error: "not_found" });
+      return;
+    }
+    res.json(pricingView(row));
+  }),
+);
+
+adminRouter.patch(
+  "/pricing",
+  asyncHandler(async (req, res) => {
+    const tenantId = await getTenantId();
+    const body = (req.body ?? {}) as Record<string, unknown>;
+    const data = pick(body, [
+      "defaultMarkup",
+      "fxUsdTry",
+      "fxBufferPct",
+      "minProfitPct",
+    ] as const);
+
+    const update: Record<string, unknown> = {};
+    // defaultMarkup ORAN olarak beklenir (0.22 = %22); 0–1 aralığı dışı reddedilir.
+    if ("defaultMarkup" in data) {
+      const v = Number(data.defaultMarkup);
+      if (!Number.isFinite(v) || v < 0 || v >= 1) {
+        res.status(400).json({
+          error: "validation",
+          fields: { defaultMarkup: "Oran olarak girin (ör. 0.22 = %22)." },
+        });
+        return;
+      }
+      update.defaultMarkup = v.toFixed(4);
+    }
+    if ("fxUsdTry" in data) {
+      const v = Number(data.fxUsdTry);
+      if (!Number.isFinite(v) || v <= 0) {
+        res.status(400).json({ error: "validation", fields: { fxUsdTry: "Geçerli kur girin." } });
+        return;
+      }
+      update.fxUsdTry = v.toFixed(4);
+    }
+    if ("fxBufferPct" in data) {
+      const v = Number(data.fxBufferPct);
+      if (!Number.isFinite(v) || v < 0 || v > 100) {
+        res.status(400).json({ error: "validation", fields: { fxBufferPct: "0–100 arası yüzde girin." } });
+        return;
+      }
+      update.fxBufferPct = v.toFixed(2);
+    }
+    if ("minProfitPct" in data) {
+      const v = Number(data.minProfitPct);
+      if (!Number.isFinite(v) || v < 0 || v > 100) {
+        res.status(400).json({ error: "validation", fields: { minProfitPct: "0–100 arası yüzde girin." } });
+        return;
+      }
+      update.minProfitPct = v.toFixed(2);
+    }
+
+    if (Object.keys(update).length > 0) {
+      update.updatedAt = new Date();
+      await db.update(tenants).set(update).where(eq(tenants.id, tenantId));
+      invalidateTenantPricing(tenantId);
+    }
+
+    const recompute = body.recompute === true;
+    const summary = recompute ? await recomputeTenantPrices(tenantId) : null;
+
+    const [row] = await db
+      .select({
+        defaultMarkup: tenants.defaultMarkup,
+        fxUsdTry: tenants.fxUsdTry,
+        fxBufferPct: tenants.fxBufferPct,
+        minProfitPct: tenants.minProfitPct,
+      })
+      .from(tenants)
+      .where(eq(tenants.id, tenantId))
+      .limit(1);
+
+    res.json({ ...pricingView(row), recompute: summary });
+  }),
+);
+
+// ===========================================================================
 // PRODUCTS
 // ===========================================================================
 const PRODUCT_FIELDS = [
@@ -262,6 +384,8 @@ const PRODUCT_FIELDS = [
   "supplierSku",
   "sourceUrl",
   "costPrice",
+  "costUsd",
+  "competitorPrice",
   "markupPercent",
   "currency",
   "fulfillmentType",
@@ -282,8 +406,11 @@ function adminProductView(row: typeof products.$inferSelect) {
     supplierSku: row.supplierSku,
     sourceUrl: row.sourceUrl,
     costPrice: Number(row.costPrice),
+    costUsd: row.costUsd === null ? null : Number(row.costUsd),
+    competitorPrice: row.competitorPrice === null ? null : Number(row.competitorPrice),
     markupPercent: row.markupPercent === null ? null : Number(row.markupPercent),
     finalPrice: Number(row.finalPrice),
+    saleUsd: row.saleUsd === null ? null : Number(row.saleUsd),
     currency: row.currency,
     fulfillmentType: row.fulfillmentType,
     stockQty: row.stockQty,
@@ -349,14 +476,18 @@ adminRouter.post(
       typeof data.slug === "string" && data.slug.trim() ? slugify(data.slug) : slugify(name);
 
     const costPrice = asNumericStr(data.costPrice) ?? "0";
+    const costUsd = asNumericStr(data.costUsd);
+    const competitorPrice = asNumericStr(data.competitorPrice);
     const markupPercent = asNumericStr(data.markupPercent);
     const categoryId = typeof data.categoryId === "string" && data.categoryId ? data.categoryId : null;
     const supplierId = typeof data.supplierId === "string" && data.supplierId ? data.supplierId : null;
     const brandId = typeof data.brandId === "string" && data.brandId ? data.brandId : null;
 
-    const finalPrice = await resolveFinalPrice({
+    const { finalPrice, saleUsd } = await resolvePrices({
       tenantId,
       costPrice,
+      costUsd,
+      competitorPrice,
       markupPercent,
       categoryId,
       supplierId,
@@ -376,8 +507,11 @@ adminRouter.post(
           supplierSku: typeof data.supplierSku === "string" ? data.supplierSku : null,
           sourceUrl: typeof data.sourceUrl === "string" ? data.sourceUrl : null,
           costPrice,
+          costUsd,
+          competitorPrice,
           markupPercent,
           finalPrice,
+          saleUsd,
           currency: typeof data.currency === "string" ? data.currency : "TRY",
           fulfillmentType: data.fulfillmentType === "dropship" ? "dropship" : "stock",
           stockQty: asInt(data.stockQty, 0),
@@ -423,6 +557,8 @@ adminRouter.patch(
     if ("supplierSku" in data) update.supplierSku = typeof data.supplierSku === "string" ? data.supplierSku : null;
     if ("sourceUrl" in data) update.sourceUrl = typeof data.sourceUrl === "string" ? data.sourceUrl : null;
     if ("costPrice" in data) update.costPrice = asNumericStr(data.costPrice) ?? "0";
+    if ("costUsd" in data) update.costUsd = asNumericStr(data.costUsd);
+    if ("competitorPrice" in data) update.competitorPrice = asNumericStr(data.competitorPrice);
     if ("markupPercent" in data) update.markupPercent = asNumericStr(data.markupPercent);
     if (typeof data.currency === "string") update.currency = data.currency;
     if (data.fulfillmentType === "dropship" || data.fulfillmentType === "stock")
@@ -432,18 +568,29 @@ adminRouter.patch(
     if (data.status === "active" || data.status === "archived" || data.status === "draft")
       update.status = data.status;
 
-    // Recompute finalPrice when anything in the pricing chain changed.
+    // Recompute snapshot prices when anything in the pricing chain changed.
     const pricingTouched =
-      "costPrice" in update || "markupPercent" in update || "categoryId" in update || "supplierId" in update;
+      "costPrice" in update ||
+      "costUsd" in update ||
+      "competitorPrice" in update ||
+      "markupPercent" in update ||
+      "categoryId" in update ||
+      "supplierId" in update;
     if (pricingTouched) {
-      update.finalPrice = await resolveFinalPrice({
+      const prices = await resolvePrices({
         tenantId,
         costPrice: (update.costPrice as string | undefined) ?? existing.costPrice,
+        costUsd: ("costUsd" in update ? update.costUsd : existing.costUsd) as string | null,
+        competitorPrice: ("competitorPrice" in update
+          ? update.competitorPrice
+          : existing.competitorPrice) as string | null,
         markupPercent:
           "markupPercent" in update ? (update.markupPercent as string | null) : existing.markupPercent,
         categoryId: ("categoryId" in update ? update.categoryId : existing.categoryId) as string | null,
         supplierId: ("supplierId" in update ? update.supplierId : existing.supplierId) as string | null,
       });
+      update.finalPrice = prices.finalPrice;
+      update.saleUsd = prices.saleUsd;
     }
 
     try {
