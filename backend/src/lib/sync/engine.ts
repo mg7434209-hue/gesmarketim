@@ -22,9 +22,9 @@
 // Fiyatı olmayan YENİ ürün satırı atlanır ve loglanır (summary.errors +
 // console.warn) — mevcut ürünler fiyatsız satırla yalnız stok güncelleyebilir.
 
-import { and, eq } from "drizzle-orm";
+import { and, eq, or } from "drizzle-orm";
 import { db } from "../../db/index.js";
-import { products, categories, brands } from "../../db/schema.js";
+import { products, categories, brands, supplierPrices } from "../../db/schema.js";
 import { resolvePrices } from "../../db/resolvePrice.js";
 import { slugify } from "../util.js";
 import { parseNumber } from "./csv.js";
@@ -34,6 +34,16 @@ export interface SyncOptions {
   defaultCategoryId?: string | null;
   /** createMissing ile oluşturulan ürünlerin tedarik modeli (varsayılan "stock"). */
   defaultFulfillment?: "stock" | "dropship";
+  /** true → SKU yerine ürün ADI ile eşleştir: slugify(name), TENANT genelinde
+   *  (supplierSku VEYA slug). Tedarikçi değişse de aynı ürün bulunur. */
+  matchByName?: boolean;
+  /** true → eşleşen ürünün supplierId'si bu import'un tedarikçisine devredilir
+   *  (fiyat kaynağı değişimi — ör. Lexron listesinden ACS listesine geçiş). */
+  reassignSupplier?: boolean;
+  /** true → maliyetler supplier_prices arşivine yazılır: satırın price_date'i
+   *  (yoksa bugün) ile günün fiyatı; costUsd DEĞİŞİYORSA eski değer de eski
+   *  tedarikçi + son senkron tarihiyle arşivlenir. */
+  archivePrices?: boolean;
   dryRun: boolean;
 }
 
@@ -46,6 +56,9 @@ export interface SyncSummary {
   dryRun: boolean;
   errors: { row: number; sku: string; reason: string }[];
   details: { row: number; sku: string; action: string; note?: string }[];
+  /** Bu import'ta eşleşen/oluşturulan ürün id'leri (katalog temizliği bunun
+   *  DIŞINDA kalan ürünleri hedefler). dryRun'da da dolar. */
+  matchedIds: string[];
 }
 
 function pick(row: Record<string, string>, keys: string[]): string | undefined {
@@ -79,7 +92,24 @@ export async function runCsvSync(
     dryRun: options.dryRun,
     errors: [],
     details: [],
+    matchedIds: [],
   };
+
+  // Günün maliyetini (ve değişiyorsa eski maliyeti) fiyat arşivine yaz.
+  // (productId, supplierId, priceDate) benzersizdir — tekrar import idempotent.
+  async function archivePriceRow(
+    productId: string,
+    supId: string | null,
+    priceDate: string,
+    costUsdVal: string | null,
+    costTryVal: string | null,
+  ): Promise<void> {
+    if (options.dryRun) return;
+    await db
+      .insert(supplierPrices)
+      .values({ tenantId, productId, supplierId: supId, priceDate, costUsd: costUsdVal, costTry: costTryVal })
+      .onConflictDoNothing();
+  }
 
   // Prefetch slug → id maps for category/brand resolution.
   const [catRows, brandRows] = await Promise.all([
@@ -151,6 +181,13 @@ export async function runCsvSync(
         : parseNumber(pick(row, ["cost", "maliyet", "alis", "alış", "fiyat", "price"]));
     // sale_* kolonları yalnız doğrulama içindir; fiyat kaynağı DEĞİLDİR.
     const saleUsdCsv = parseNumber(pick(row, ["sale_usd", "satis_usd", "satış_usd"]));
+    // Arşiv alanları: liste tarihi (YYYY-MM-DD) + bilgi amaçlı ₺ maliyet.
+    const priceDateRaw = pick(row, ["price_date", "tarih", "fiyat_tarihi"]);
+    const priceDate =
+      priceDateRaw && /^\d{4}-\d{2}-\d{2}$/.test(priceDateRaw)
+        ? priceDateRaw
+        : new Date().toISOString().slice(0, 10);
+    const costTl = parseNumber(pick(row, ["cost_tl", "maliyet_tl", "cost_try"]));
     const markup = parseNumber(pick(row, ["markup", "marj"]));
     const stock = parseNumber(pick(row, ["stock", "stok", "adet"]));
     const stockStatus = parseStockStatus(pick(row, ["stock_status", "stok_durumu"]));
@@ -167,19 +204,28 @@ export async function runCsvSync(
       const categoryId = await resolveCategoryId(categoryRaw);
       const brandId = await resolveBrandId(brandRaw);
 
+      // matchByName: tedarikçiden bağımsız, tenant genelinde ad slug'ı ile
+      // eşleş (önceki import'lar supplierSku'yu slugify(name) yazar; slug da
+      // aynı addan türetilir). Aksi halde klasik (supplierId, supplierSku).
       const [existing] = await db
         .select()
         .from(products)
         .where(
-          and(
-            eq(products.tenantId, tenantId),
-            eq(products.supplierId, supplierId),
-            eq(products.supplierSku, sku),
-          ),
+          options.matchByName
+            ? and(
+                eq(products.tenantId, tenantId),
+                or(eq(products.supplierSku, sku), eq(products.slug, sku)),
+              )
+            : and(
+                eq(products.tenantId, tenantId),
+                eq(products.supplierId, supplierId),
+                eq(products.supplierSku, sku),
+              ),
         )
         .limit(1);
 
       if (existing) {
+        summary.matchedIds.push(existing.id);
         const update: Record<string, unknown> = {};
         let changed = false;
 
@@ -191,7 +237,19 @@ export async function runCsvSync(
           costUsd !== null &&
           (existing.costUsd === null || Number(existing.costUsd) !== costUsd)
         ) {
+          // Eski maliyeti, eski tedarikçisi + son senkron tarihiyle arşivle.
+          if (options.archivePrices && existing.costUsd !== null) {
+            const oldDate = (existing.lastSyncedAt ?? existing.createdAt)
+              .toISOString()
+              .slice(0, 10);
+            await archivePriceRow(existing.id, existing.supplierId, oldDate, existing.costUsd, null);
+          }
           update.costUsd = costUsd.toFixed(2);
+          changed = true;
+        }
+        // Fiyat kaynağı devri: ürün artık bu import'un tedarikçisinden geliyor.
+        if (options.reassignSupplier && existing.supplierId !== supplierId) {
+          update.supplierId = supplierId;
           changed = true;
         }
         if (markup !== null && (existing.markupPercent === null || Number(existing.markupPercent) !== markup)) {
@@ -215,13 +273,25 @@ export async function runCsvSync(
           changed = true;
         }
 
+        // Günün maliyetini fiyat arşivine yaz (değişmese de tarihli kayıt).
+        if (options.archivePrices && (costUsd !== null || costTl !== null)) {
+          await archivePriceRow(
+            existing.id,
+            supplierId,
+            priceDate,
+            costUsd !== null ? costUsd.toFixed(2) : null,
+            costTl !== null ? costTl.toFixed(2) : null,
+          );
+        }
+
         // Recompute snapshot prices when pricing inputs changed.
         let computedSaleUsd: string | null = null;
         if (
           "costPrice" in update ||
           "costUsd" in update ||
           "markupPercent" in update ||
-          "categoryId" in update
+          "categoryId" in update ||
+          "supplierId" in update
         ) {
           const prices = await resolvePrices({
             tenantId,
@@ -328,7 +398,7 @@ export async function runCsvSync(
         status ?? (stockStatus === "out" ? "archived" : "draft");
 
       if (!options.dryRun) {
-        await insertWithUniqueSlug(tenantId, slugify(name), sku, {
+        const newId = await insertWithUniqueSlug(tenantId, slugify(name), sku, {
           tenantId,
           name,
           supplierId,
@@ -347,6 +417,16 @@ export async function runCsvSync(
           lastSyncedAt: new Date(),
           syncStatus: stockStatus === "out" ? "out_of_stock" : "ok",
         });
+        summary.matchedIds.push(newId);
+        if (options.archivePrices && (costUsd !== null || costTl !== null)) {
+          await archivePriceRow(
+            newId,
+            supplierId,
+            priceDate,
+            costUsd !== null ? costUsd.toFixed(2) : null,
+            costTl !== null ? costTl.toFixed(2) : null,
+          );
+        }
       }
       summary.created++;
       summary.details.push({
@@ -383,18 +463,22 @@ function appendDriftNote(
 }
 
 // Insert a product, retrying with a sku-suffixed slug on unique collision.
+// Returns the new product's id.
 async function insertWithUniqueSlug(
   _tenantId: string,
   baseSlug: string,
   sku: string,
   values: Record<string, unknown>,
-): Promise<void> {
+): Promise<string> {
   const candidates = [baseSlug, `${baseSlug}-${slugify(sku)}`, `${baseSlug}-${Date.now()}`];
   let lastErr: unknown;
   for (const slug of candidates) {
     try {
-      await db.insert(products).values({ ...values, slug } as typeof products.$inferInsert);
-      return;
+      const [row] = await db
+        .insert(products)
+        .values({ ...values, slug } as typeof products.$inferInsert)
+        .returning({ id: products.id });
+      return row.id;
     } catch (err) {
       if (typeof err === "object" && err !== null && (err as { code?: string }).code === "23505") {
         lastErr = err;

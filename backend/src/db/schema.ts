@@ -35,6 +35,7 @@ import {
   boolean,
   numeric,
   jsonb,
+  date,
   timestamp,
   uniqueIndex,
   index,
@@ -315,6 +316,45 @@ export const products = pgTable(
 );
 
 // ---------------------------------------------------------------------------
+// supplier_prices — tedarikçi maliyet ARŞİVİ (fiyat listesi geçmişi)
+// Her CSV import'u günün fiyatını tarihli satır olarak yazar; ürünün önceki
+// maliyeti de değişmeden önce arşiv satırı olarak saklanır. products.costUsd
+// her zaman GÜNCEL değerdir; bu tablo yalnız geçmiş/denetim içindir ve
+// müşteriye ASLA gösterilmez.
+// ---------------------------------------------------------------------------
+export const supplierPrices = pgTable(
+  "supplier_prices",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id")
+      .notNull()
+      .references(() => tenants.id, { onDelete: "cascade" }),
+    productId: uuid("product_id")
+      .notNull()
+      .references(() => products.id, { onDelete: "cascade" }),
+    supplierId: uuid("supplier_id").references(() => suppliers.id, {
+      onDelete: "set null",
+    }),
+    priceDate: date("price_date").notNull(), // fiyat listesinin tarihi
+    costUsd: numeric("cost_usd", { precision: 12, scale: 2 }),
+    costTry: numeric("cost_try", { precision: 12, scale: 2 }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => ({
+    // Aynı ürün+tedarikçi+tarih bir kez yazılır — import idempotent kalır.
+    uniqIdx: uniqueIndex("supplier_prices_product_supplier_date_idx").on(
+      t.productId,
+      t.supplierId,
+      t.priceDate,
+    ),
+    productIdx: index("supplier_prices_product_idx").on(t.tenantId, t.productId),
+    supplierIdx: index("supplier_prices_supplier_idx").on(t.supplierId),
+  }),
+);
+
+// ---------------------------------------------------------------------------
 // orders — müşteri siparişleri (checkout ile oluşur)
 // ---------------------------------------------------------------------------
 export const orders = pgTable(
@@ -541,6 +581,8 @@ export type Category = typeof categories.$inferSelect;
 export type NewCategory = typeof categories.$inferInsert;
 export type Product = typeof products.$inferSelect;
 export type NewProduct = typeof products.$inferInsert;
+export type SupplierPrice = typeof supplierPrices.$inferSelect;
+export type NewSupplierPrice = typeof supplierPrices.$inferInsert;
 export type Order = typeof orders.$inferSelect;
 export type NewOrder = typeof orders.$inferInsert;
 export type OrderItem = typeof orderItems.$inferSelect;

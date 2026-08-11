@@ -43,6 +43,13 @@
       "when": 1786367257298,
       "tag": "0005_pricing_usd",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1786433237502,
+      "tag": "0006_supplier_prices",
+      "breakpoints": true
     }
   ]
 }

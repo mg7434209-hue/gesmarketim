@@ -32,6 +32,19 @@ test("doğrulama örneği: 12W panel — costUSD=12.84 → saleUSD=15.66, saleTR
   assert.equal(r.rule, "markup");
 });
 
+test("ACS listesi doğrulaması: 12W 12.99→15.85 · 285W 115.01→140.31", () => {
+  const p12 = computeFinalPrice(
+    { costPrice: "0", costUsd: "12.99", productMarkupPct: null, supplierMarkupPct: null, categoryMarkupPct: null },
+    SETTINGS,
+  );
+  assert.equal(p12.saleUsd, 15.85); // 12.99 × 1.22 = 15.8478 → 15.85
+  const p285 = computeFinalPrice(
+    { costPrice: "0", costUsd: "115.01", productMarkupPct: null, supplierMarkupPct: null, categoryMarkupPct: null },
+    SETTINGS,
+  );
+  assert.equal(p285.saleUsd, 140.31); // 115.01 × 1.22 = 140.3122 → 140.31
+});
+
 test("USD yolunda iki aşamalı yuvarlama: önce saleUSD, sonra tamponlu TRY", () => {
   // 478.72 × 1.22 = 584.0384 → saleUSD 584.04 (CSV sale_usd ile birebir)
   const r = computeFinalPrice(
