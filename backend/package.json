@@ -16,7 +16,8 @@
     "db:recompute": "tsx src/db/recomputePricesCli.ts",
     "db:import-csv": "tsx src/db/importPriceCsvCli.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "tsx --test src/tests/*.test.ts"
+    "test": "tsx --test src/tests/*.test.ts",
+    "db:purge": "tsx src/db/purgeCatalogCli.ts"
   },
   "dependencies": {
     "cors": "^2.8.5",
