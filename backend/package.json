@@ -17,7 +17,8 @@
     "db:import-csv": "tsx src/db/importPriceCsvCli.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "tsx --test src/tests/*.test.ts",
-    "db:purge": "tsx src/db/purgeCatalogCli.ts"
+    "db:purge": "tsx src/db/purgeCatalogCli.ts",
+    "db:rebuild": "tsx src/db/rebuildLexronCli.ts"
   },
   "dependencies": {
     "cors": "^2.8.5",

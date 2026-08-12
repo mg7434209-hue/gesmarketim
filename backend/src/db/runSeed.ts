@@ -5,15 +5,15 @@
 // Idempotent: seedDatabase() uses onConflictDoNothing and slug lookups, so
 // re-running against an already-seeded database only inserts what's missing —
 // existing rows (admin edits, prices) are never touched.
-// DEFAULT ON: canlı mağazanın boş açılmaması için varsayılan açık.
-// Kapatmak için AUTO_SEED=false. (Admin'in kasıtlı sildiği bir seed ürünü
-// sonraki deploy'da geri gelir; kalıcı kaldırmak için ürünü silmek yerine
-// "archived" durumuna almak yeterlidir — seed slug'ı görüp atlar.)
+// VARSAYILAN KAPALI (aşamalı katalog kurulumu, 11.08.2026): katalog artık
+// gerçek fiyat listelerinden `npm run db:rebuild` / `db:import-csv` ile
+// kurulur; demo seed'in deploy'da geri gelmesi istenmez. Seed'i bilinçli
+// çalıştırmak için AUTO_SEED=true ver (ya da `npm run db:seed`).
 
 import { seedDatabase } from "./seed.js";
 
 export function isAutoSeedEnabled(): boolean {
-  const v = (process.env.AUTO_SEED ?? "true").toLowerCase();
+  const v = (process.env.AUTO_SEED ?? "false").toLowerCase();
   return v === "true" || v === "1" || v === "yes";
 }
 

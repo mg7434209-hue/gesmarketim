@@ -1,0 +1,2162 @@
+[
+ {
+  "id": "7d45ad93-d161-4e88-9b18-1e78caa81386",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "c1bfd41e-1547-47db-a879-3972cdda0c4c",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "12.84",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.056Z"
+ },
+ {
+  "id": "ecf4828a-ef03-4ca7-a671-f988a9e6106b",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "c1bfd41e-1547-47db-a879-3972cdda0c4c",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "12.99",
+  "costTry": "612.99",
+  "createdAt": "2026-08-11T07:31:48.059Z"
+ },
+ {
+  "id": "3530f666-0c97-4e75-816f-6ac2b0df79c5",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "3cb45848-6d62-49bd-8435-8110f819c609",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "20.85",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.069Z"
+ },
+ {
+  "id": "2ed99737-ff3d-4880-8abe-51ac07e20c7c",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "3cb45848-6d62-49bd-8435-8110f819c609",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "21.09",
+  "costTry": "995.67",
+  "createdAt": "2026-08-11T07:31:48.070Z"
+ },
+ {
+  "id": "44cd6bae-0f98-4cc4-9fe3-b539a501b640",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "e8b9aa6e-5bff-42cd-a8ab-1418ea5cd6d1",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "88.85",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.074Z"
+ },
+ {
+  "id": "baaf9445-448b-4597-bd40-f45a6967ba1d",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "e8b9aa6e-5bff-42cd-a8ab-1418ea5cd6d1",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "89.88",
+  "costTry": "4242.42",
+  "createdAt": "2026-08-11T07:31:48.075Z"
+ },
+ {
+  "id": "cec1c83a-9f1c-459e-8290-d6cc641c62ce",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "b6e877e8-f2a0-40fc-8db7-460255d2d0f0",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "74.95",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.080Z"
+ },
+ {
+  "id": "aae6f3a0-3324-4ab9-bac5-c1511c85da1f",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "b6e877e8-f2a0-40fc-8db7-460255d2d0f0",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "75.82",
+  "costTry": "3578.64",
+  "createdAt": "2026-08-11T07:31:48.081Z"
+ },
+ {
+  "id": "2f05b979-4fa6-4491-8e02-3abcd7a784ca",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "d73a1c26-90bf-4a50-877c-defb6126e712",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "39.89",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.087Z"
+ },
+ {
+  "id": "fbeeeed4-b8f9-4cf0-be43-8d6efd4c459b",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "d73a1c26-90bf-4a50-877c-defb6126e712",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "40.36",
+  "costTry": "1904.76",
+  "createdAt": "2026-08-11T07:31:48.088Z"
+ },
+ {
+  "id": "7debe826-0641-46b8-8bd9-a88827aa93fa",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "ecf6160a-7798-4347-8425-60b88f84cf7c",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "64.57",
+  "costTry": "3047.62",
+  "createdAt": "2026-08-11T07:31:48.097Z"
+ },
+ {
+  "id": "080ed810-cae0-4787-a631-5d8122d313f4",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "c3194215-a3e6-41bc-9361-7c2eea6c153d",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "103.36",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.099Z"
+ },
+ {
+  "id": "b8f59d67-5dde-44a4-b2b5-e21ac9e0227d",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "c3194215-a3e6-41bc-9361-7c2eea6c153d",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "115.01",
+  "costTry": "5428.57",
+  "createdAt": "2026-08-11T07:31:48.100Z"
+ },
+ {
+  "id": "1a626340-ceee-4ae7-986a-87d7db871021",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "256269b1-a807-4283-bd1a-aba2bdb19f5e",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "71.93",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.103Z"
+ },
+ {
+  "id": "923093a7-f9f7-43a8-b48f-fa7c90f4ed7c",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "256269b1-a807-4283-bd1a-aba2bdb19f5e",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "72.76",
+  "costTry": "3434.34",
+  "createdAt": "2026-08-11T07:31:48.104Z"
+ },
+ {
+  "id": "3ca89f46-e262-4fb3-8a52-7b6f3285f122",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "7b6c719a-9069-46e7-aa09-4be06769251e",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "59.92",
+  "costTry": "2828.28",
+  "createdAt": "2026-08-11T07:31:48.111Z"
+ },
+ {
+  "id": "0aa794e4-59f5-4292-bd5b-b859d11d7a72",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "7b667468-f319-4507-9013-c295f6b6578b",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "106.94",
+  "costTry": "5047.61",
+  "createdAt": "2026-08-11T07:31:48.115Z"
+ },
+ {
+  "id": "1331e3ba-3a11-4f68-a40f-a56b8bc1e52f",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "407f5660-d61e-4cc6-aa2c-c76afc12c630",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "94.29",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.117Z"
+ },
+ {
+  "id": "83161491-c6f6-41a5-8115-d79ecb4f0704",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "407f5660-d61e-4cc6-aa2c-c76afc12c630",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "95.38",
+  "costTry": "4502.16",
+  "createdAt": "2026-08-11T07:31:48.118Z"
+ },
+ {
+  "id": "1ca9daf2-b47a-4c3e-a419-14e99b7ff5e6",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "a0d50702-0ea1-471c-bf8a-ddf38ab55e8d",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "67.70",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.123Z"
+ },
+ {
+  "id": "7d94899e-0a2c-4b9b-94ea-c720520fd464",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "a0d50702-0ea1-471c-bf8a-ddf38ab55e8d",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "68.48",
+  "costTry": "3232.32",
+  "createdAt": "2026-08-11T07:31:48.124Z"
+ },
+ {
+  "id": "3a377e91-0913-4bad-ab4d-d96f5e5b6e8d",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "0c0723e9-4a44-467b-b730-24c9cfd611c1",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "125.73",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.129Z"
+ },
+ {
+  "id": "a348a8e2-89f0-452c-9271-09e556b05f68",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "0c0723e9-4a44-467b-b730-24c9cfd611c1",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "132.07",
+  "costTry": "6233.76",
+  "createdAt": "2026-08-11T07:31:48.129Z"
+ },
+ {
+  "id": "7f6eb61c-75b3-491d-8c84-c97837239571",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "817af001-e05e-441d-85de-65739472644d",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "181.33",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.133Z"
+ },
+ {
+  "id": "35938b5b-14e2-40dd-9183-5290d8774fb2",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "817af001-e05e-441d-85de-65739472644d",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "183.43",
+  "costTry": "8658.00",
+  "createdAt": "2026-08-11T07:31:48.134Z"
+ },
+ {
+  "id": "f3b8bf86-62f9-401a-b0ff-c4bc90c257aa",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "4880f8d7-2b00-4ee2-a39c-5e7285a3b329",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "174.20",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.138Z"
+ },
+ {
+  "id": "ff6a4e68-d4c4-4678-a3cc-cf48d59a407f",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "4880f8d7-2b00-4ee2-a39c-5e7285a3b329",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "176.22",
+  "costTry": "8317.45",
+  "createdAt": "2026-08-11T07:31:48.139Z"
+ },
+ {
+  "id": "6d4d0aa4-b7a0-41ed-bba3-82cd3348c4ea",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "6f165d71-1491-40f6-ab07-d9da741a54a1",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "478.72",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.143Z"
+ },
+ {
+  "id": "6a795dab-a856-4b5c-a307-429433b847c3",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "6f165d71-1491-40f6-ab07-d9da741a54a1",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "484.26",
+  "costTry": "22857.12",
+  "createdAt": "2026-08-11T07:31:48.144Z"
+ },
+ {
+  "id": "adda556c-9722-4e16-88e3-cff18c92f8b6",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "b093b4bb-65c5-4c5f-90ae-74a3eb041447",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "365.39",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.148Z"
+ },
+ {
+  "id": "1f5b1cfb-9ef6-4a23-8b7b-0d367488322a",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "b093b4bb-65c5-4c5f-90ae-74a3eb041447",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "369.62",
+  "costTry": "17445.87",
+  "createdAt": "2026-08-11T07:31:48.149Z"
+ },
+ {
+  "id": "f2013c9d-0164-4540-b9f7-7d074da99e38",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "9684b8d8-5294-4964-9c73-feebf9a09eb0",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "424.32",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.153Z"
+ },
+ {
+  "id": "3971a1b1-2f61-4d0b-b05c-a160e8e57933",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "9684b8d8-5294-4964-9c73-feebf9a09eb0",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "429.23",
+  "costTry": "20259.72",
+  "createdAt": "2026-08-11T07:31:48.154Z"
+ },
+ {
+  "id": "212b2abe-0730-4d7c-a636-31372a3a1f77",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "4769fdaf-7dca-43c8-b1c1-78659b4d546d",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "115.51",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.159Z"
+ },
+ {
+  "id": "0ad7d3ae-ab2a-4653-a623-52c30588e3ca",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "4769fdaf-7dca-43c8-b1c1-78659b4d546d",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "122.29",
+  "costTry": "5772.00",
+  "createdAt": "2026-08-11T07:31:48.160Z"
+ },
+ {
+  "id": "f3c1bd7b-0e80-4080-bd5d-f3953c16dda8",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "33357a4d-447e-49f2-b957-fa361b8fc628",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "344.54",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.164Z"
+ },
+ {
+  "id": "b9c6a025-8935-4768-81d6-2e6f5a3cc153",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "33357a4d-447e-49f2-b957-fa361b8fc628",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "360.75",
+  "costTry": "17027.40",
+  "createdAt": "2026-08-11T07:31:48.165Z"
+ },
+ {
+  "id": "a928b5d7-f35c-4031-b859-6cf1566b50be",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "76aca739-dd14-4860-9332-7373545b4ec2",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "574.23",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.171Z"
+ },
+ {
+  "id": "59d30333-b8fa-4d7b-b276-8a6f6bb84f8e",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "76aca739-dd14-4860-9332-7373545b4ec2",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "605.33",
+  "costTry": "28571.40",
+  "createdAt": "2026-08-11T07:31:48.172Z"
+ },
+ {
+  "id": "29ad26d7-c28b-444b-8781-5f790e968c25",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "92aa8a00-ea8b-449d-bf31-7b90ff29ace3",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "876.45",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.177Z"
+ },
+ {
+  "id": "34723f87-b01e-47be-8255-d10c6c2a1c8e",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "92aa8a00-ea8b-449d-bf31-7b90ff29ace3",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "886.59",
+  "costTry": "41847.00",
+  "createdAt": "2026-08-11T07:31:48.178Z"
+ },
+ {
+  "id": "2235b60a-9e01-44fc-bb7f-a5f7c16518fc",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "34942f4c-557f-434a-9e59-e2c094d8f9bb",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "1081.96",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.184Z"
+ },
+ {
+  "id": "e656d63f-a26d-4acd-aaf4-ca00609deedf",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "34942f4c-557f-434a-9e59-e2c094d8f9bb",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "1137.28",
+  "costTry": "53679.60",
+  "createdAt": "2026-08-11T07:31:48.185Z"
+ },
+ {
+  "id": "0a80b219-cbbe-4c63-8ae7-4bf855dafbba",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "02415606-0314-4144-928a-207918009a2c",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "955.03",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.190Z"
+ },
+ {
+  "id": "628f7e11-82f7-49cb-bfe1-3220dbb24467",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "02415606-0314-4144-928a-207918009a2c",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "1039.45",
+  "costTry": "49062.00",
+  "createdAt": "2026-08-11T07:31:48.191Z"
+ },
+ {
+  "id": "e3895bb4-fdab-4e31-bdeb-0121d3ab1d99",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "f1eab33e-a0b4-43d6-b459-38ac19e830a8",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "3143.14",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.195Z"
+ },
+ {
+  "id": "84bcf25b-7b84-4152-8ae4-dc657c905de0",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "f1eab33e-a0b4-43d6-b459-38ac19e830a8",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "3179.49",
+  "costTry": "150072.00",
+  "createdAt": "2026-08-11T07:31:48.196Z"
+ },
+ {
+  "id": "3c266907-52ad-4f06-b0a6-cd1a1bafeee4",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "20960bc5-1884-49a7-b015-ac8d1b13181a",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "1027.56",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.200Z"
+ },
+ {
+  "id": "8365313f-a384-4f1d-a9a0-dfd2bbe4f495",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "20960bc5-1884-49a7-b015-ac8d1b13181a",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "1039.45",
+  "costTry": "49062.00",
+  "createdAt": "2026-08-11T07:31:48.201Z"
+ },
+ {
+  "id": "5926b8fe-c470-41eb-b7f3-d3a0d40fd3ec",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "70c5c523-c1f4-43e8-83ec-5110eaa2d7d1",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "574.23",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.205Z"
+ },
+ {
+  "id": "9f44f831-1c2c-4c08-9e8d-ba5ec2fd5078",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "70c5c523-c1f4-43e8-83ec-5110eaa2d7d1",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "605.33",
+  "costTry": "28571.40",
+  "createdAt": "2026-08-11T07:31:48.206Z"
+ },
+ {
+  "id": "c64572c9-c202-4588-911e-4d79d4ae350c",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "7a9b454e-ea04-4947-8a9d-ae0844a021d5",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "27.80",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.209Z"
+ },
+ {
+  "id": "d7d6490a-1423-4f6d-b4a5-42395f396ba4",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "7a9b454e-ea04-4947-8a9d-ae0844a021d5",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "30.57",
+  "costTry": "1443.00",
+  "createdAt": "2026-08-11T07:31:48.210Z"
+ },
+ {
+  "id": "f614c7a6-f88e-43a9-9e09-68c106942276",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "18f15338-c759-4d24-a555-d7d15fad4d31",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "73.74",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.214Z"
+ },
+ {
+  "id": "e7f4cef3-6283-474a-9de1-1e7f9497e5c3",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "18f15338-c759-4d24-a555-d7d15fad4d31",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "74.60",
+  "costTry": "3520.92",
+  "createdAt": "2026-08-11T07:31:48.215Z"
+ },
+ {
+  "id": "c7ca0686-6182-46e5-862d-be81ffeadd27",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "da314ed4-bb4e-4ec7-85f1-54a177b28960",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "108.20",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.218Z"
+ },
+ {
+  "id": "21337171-f25e-4fe9-b19d-7cf388a357f7",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "da314ed4-bb4e-4ec7-85f1-54a177b28960",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "109.45",
+  "costTry": "5165.94",
+  "createdAt": "2026-08-11T07:31:48.219Z"
+ },
+ {
+  "id": "3f7a1a4b-3676-4818-ac77-0d774a827064",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "2945ace8-c9c8-4b37-a416-b5ff01b3df23",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "9.07",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.222Z"
+ },
+ {
+  "id": "9f12da91-442a-45ed-aeb9-6825000d913d",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "2945ace8-c9c8-4b37-a416-b5ff01b3df23",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "9.78",
+  "costTry": "461.76",
+  "createdAt": "2026-08-11T07:31:48.223Z"
+ },
+ {
+  "id": "30615c59-2c38-4a22-ab53-41937ccbc49f",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "bd25eb40-c196-460e-962a-9d7445fc3122",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "10.88",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.227Z"
+ },
+ {
+  "id": "de86bc66-97a5-4c07-9f34-f084cc183e38",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "bd25eb40-c196-460e-962a-9d7445fc3122",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "11.62",
+  "costTry": "548.34",
+  "createdAt": "2026-08-11T07:31:48.228Z"
+ },
+ {
+  "id": "773093cb-816e-4858-8ec7-f49ee8f2d265",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "713a5ec3-00be-423d-b552-0aa3dbad50ed",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "16.32",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.231Z"
+ },
+ {
+  "id": "7c2013fb-56e2-491e-840a-7e18b045bd76",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "713a5ec3-00be-423d-b552-0aa3dbad50ed",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "17.73",
+  "costTry": "836.94",
+  "createdAt": "2026-08-11T07:31:48.232Z"
+ },
+ {
+  "id": "1454af0e-cec6-4887-9a84-21b40aed89fd",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "435bb1dd-4896-44dc-802c-b7f7c3c36eb9",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "157.16",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.236Z"
+ },
+ {
+  "id": "5b4901b0-145d-4b5a-a5cf-13a44d0b4726",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "435bb1dd-4896-44dc-802c-b7f7c3c36eb9",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "165.09",
+  "costTry": "7792.20",
+  "createdAt": "2026-08-11T07:31:48.237Z"
+ },
+ {
+  "id": "c8ffa504-a1c6-4207-82ba-4d0b84d348e9",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "697c1bf4-afc3-4c6f-8948-acdaf2594142",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "235.74",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.241Z"
+ },
+ {
+  "id": "070390e9-67a0-45a9-82db-bebbca96bd4c",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "697c1bf4-afc3-4c6f-8948-acdaf2594142",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "250.69",
+  "costTry": "11832.60",
+  "createdAt": "2026-08-11T07:31:48.241Z"
+ },
+ {
+  "id": "4f55a851-ffbc-454b-b95d-cbbc563cc882",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "b51924a7-edf2-4177-b422-9ba9d82f54ed",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "314.31",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.245Z"
+ },
+ {
+  "id": "2fb493ee-03d9-4c3f-9883-df6ce0d6798c",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "b51924a7-edf2-4177-b422-9ba9d82f54ed",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "330.18",
+  "costTry": "15584.40",
+  "createdAt": "2026-08-11T07:31:48.246Z"
+ },
+ {
+  "id": "e5c0dd01-3ccc-423d-bd89-3f9d78f239c9",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "2a7ad3be-4ceb-4f9e-820c-f05554856c64",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "15171.67",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.250Z"
+ },
+ {
+  "id": "15568bb9-90e4-4799-a4c1-bbdec7ad8ebc",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "2a7ad3be-4ceb-4f9e-820c-f05554856c64",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "15347.16",
+  "costTry": "724386.00",
+  "createdAt": "2026-08-11T07:31:48.250Z"
+ },
+ {
+  "id": "6954261b-be5a-4947-b7d3-c92b6ddfd846",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "fc76a5cc-88d7-45e1-9d95-a5391a7b264e",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "10517.42",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.254Z"
+ },
+ {
+  "id": "6f6b74e8-3f95-439b-acb2-0da0f57a007a",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "fc76a5cc-88d7-45e1-9d95-a5391a7b264e",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "10639.07",
+  "costTry": "502164.00",
+  "createdAt": "2026-08-11T07:31:48.255Z"
+ },
+ {
+  "id": "0eacdb6a-cb8e-424a-8025-f38664bb5956",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "a5af8048-b810-41ba-80e6-f69d90336d59",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "6648.94",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.260Z"
+ },
+ {
+  "id": "9f00bd3a-4ec1-4416-b584-9a605f2d4dce",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "a5af8048-b810-41ba-80e6-f69d90336d59",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "6725.85",
+  "costTry": "317460.00",
+  "createdAt": "2026-08-11T07:31:48.260Z"
+ },
+ {
+  "id": "50a5100b-37fc-48b4-97c7-0b4c986edc74",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "5550ab04-d8fc-494a-9817-c8117d3a9324",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "35.66",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.264Z"
+ },
+ {
+  "id": "c23c934e-3bea-4ffd-8712-a2c0dd2bb2a9",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "5550ab04-d8fc-494a-9817-c8117d3a9324",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "36.07",
+  "costTry": "1702.74",
+  "createdAt": "2026-08-11T07:31:48.265Z"
+ },
+ {
+  "id": "4a04e477-4fb8-4bb2-8425-3c19b720c824",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "de29bdff-60dc-41db-a347-886d475a0a5b",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "15.11",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.268Z"
+ },
+ {
+  "id": "dd2bdd49-86b8-4f0a-9b72-9f984c960a97",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "de29bdff-60dc-41db-a347-886d475a0a5b",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "15.29",
+  "costTry": "721.50",
+  "createdAt": "2026-08-11T07:31:48.269Z"
+ },
+ {
+  "id": "be884a75-f8c6-4f1f-8e1f-36420abfc3d0",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "c93fa664-e4d1-4f0b-a636-ef0e87666e46",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "106.38",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.273Z"
+ },
+ {
+  "id": "8ae93e8c-7e58-460f-8d52-949b2556c2c8",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "c93fa664-e4d1-4f0b-a636-ef0e87666e46",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "107.61",
+  "costTry": "5079.36",
+  "createdAt": "2026-08-11T07:31:48.274Z"
+ },
+ {
+  "id": "38f38ba0-ac0f-41cb-b5fc-ada3da157d2e",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "4b868f50-2299-45d9-8742-7ac538f45e5c",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "3614.61",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.278Z"
+ },
+ {
+  "id": "d09202e7-5615-407e-ae23-85aa537732b5",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "4b868f50-2299-45d9-8742-7ac538f45e5c",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "3656.42",
+  "costTry": "172582.80",
+  "createdAt": "2026-08-11T07:31:48.279Z"
+ },
+ {
+  "id": "69955705-bec3-4e68-a001-792033cc76f2",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "9e783c03-309f-4681-a185-761950781b7e",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "3082.69",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.283Z"
+ },
+ {
+  "id": "8988b179-9a1d-4ff6-8877-48e05bc6f2b5",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "9e783c03-309f-4681-a185-761950781b7e",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "3179.49",
+  "costTry": "150072.00",
+  "createdAt": "2026-08-11T07:31:48.284Z"
+ },
+ {
+  "id": "9d3335d1-410a-4e7a-9283-853e7a9d33f7",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "0caa5198-2fae-4d3a-b3b5-56393c742440",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "8522.73",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.288Z"
+ },
+ {
+  "id": "af30ca5f-fed4-471d-a9ea-efe33045dcf1",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "0caa5198-2fae-4d3a-b3b5-56393c742440",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "8621.31",
+  "costTry": "406926.00",
+  "createdAt": "2026-08-11T07:31:48.288Z"
+ },
+ {
+  "id": "6aa08d18-879d-4e89-a463-edff16d2bc06",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "abbfad4c-3057-448c-84de-5be34ea70615",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "7857.84",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.292Z"
+ },
+ {
+  "id": "ef969841-6174-41e1-bcee-5a3d79f8a217",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "abbfad4c-3057-448c-84de-5be34ea70615",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "7948.73",
+  "costTry": "375180.00",
+  "createdAt": "2026-08-11T07:31:48.293Z"
+ },
+ {
+  "id": "540ac217-9f38-44a5-90e2-a7b82764ecb3",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "cce9510a-6733-4aa3-a687-623ce1abbfe7",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "6250.00",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.296Z"
+ },
+ {
+  "id": "5eea488e-1a26-47f2-803f-4b15d97b1efd",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "cce9510a-6733-4aa3-a687-623ce1abbfe7",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "5747.54",
+  "costTry": "271284.00",
+  "createdAt": "2026-08-11T07:31:48.297Z"
+ },
+ {
+  "id": "51801dba-55b4-4214-a342-30ddf4e738d3",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "229e1867-efab-4c9c-8dcf-dee96238f18b",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "1752.90",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.301Z"
+ },
+ {
+  "id": "f5d4353f-87bd-41cd-829e-7b8246516fb4",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "229e1867-efab-4c9c-8dcf-dee96238f18b",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "1650.89",
+  "costTry": "77922.00",
+  "createdAt": "2026-08-11T07:31:48.302Z"
+ },
+ {
+  "id": "c090f223-e8cd-48dc-8ca6-eb8948e97bdd",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "f7643cec-a41f-4618-a185-20e68d9169ff",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "2411.75",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.305Z"
+ },
+ {
+  "id": "447384c9-ce40-498a-a9a3-2ea4e0f79825",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "f7643cec-a41f-4618-a185-20e68d9169ff",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "2439.65",
+  "costTry": "115151.40",
+  "createdAt": "2026-08-11T07:31:48.306Z"
+ },
+ {
+  "id": "7226c73c-46f1-413c-b1b9-f9fa12f35c9a",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "28f70c6e-52a2-474f-a110-335c354cebb6",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "2272.73",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.309Z"
+ },
+ {
+  "id": "2418f0b1-1672-48a3-ad77-42fe7eb68c37",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "28f70c6e-52a2-474f-a110-335c354cebb6",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "2299.02",
+  "costTry": "108513.60",
+  "createdAt": "2026-08-11T07:31:48.310Z"
+ },
+ {
+  "id": "a78378a0-37b5-4d18-92d5-f95e14828bf8",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "961fb6e7-93e5-4b44-9213-22ad400dc9b4",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "7241.30",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.314Z"
+ },
+ {
+  "id": "1d50c330-5e94-42c2-b511-7a29ca7e37fb",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "961fb6e7-93e5-4b44-9213-22ad400dc9b4",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "7704.15",
+  "costTry": "363636.00",
+  "createdAt": "2026-08-11T07:31:48.315Z"
+ },
+ {
+  "id": "d2cabae4-dcf2-4c4a-a6f3-8754543b09b2",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "02d18717-34dc-4c23-8261-ec6fc2f6f54a",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "4533.37",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.319Z"
+ },
+ {
+  "id": "42cfa849-56b5-4605-96d3-d0d5d365a6d0",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "02d18717-34dc-4c23-8261-ec6fc2f6f54a",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "4585.81",
+  "costTry": "216450.00",
+  "createdAt": "2026-08-11T07:31:48.320Z"
+ },
+ {
+  "id": "b00e935d-d815-48ff-90ba-bf954d88b418",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "4aeebffb-5044-4da3-8ca1-b8e19d13f60a",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "2720.02",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.323Z"
+ },
+ {
+  "id": "1070c843-a55b-4a21-90c6-2696eb2ed7de",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "4aeebffb-5044-4da3-8ca1-b8e19d13f60a",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "2751.48",
+  "costTry": "129870.00",
+  "createdAt": "2026-08-11T07:31:48.324Z"
+ },
+ {
+  "id": "8fe241c0-ca7c-4a87-9d9d-98b982af8191",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "df8d8a90-cc3b-4c48-aa48-f205fdb6c667",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "3016.20",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.328Z"
+ },
+ {
+  "id": "d286bf5b-b850-4a83-b963-f9edb7e61f96",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "df8d8a90-cc3b-4c48-aa48-f205fdb6c667",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "3051.09",
+  "costTry": "144011.40",
+  "createdAt": "2026-08-11T07:31:48.330Z"
+ },
+ {
+  "id": "dbd8c24d-df5d-432c-ae3c-438938f9b429",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "d5b07d96-49ee-49b8-9897-deae47202d14",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "3989.36",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.334Z"
+ },
+ {
+  "id": "914e848e-15ea-4d22-acbe-fa207e5099d2",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "d5b07d96-49ee-49b8-9897-deae47202d14",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "3656.42",
+  "costTry": "172582.80",
+  "createdAt": "2026-08-11T07:31:48.335Z"
+ },
+ {
+  "id": "f1605423-d8b4-4b47-b269-6677d80551df",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "4922ee65-318c-48ad-bdee-9dc42a2b3aeb",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "2478.24",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.339Z"
+ },
+ {
+  "id": "12d62ca1-2f4f-4bfa-8876-dea6ae6f6c9d",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "4922ee65-318c-48ad-bdee-9dc42a2b3aeb",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "2506.91",
+  "costTry": "118326.00",
+  "createdAt": "2026-08-11T07:31:48.340Z"
+ },
+ {
+  "id": "87d0dd9b-696c-416f-96fd-b7d0da4e81b7",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "91d7b10c-09cc-4470-8588-428516ad9d83",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "1160.54",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.344Z"
+ },
+ {
+  "id": "dc7599b0-ba88-4ca1-b864-3acefaa1a308",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "91d7b10c-09cc-4470-8588-428516ad9d83",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "1100.59",
+  "costTry": "51948.00",
+  "createdAt": "2026-08-11T07:31:48.345Z"
+ },
+ {
+  "id": "87740e64-f11c-4e38-9da2-6a6ce4fffb85",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "f5151038-74f8-4946-b544-4b4b25df1d79",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "707.21",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.348Z"
+ },
+ {
+  "id": "cba22cb5-2ef5-422f-bf76-2541c1c03e11",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "f5151038-74f8-4946-b544-4b4b25df1d79",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "715.39",
+  "costTry": "33766.20",
+  "createdAt": "2026-08-11T07:31:48.349Z"
+ },
+ {
+  "id": "49331c50-d1b8-4656-8576-0247536dbc84",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "4ba6e642-4f6d-4c79-bdd7-cacfd33f6cfd",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "544.00",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.353Z"
+ },
+ {
+  "id": "f8891722-9d6b-4915-be8f-e7a1f0a79a95",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "4ba6e642-4f6d-4c79-bdd7-cacfd33f6cfd",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "586.98",
+  "costTry": "27705.60",
+  "createdAt": "2026-08-11T07:31:48.354Z"
+ },
+ {
+  "id": "69eb0f65-edd1-4097-9e40-75274b8bdc85",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "e2a7ae73-0443-4f2f-a684-ea0cbd49bf35",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "338.49",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.358Z"
+ },
+ {
+  "id": "46800e1c-86e9-4780-b504-3abde2d4a094",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "e2a7ae73-0443-4f2f-a684-ea0cbd49bf35",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "342.41",
+  "costTry": "16161.60",
+  "createdAt": "2026-08-11T07:31:48.359Z"
+ },
+ {
+  "id": "7633e671-a660-4654-83e6-2af8ecc76d7b",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "62cda557-b63d-4de3-bb45-58d511ea2a96",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "193.42",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.363Z"
+ },
+ {
+  "id": "3f0c57cd-0fb8-4e99-9815-c17b537fb3a2",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "62cda557-b63d-4de3-bb45-58d511ea2a96",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "195.66",
+  "costTry": "9235.20",
+  "createdAt": "2026-08-11T07:31:48.364Z"
+ },
+ {
+  "id": "bdbc632a-6a53-4fe4-abc2-1a8291a29096",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "86b60f87-f98b-459f-83df-b603884be381",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "322.84",
+  "costTry": "15238.08",
+  "createdAt": "2026-08-11T07:31:48.369Z"
+ },
+ {
+  "id": "90c033a8-3a43-42de-9ac4-eb7ed04078b5",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "7dcca8af-23b4-4f5a-bf2b-5f6d2a4de207",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "440.24",
+  "costTry": "20779.20",
+  "createdAt": "2026-08-11T07:31:48.373Z"
+ },
+ {
+  "id": "98fed31a-ec4f-40fb-8a9e-63848e2da0f2",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "0931ba9e-594b-4077-a73b-862e1ad8e5a1",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "1143.39",
+  "costTry": "53968.20",
+  "createdAt": "2026-08-11T07:31:48.377Z"
+ },
+ {
+  "id": "b0654734-61fd-45cc-96d0-77c443815701",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "db336edd-8d7e-4cd2-8514-61de9af15b76",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "4170.70",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.379Z"
+ },
+ {
+  "id": "9c8791c5-91fb-4737-9ee4-2cdee1b6c820",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "db336edd-8d7e-4cd2-8514-61de9af15b76",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "4218.94",
+  "costTry": "199134.00",
+  "createdAt": "2026-08-11T07:31:48.380Z"
+ },
+ {
+  "id": "f90766f6-b70e-4afa-9665-aa6ceaba75f0",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "a4c398d8-3b4f-40a5-998d-97f57cd444ba",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "1320.71",
+  "costTry": "62337.60",
+  "createdAt": "2026-08-11T07:31:48.387Z"
+ },
+ {
+  "id": "e6bf96eb-1ab9-49b8-afdf-bff973ca8e58",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "56fe6904-94e4-428f-94c9-100c45625997",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "715.39",
+  "costTry": "33766.20",
+  "createdAt": "2026-08-11T07:31:48.390Z"
+ },
+ {
+  "id": "fa551141-0627-4725-9462-398d7a473b47",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "7d040ca6-2f49-400b-9493-9bf0e64bbeeb",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "972.19",
+  "costTry": "45887.40",
+  "createdAt": "2026-08-11T07:31:48.394Z"
+ },
+ {
+  "id": "e4157074-3f89-48ca-b10e-8cb735c66e23",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "0d1260fb-c628-4617-b06c-42d49c81e36c",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "697.04",
+  "costTry": "32900.40",
+  "createdAt": "2026-08-11T07:31:48.398Z"
+ },
+ {
+  "id": "bee09ddf-ef6c-4807-aeb6-7eca64adef28",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "b5d4a04f-eae9-41d5-9f9a-db825876a447",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "342.41",
+  "costTry": "16161.60",
+  "createdAt": "2026-08-11T07:31:48.401Z"
+ },
+ {
+  "id": "78321a43-e8e5-41af-a7fa-ada20e731028",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "6d07d193-c2ef-48da-b199-6c1741241930",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "264.14",
+  "costTry": "12467.52",
+  "createdAt": "2026-08-11T07:31:48.405Z"
+ },
+ {
+  "id": "8a2f6145-bd28-482a-b936-937d80313687",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "60ea58cb-18bb-4bb8-b584-ca0600907932",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "217.60",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.407Z"
+ },
+ {
+  "id": "acbf389f-9085-4221-9ea8-af9db65d8c78",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "60ea58cb-18bb-4bb8-b584-ca0600907932",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "220.12",
+  "costTry": "10389.60",
+  "createdAt": "2026-08-11T07:31:48.407Z"
+ },
+ {
+  "id": "5be94126-82a6-443c-925c-7abffaf4d67b",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "740d8126-0080-440e-a64a-be1f8a6aa013",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "9.67",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.411Z"
+ },
+ {
+  "id": "943e8bc8-8990-44f9-8b4e-0972df254a99",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "740d8126-0080-440e-a64a-be1f8a6aa013",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "9.78",
+  "costTry": "461.76",
+  "createdAt": "2026-08-11T07:31:48.412Z"
+ },
+ {
+  "id": "86a59e2c-1d08-44d8-83c8-9def16a3cfd7",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "923c9c4a-4cc4-4271-9331-a81de5be9938",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "265.96",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.415Z"
+ },
+ {
+  "id": "37734679-fb11-4441-ba6c-e76622373566",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "923c9c4a-4cc4-4271-9331-a81de5be9938",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "269.03",
+  "costTry": "12698.40",
+  "createdAt": "2026-08-11T07:31:48.416Z"
+ },
+ {
+  "id": "7f68d471-4e65-49de-a9ca-554d208ec6f0",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "1e65356e-0045-4b5f-b339-7d34dde46e83",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "4775.15",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.421Z"
+ },
+ {
+  "id": "7fa3596e-086f-4251-acdc-a610e19b80c3",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "1e65356e-0045-4b5f-b339-7d34dde46e83",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "4830.38",
+  "costTry": "227994.00",
+  "createdAt": "2026-08-11T07:31:48.421Z"
+ },
+ {
+  "id": "46d76110-2e12-4de1-b4dd-fc6b962821bf",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "d18c717e-5481-4a1f-aa1e-0f11a105b7b8",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "4231.14",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.425Z"
+ },
+ {
+  "id": "7f6e07ae-3243-48c4-8fee-facb02264961",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "d18c717e-5481-4a1f-aa1e-0f11a105b7b8",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "4280.08",
+  "costTry": "202020.00",
+  "createdAt": "2026-08-11T07:31:48.426Z"
+ },
+ {
+  "id": "980a08b5-ce85-4c6b-8456-fe4f385a43da",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "c671dd54-9aff-461a-a44b-d575e2fdefd3",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "2599.13",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.429Z"
+ },
+ {
+  "id": "6a386ddf-98ea-460d-a116-74b484f4eca2",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "c671dd54-9aff-461a-a44b-d575e2fdefd3",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "2629.19",
+  "costTry": "124098.00",
+  "createdAt": "2026-08-11T07:31:48.430Z"
+ },
+ {
+  "id": "3da69f1b-1894-41e8-9140-ab7e00353ff6",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "e476b72c-4823-4279-ac1f-ee167c5a764b",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "1571.57",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.434Z"
+ },
+ {
+  "id": "3735bca2-42ef-4a33-8abd-5a410f35cdf3",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "e476b72c-4823-4279-ac1f-ee167c5a764b",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "1589.75",
+  "costTry": "75036.00",
+  "createdAt": "2026-08-11T07:31:48.435Z"
+ },
+ {
+  "id": "010368f8-6a2e-4b11-b663-39a12ebe44e1",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "ec804b16-c04f-4a0d-8a1d-dee49f4aaa1e",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "7.13",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.439Z"
+ },
+ {
+  "id": "4fb5ad38-5a83-46e2-a78d-14dd93e53738",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "ec804b16-c04f-4a0d-8a1d-dee49f4aaa1e",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "7.22",
+  "costTry": "340.55",
+  "createdAt": "2026-08-11T07:31:48.440Z"
+ },
+ {
+  "id": "3f58a000-c3c3-49a1-b7ae-42a58102bb31",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "fe28236a-5605-4ff1-8755-df74163e7799",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "139.02",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.444Z"
+ },
+ {
+  "id": "43fcc7c5-19f4-498f-b26c-d7e2e63bfbca",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "fe28236a-5605-4ff1-8755-df74163e7799",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "140.63",
+  "costTry": "6637.80",
+  "createdAt": "2026-08-11T07:31:48.444Z"
+ },
+ {
+  "id": "7e5dc989-1f31-4348-bba2-d2906c7323d7",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "1a1d7c3c-bf97-4e54-86dc-5f02f6571525",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "145.07",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.448Z"
+ },
+ {
+  "id": "eda1cf86-3c2a-44a9-8d20-7a52d72f4a52",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "1a1d7c3c-bf97-4e54-86dc-5f02f6571525",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "146.75",
+  "costTry": "6926.40",
+  "createdAt": "2026-08-11T07:31:48.449Z"
+ },
+ {
+  "id": "b1071839-6649-4720-879f-ae3072403e61",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "4a219171-ccc1-4514-ace9-3cc6ac936e21",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "199.47",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.454Z"
+ },
+ {
+  "id": "85a2ad53-fa4e-4867-8f86-ac6673d8f9b8",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "4a219171-ccc1-4514-ace9-3cc6ac936e21",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "201.78",
+  "costTry": "9523.80",
+  "createdAt": "2026-08-11T07:31:48.455Z"
+ },
+ {
+  "id": "69a10219-0651-4c89-8250-3fd84e7946b6",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "fbf50919-d7b3-4ea4-ba0d-1f2dc75017d7",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "239.36",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.459Z"
+ },
+ {
+  "id": "2db6c88f-8c56-41f9-b9b3-091c82c28521",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "fbf50919-d7b3-4ea4-ba0d-1f2dc75017d7",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "242.13",
+  "costTry": "11428.56",
+  "createdAt": "2026-08-11T07:31:48.460Z"
+ },
+ {
+  "id": "6bfe4c61-51b9-4b79-9491-012132bf1c69",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "fce086f0-f3aa-4e66-a83b-b6bf949e86a5",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "284.09",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.464Z"
+ },
+ {
+  "id": "90524c85-f1c6-4a70-ab14-559a03982831",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "fce086f0-f3aa-4e66-a83b-b6bf949e86a5",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "287.38",
+  "costTry": "13564.20",
+  "createdAt": "2026-08-11T07:31:48.465Z"
+ },
+ {
+  "id": "276abc81-5ea8-4c51-9cb5-80d74db6631a",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "5a8956e4-52dd-44e3-913d-5449a214df4d",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "423.11",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.469Z"
+ },
+ {
+  "id": "1a07c9ba-e362-405f-bd36-85a26ac686d4",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "5a8956e4-52dd-44e3-913d-5449a214df4d",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "428.01",
+  "costTry": "20202.00",
+  "createdAt": "2026-08-11T07:31:48.471Z"
+ },
+ {
+  "id": "cc9b148b-d6e8-4724-af12-4e7ef67bdedd",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "5a0c6cc8-1713-4f26-8822-b1fbdc7eebad",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "477.51",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.474Z"
+ },
+ {
+  "id": "e0055768-3472-458e-a7ce-f337b49ad9c9",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "5a0c6cc8-1713-4f26-8822-b1fbdc7eebad",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "483.04",
+  "costTry": "22799.40",
+  "createdAt": "2026-08-11T07:31:48.475Z"
+ },
+ {
+  "id": "9e8b7394-ecd5-4ea8-8f3c-a6635fc357ec",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "25d31b09-c2e4-439f-adc9-68007116d15e",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "598.40",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.478Z"
+ },
+ {
+  "id": "a931da57-21e8-43b0-a974-383af65349fe",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "25d31b09-c2e4-439f-adc9-68007116d15e",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "605.33",
+  "costTry": "28571.40",
+  "createdAt": "2026-08-11T07:31:48.479Z"
+ },
+ {
+  "id": "5ae9929c-52f5-43c8-8f1d-9b55ebdd5c03",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "b6bbc83a-2a30-4c3a-a50c-4b724a9da14d",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "785.78",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.482Z"
+ },
+ {
+  "id": "00c4c53e-7beb-4ff1-9bea-913fe7e0874b",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "b6bbc83a-2a30-4c3a-a50c-4b724a9da14d",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "794.87",
+  "costTry": "37518.00",
+  "createdAt": "2026-08-11T07:31:48.483Z"
+ },
+ {
+  "id": "86689aed-e853-483b-8eed-bac41d26fe9e",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "669eb8c5-5c00-4610-aceb-8019d185faab",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "961.07",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.487Z"
+ },
+ {
+  "id": "36d9c2b2-7220-4ef3-8958-39c7317c2998",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "669eb8c5-5c00-4610-aceb-8019d185faab",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "972.19",
+  "costTry": "45887.40",
+  "createdAt": "2026-08-11T07:31:48.488Z"
+ },
+ {
+  "id": "0640790a-00f0-4810-93da-331e8ad2ec8b",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "6bbed5e0-d567-4887-adae-b9504995385a",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "1184.72",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.492Z"
+ },
+ {
+  "id": "d557c44a-2a3a-4e5a-82ba-70e3ccec8334",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "6bbed5e0-d567-4887-adae-b9504995385a",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "1198.42",
+  "costTry": "56565.60",
+  "createdAt": "2026-08-11T07:31:48.493Z"
+ },
+ {
+  "id": "11227c24-0dbf-41d0-9086-78c313b6e0c1",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "0ff3abd3-1a54-40f3-8cc7-af780d788606",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "1692.46",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.496Z"
+ },
+ {
+  "id": "464a88c7-6fbc-4aea-8de5-5758e705a173",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "0ff3abd3-1a54-40f3-8cc7-af780d788606",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "1712.03",
+  "costTry": "80808.00",
+  "createdAt": "2026-08-11T07:31:48.497Z"
+ },
+ {
+  "id": "12e9da81-0f6b-42e9-80c5-d499ce953d6e",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "5dddcd28-4fd9-4e5d-b902-01b7b0f00bc6",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "1994.68",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.501Z"
+ },
+ {
+  "id": "9c163ff6-bf90-4d4d-a8ab-1a0f5b1e69d0",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "5dddcd28-4fd9-4e5d-b902-01b7b0f00bc6",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "2017.75",
+  "costTry": "95238.00",
+  "createdAt": "2026-08-11T07:31:48.501Z"
+ },
+ {
+  "id": "02f53112-58f8-4de3-8f73-7a26e315b422",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "6d321458-7f5b-4b59-b406-d51ec67fba1e",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "2780.47",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.505Z"
+ },
+ {
+  "id": "775ca73f-4ebc-4823-bd40-7622979b5877",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "6d321458-7f5b-4b59-b406-d51ec67fba1e",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "2812.63",
+  "costTry": "132756.00",
+  "createdAt": "2026-08-11T07:31:48.506Z"
+ },
+ {
+  "id": "f6b28db6-673a-42ed-a4cd-7efa472db04e",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "d942fa34-b21f-4594-a799-7674b80c95c0",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "42.31",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.509Z"
+ },
+ {
+  "id": "670364e7-69b3-4aeb-b78d-a67c71316290",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "d942fa34-b21f-4594-a799-7674b80c95c0",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "42.80",
+  "costTry": "2020.20",
+  "createdAt": "2026-08-11T07:31:48.510Z"
+ },
+ {
+  "id": "e772689d-d2d5-4291-82cb-17749cd3a05f",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "794cdf26-ddd7-4ee6-bf03-937f8eea3d6d",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "102.76",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.514Z"
+ },
+ {
+  "id": "9bc8284f-d488-4cdd-9b81-b1c066e4c230",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "794cdf26-ddd7-4ee6-bf03-937f8eea3d6d",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "103.94",
+  "costTry": "4906.20",
+  "createdAt": "2026-08-11T07:31:48.515Z"
+ },
+ {
+  "id": "b9a088b1-9aff-4fd5-aee2-31baa26089f8",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "8d6a1922-34ec-4f13-a1d7-2abbb577edd4",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "66.49",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.518Z"
+ },
+ {
+  "id": "addab2a7-c33c-41b6-ad57-b86ed666327c",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "8d6a1922-34ec-4f13-a1d7-2abbb577edd4",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "67.26",
+  "costTry": "3174.60",
+  "createdAt": "2026-08-11T07:31:48.519Z"
+ },
+ {
+  "id": "24c2db70-90e2-40da-ac38-a9144308e238",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "50cd334f-471c-4093-ad52-d8f5bd9ea011",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "36.27",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.523Z"
+ },
+ {
+  "id": "28e397db-6e63-44c8-afd0-5ecb57e3ddc1",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "50cd334f-471c-4093-ad52-d8f5bd9ea011",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "36.69",
+  "costTry": "1731.60",
+  "createdAt": "2026-08-11T07:31:48.524Z"
+ },
+ {
+  "id": "36132991-287f-49de-808a-46af411a04d8",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "ffd8b66d-e251-4068-abaf-5b40e0c85063",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "30.22",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.528Z"
+ },
+ {
+  "id": "701c4bb1-db36-422c-b933-c9bd9246ae71",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "ffd8b66d-e251-4068-abaf-5b40e0c85063",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "30.57",
+  "costTry": "1443.00",
+  "createdAt": "2026-08-11T07:31:48.529Z"
+ },
+ {
+  "id": "55ac9efd-ce92-4b08-b371-58d02af5334c",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "68464c08-22a9-4db1-ab8e-5f43b9baada5",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "48.36",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.532Z"
+ },
+ {
+  "id": "e180cec4-d3b0-44e8-a2d2-eb84507bd67f",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "68464c08-22a9-4db1-ab8e-5f43b9baada5",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "48.92",
+  "costTry": "2308.80",
+  "createdAt": "2026-08-11T07:31:48.533Z"
+ },
+ {
+  "id": "1fcf036c-0ff1-41f2-b143-16a9a578dfb5",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "3ad68ce7-d451-475b-8dfe-98a7f8453f1c",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "0.79",
+  "costTry": "37.52",
+  "createdAt": "2026-08-11T07:31:48.536Z"
+ },
+ {
+  "id": "8ba41d7d-e02c-4b10-8089-1c85c9c0e0a1",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "784397de-6573-4c2f-81fc-3f01d1361fe6",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "3.38",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.540Z"
+ },
+ {
+  "id": "4c5eecbf-5873-4256-9457-42c3b40f3c56",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "784397de-6573-4c2f-81fc-3f01d1361fe6",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "3.42",
+  "costTry": "161.62",
+  "createdAt": "2026-08-11T07:31:48.541Z"
+ },
+ {
+  "id": "799676d5-4c7f-447e-a0fa-e150a23fb673",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "4da1c968-bf71-4c1f-859b-52a10e0de860",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "4.84",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.544Z"
+ },
+ {
+  "id": "49348395-d09b-4337-b9a6-aab1c7bc8610",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "4da1c968-bf71-4c1f-859b-52a10e0de860",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "4.89",
+  "costTry": "230.88",
+  "createdAt": "2026-08-11T07:31:48.545Z"
+ },
+ {
+  "id": "8b8d16b6-1818-4bd4-b2cf-3b25a6b9b857",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "f6c66f61-7c30-49f7-ad10-cb2abc1a445f",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "0.83",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.550Z"
+ },
+ {
+  "id": "cef56290-7634-4319-95bd-23f1ed243b86",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "f6c66f61-7c30-49f7-ad10-cb2abc1a445f",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "0.84",
+  "costTry": "39.83",
+  "createdAt": "2026-08-11T07:31:48.550Z"
+ },
+ {
+  "id": "bb805dfd-733f-441e-977d-550c8413abc5",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "72f2abe4-7478-432e-9e97-33a6101f75e0",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "0.83",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.554Z"
+ },
+ {
+  "id": "00b3d8ef-9046-45f1-ad9d-f903a5ab0bb2",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "72f2abe4-7478-432e-9e97-33a6101f75e0",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "0.84",
+  "costTry": "39.83",
+  "createdAt": "2026-08-11T07:31:48.555Z"
+ },
+ {
+  "id": "e2099046-00b1-4471-ab93-3492e6d843cf",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "76a0383d-6108-4af1-aa5a-03918d2d1847",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "1.69",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.559Z"
+ },
+ {
+  "id": "fc9524b9-c9b0-4828-b1bd-71117c3a40d7",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "76a0383d-6108-4af1-aa5a-03918d2d1847",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "1.71",
+  "costTry": "80.81",
+  "createdAt": "2026-08-11T07:31:48.559Z"
+ },
+ {
+  "id": "2272025e-0c92-41fc-a25c-515fc326d105",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "5410acce-df17-44c5-978c-8bfdf7b2161d",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "1.16",
+  "costTry": "54.83",
+  "createdAt": "2026-08-11T07:31:48.565Z"
+ },
+ {
+  "id": "0765e403-1c9a-498b-a8c4-3ddaa3132a80",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "617f80ba-b22d-4cc1-bef5-b15bae24b94f",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "9.67",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.568Z"
+ },
+ {
+  "id": "8f673647-a3d2-4e56-afe1-8b1a067a6ecb",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "617f80ba-b22d-4cc1-bef5-b15bae24b94f",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "11.01",
+  "costTry": "519.48",
+  "createdAt": "2026-08-11T07:31:48.570Z"
+ },
+ {
+  "id": "8a537596-2b31-440d-9acb-6296cbd24a76",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "92d3d671-3695-40be-a8ad-de9a06635065",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "12.21",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.574Z"
+ },
+ {
+  "id": "9a028056-dad8-4e05-a91e-73c3905053cb",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "92d3d671-3695-40be-a8ad-de9a06635065",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "12.35",
+  "costTry": "582.97",
+  "createdAt": "2026-08-11T07:31:48.575Z"
+ },
+ {
+  "id": "c624a840-feae-428e-8a9c-f17b477479fd",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "4a44d75d-7c06-49b2-9365-a70cb77ec088",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "15.72",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.578Z"
+ },
+ {
+  "id": "d7250e0e-99ea-4e93-a221-9ee6c554d414",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "4a44d75d-7c06-49b2-9365-a70cb77ec088",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "15.90",
+  "costTry": "750.36",
+  "createdAt": "2026-08-11T07:31:48.579Z"
+ },
+ {
+  "id": "0203156e-1214-4392-8b67-cf1890ef8c7c",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "3e14f685-eddd-41b0-8671-7421d72798e5",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "32.64",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.583Z"
+ },
+ {
+  "id": "01bf463d-fb09-4dd0-a8ee-3f20a34a1297",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "3e14f685-eddd-41b0-8671-7421d72798e5",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "33.02",
+  "costTry": "1558.44",
+  "createdAt": "2026-08-11T07:31:48.584Z"
+ },
+ {
+  "id": "ca422d3a-f312-4bc9-8e5e-6a95b78a4504",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "38957e0f-3b3f-4413-bcad-1c4b183e2d22",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "42.31",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.587Z"
+ },
+ {
+  "id": "7b7bdcb6-e499-4b74-9668-45d68c9fe376",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "38957e0f-3b3f-4413-bcad-1c4b183e2d22",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "47.69",
+  "costTry": "2251.08",
+  "createdAt": "2026-08-11T07:31:48.587Z"
+ },
+ {
+  "id": "c8eee5b0-db78-4b29-958d-b13a250dc7de",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "c589d7fe-ead9-4648-96ce-9c70545c03c1",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "51.98",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.591Z"
+ },
+ {
+  "id": "1eb90ea3-f33d-4e1d-aed1-5e288bbc5f1a",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "c589d7fe-ead9-4648-96ce-9c70545c03c1",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "52.58",
+  "costTry": "2481.96",
+  "createdAt": "2026-08-11T07:31:48.591Z"
+ },
+ {
+  "id": "d333a885-ad72-4a7a-8e75-a015671d2b84",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "14f06a0f-3865-4ed8-a188-f5fa6416369e",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "56.82",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.594Z"
+ },
+ {
+  "id": "a9fae8f7-7799-42e4-b87c-07594ea1331e",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "14f06a0f-3865-4ed8-a188-f5fa6416369e",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "57.48",
+  "costTry": "2712.84",
+  "createdAt": "2026-08-11T07:31:48.595Z"
+ },
+ {
+  "id": "f5a1120e-b1ff-462e-b201-8bd0ce61699a",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "09bc452b-91ba-4950-82f1-2ed92b5c69ac",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "151.11",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.599Z"
+ },
+ {
+  "id": "f6651d71-a79e-4dcc-8892-f59237a922fd",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "09bc452b-91ba-4950-82f1-2ed92b5c69ac",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "152.86",
+  "costTry": "7215.00",
+  "createdAt": "2026-08-11T07:31:48.600Z"
+ },
+ {
+  "id": "5f7ae599-b4fa-4b38-b650-65afae379669",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "7dd6b95a-4ce6-4a5a-91a6-9192c0ec9ad8",
+  "supplierId": "340cc809-a1a2-4716-9245-7eea20d57b1e",
+  "priceDate": "2026-08-10",
+  "costUsd": "6.23",
+  "costTry": null,
+  "createdAt": "2026-08-11T07:31:48.603Z"
+ },
+ {
+  "id": "c54a8915-53ae-4975-83d7-5a4e0c630bfe",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "productId": "7dd6b95a-4ce6-4a5a-91a6-9192c0ec9ad8",
+  "supplierId": "00042e9b-7a66-4f8e-b9f3-cd138be41c52",
+  "priceDate": "2026-08-10",
+  "costUsd": "6.30",
+  "costTry": "297.26",
+  "createdAt": "2026-08-11T07:31:48.604Z"
+ }
+]

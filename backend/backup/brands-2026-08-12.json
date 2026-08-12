@@ -1,0 +1,101 @@
+[
+ {
+  "id": "6e1ff3fb-ab70-4700-a881-c586652cfc16",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "name": "DEYE",
+  "slug": "deye",
+  "logoUrl": null,
+  "createdAt": "2026-08-10T13:16:01.207Z",
+  "updatedAt": "2026-08-10T13:16:01.207Z"
+ },
+ {
+  "id": "135f3ad2-4ac9-49e1-a253-fcadd8cce514",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "name": "LEXRON",
+  "slug": "lexron",
+  "logoUrl": null,
+  "createdAt": "2026-08-10T13:16:01.207Z",
+  "updatedAt": "2026-08-10T13:16:01.207Z"
+ },
+ {
+  "id": "3409e12b-342a-4972-985d-7bad0c2d9769",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "name": "EVE",
+  "slug": "eve",
+  "logoUrl": null,
+  "createdAt": "2026-08-10T13:16:01.207Z",
+  "updatedAt": "2026-08-10T13:16:01.207Z"
+ },
+ {
+  "id": "9522728e-3c2f-42a6-afa6-c90cb0728a5f",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "name": "SOROTEC",
+  "slug": "sorotec",
+  "logoUrl": null,
+  "createdAt": "2026-08-10T13:16:01.207Z",
+  "updatedAt": "2026-08-10T13:16:01.207Z"
+ },
+ {
+  "id": "8fd0be56-05b5-469a-9e95-8212b8295f0e",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "name": "ECOSOL",
+  "slug": "ecosol",
+  "logoUrl": null,
+  "createdAt": "2026-08-10T13:16:06.119Z",
+  "updatedAt": "2026-08-10T13:16:06.119Z"
+ },
+ {
+  "id": "4b2c6d7c-ca1d-43a9-894b-d258bb2ade61",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "name": "SMART",
+  "slug": "smart",
+  "logoUrl": null,
+  "createdAt": "2026-08-10T13:16:06.760Z",
+  "updatedAt": "2026-08-10T13:16:06.760Z"
+ },
+ {
+  "id": "6494c19f-bd37-4f0d-904b-514180ff7aa1",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "name": "MEXXSUN",
+  "slug": "mexxsun",
+  "logoUrl": null,
+  "createdAt": "2026-08-12T07:16:04.011Z",
+  "updatedAt": "2026-08-12T07:16:04.011Z"
+ },
+ {
+  "id": "5c69cfc2-1210-4a13-a490-3ebe0b339594",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "name": "HAVENSIS",
+  "slug": "havensis",
+  "logoUrl": null,
+  "createdAt": "2026-08-12T07:16:04.012Z",
+  "updatedAt": "2026-08-12T07:16:04.012Z"
+ },
+ {
+  "id": "da7ab8f1-16b0-4e11-a553-feeba58a14bc",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "name": "ARÇELİK",
+  "slug": "arcelik",
+  "logoUrl": null,
+  "createdAt": "2026-08-12T07:16:04.013Z",
+  "updatedAt": "2026-08-12T07:16:04.013Z"
+ },
+ {
+  "id": "aedf4b2d-5805-4958-8c9d-5c079354872f",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "name": "BAKIRLAR",
+  "slug": "bakirlar",
+  "logoUrl": null,
+  "createdAt": "2026-08-12T07:16:04.015Z",
+  "updatedAt": "2026-08-12T07:16:04.015Z"
+ },
+ {
+  "id": "5f86a3c0-0d6d-4eca-977f-452220bcdd95",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "name": "JINKO",
+  "slug": "jinko",
+  "logoUrl": null,
+  "createdAt": "2026-08-12T07:16:04.015Z",
+  "updatedAt": "2026-08-12T07:16:04.015Z"
+ }
+]

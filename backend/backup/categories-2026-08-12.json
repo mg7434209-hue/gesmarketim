@@ -1,0 +1,132 @@
+[
+ {
+  "id": "01985cbf-43ff-40df-b93e-08e8be7853ab",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "name": "Güneş Paneli",
+  "slug": "gunes-paneli",
+  "defaultMarkupPercent": null,
+  "sortOrder": 1,
+  "createdAt": "2026-08-10T13:16:01.204Z",
+  "updatedAt": "2026-08-10T13:16:01.204Z"
+ },
+ {
+  "id": "44a2887e-d077-496e-a22d-3bf3505fd5ef",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "name": "İnverter",
+  "slug": "inverter",
+  "defaultMarkupPercent": null,
+  "sortOrder": 2,
+  "createdAt": "2026-08-10T13:16:01.204Z",
+  "updatedAt": "2026-08-10T13:16:01.204Z"
+ },
+ {
+  "id": "3b0c2a17-d330-44dc-aae2-683905742af6",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "name": "Batarya",
+  "slug": "batarya",
+  "defaultMarkupPercent": null,
+  "sortOrder": 3,
+  "createdAt": "2026-08-10T13:16:01.204Z",
+  "updatedAt": "2026-08-10T13:16:01.204Z"
+ },
+ {
+  "id": "4b3d8d34-3aec-4216-a5b1-312f71a42c81",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "name": "Solar Kablo",
+  "slug": "solar-kablo",
+  "defaultMarkupPercent": null,
+  "sortOrder": 4,
+  "createdAt": "2026-08-10T13:16:01.204Z",
+  "updatedAt": "2026-08-10T13:16:01.204Z"
+ },
+ {
+  "id": "7e1efced-bf84-49aa-a194-c6c14218b08f",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "name": "Montaj Aparatı",
+  "slug": "montaj-aparati",
+  "defaultMarkupPercent": null,
+  "sortOrder": 5,
+  "createdAt": "2026-08-10T13:16:01.204Z",
+  "updatedAt": "2026-08-10T13:16:01.204Z"
+ },
+ {
+  "id": "cd2aaf4a-176c-4018-b602-7a6476bc9e37",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "name": "Aksesuar",
+  "slug": "aksesuar",
+  "defaultMarkupPercent": null,
+  "sortOrder": 6,
+  "createdAt": "2026-08-10T13:16:01.204Z",
+  "updatedAt": "2026-08-10T13:16:01.204Z"
+ },
+ {
+  "id": "d4447fcc-f7cc-4778-94ee-d929b875c6b5",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "name": "Panel",
+  "slug": "panel",
+  "defaultMarkupPercent": null,
+  "sortOrder": 0,
+  "createdAt": "2026-08-10T13:16:06.064Z",
+  "updatedAt": "2026-08-10T13:16:06.064Z"
+ },
+ {
+  "id": "e74aab76-7456-4a09-9087-6f3f3309b219",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "name": "Akü Batarya",
+  "slug": "aku-batarya",
+  "defaultMarkupPercent": null,
+  "sortOrder": 0,
+  "createdAt": "2026-08-10T13:16:06.413Z",
+  "updatedAt": "2026-08-10T13:16:06.413Z"
+ },
+ {
+  "id": "2849af6a-5177-47c0-9512-ff2eb3d8d8f6",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "name": "Şarj Kontrol",
+  "slug": "sarj-kontrol",
+  "defaultMarkupPercent": null,
+  "sortOrder": 0,
+  "createdAt": "2026-08-10T13:16:06.609Z",
+  "updatedAt": "2026-08-10T13:16:06.609Z"
+ },
+ {
+  "id": "e6649994-06d5-44aa-a426-f050381482c2",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "name": "Solar Pompa",
+  "slug": "solar-pompa",
+  "defaultMarkupPercent": null,
+  "sortOrder": 0,
+  "createdAt": "2026-08-10T13:16:06.662Z",
+  "updatedAt": "2026-08-10T13:16:06.662Z"
+ },
+ {
+  "id": "ece86315-e5f5-4343-ad9e-beafdb076b84",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "name": "Aydınlatma",
+  "slug": "aydinlatma",
+  "defaultMarkupPercent": null,
+  "sortOrder": 0,
+  "createdAt": "2026-08-10T13:16:06.777Z",
+  "updatedAt": "2026-08-10T13:16:06.777Z"
+ },
+ {
+  "id": "2303c916-e0d4-43bd-9023-d9fdcc0181d4",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "name": "Kablo Konnektör",
+  "slug": "kablo-konnektor",
+  "defaultMarkupPercent": null,
+  "sortOrder": 0,
+  "createdAt": "2026-08-10T13:16:06.804Z",
+  "updatedAt": "2026-08-10T13:16:06.804Z"
+ },
+ {
+  "id": "3d8841fe-1f5d-458c-82f5-745407e3e92b",
+  "tenantId": "edcacd01-8c20-40b7-892d-20c689c70f46",
+  "name": "Paket Sistemler",
+  "slug": "paket-sistemler",
+  "defaultMarkupPercent": null,
+  "sortOrder": 0,
+  "createdAt": "2026-08-10T13:16:06.851Z",
+  "updatedAt": "2026-08-10T13:16:06.851Z"
+ }
+]
