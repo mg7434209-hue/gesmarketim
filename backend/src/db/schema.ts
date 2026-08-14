@@ -495,6 +495,38 @@ export const customers = pgTable(
 );
 
 // ---------------------------------------------------------------------------
+// leads — Sistem Kur v2 potansiyel müşteri kayıtları
+// dogrulama = keşif/doğrulama randevusu, whatsapp = WhatsApp'a geçiş,
+// pdf = teklif PDF'i istedi. ozetJson: teklif/hesap özeti snapshot'ı.
+// ---------------------------------------------------------------------------
+export const leadTipEnum = pgEnum("lead_tip", ["dogrulama", "whatsapp", "pdf"]);
+
+export const leads = pgTable(
+  "leads",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id")
+      .notNull()
+      .references(() => tenants.id, { onDelete: "cascade" }),
+
+    tip: leadTipEnum("tip").notNull(),
+    ad: text("ad").notNull(),
+    telefon: text("telefon").notNull(),
+    email: text("email"),
+
+    // Sistem Kur teklif/hesap özeti (paket kalemleri, toplam, hesap girdileri)
+    ozetJson: jsonb("ozet_json"),
+
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => ({
+    tenantCreatedIdx: index("leads_tenant_created_idx").on(t.tenantId, t.createdAt),
+  }),
+);
+
+// ---------------------------------------------------------------------------
 // Relations
 // ---------------------------------------------------------------------------
 export const tenantsRelations = relations(tenants, ({ many }) => ({
@@ -587,6 +619,8 @@ export type Order = typeof orders.$inferSelect;
 export type NewOrder = typeof orders.$inferInsert;
 export type OrderItem = typeof orderItems.$inferSelect;
 export type NewOrderItem = typeof orderItems.$inferInsert;
+export type Lead = typeof leads.$inferSelect;
+export type NewLead = typeof leads.$inferInsert;
 
 // product.images jsonb şekli
 export type ProductImage = {

@@ -11,6 +11,9 @@ import { adminRouter } from './routes/admin.js';
 import { paymentRouter } from './routes/payment.js';
 import { accountRouter } from './routes/account.js';
 import { contactRouter } from './routes/contact.js';
+import { hesaplaRouter } from './routes/hesapla.js';
+import { asistanRouter } from './routes/asistan.js';
+import { leadsRouter } from './routes/leads.js';
 import { seoRouter } from './routes/seo.js';
 import { startSyncScheduler } from './lib/sync/scheduler.js';
 import { runMigrations, isAutoMigrateEnabled } from './db/runMigrations.js';
@@ -63,6 +66,9 @@ app.use('/api', ordersRouter);
 app.use('/api', paymentRouter);
 app.use('/api', accountRouter);
 app.use('/api', contactRouter);
+app.use('/api', hesaplaRouter);
+app.use('/api', asistanRouter);
+app.use('/api', leadsRouter);
 
 // ---------- SEO (served at site root, before the SPA fallback) ----------
 app.use('/', seoRouter);

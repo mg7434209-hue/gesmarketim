@@ -21,13 +21,15 @@
     "db:rebuild": "tsx src/db/rebuildLexronCli.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.117.1",
     "cors": "^2.8.5",
     "dotenv": "^16.6.1",
     "drizzle-orm": "^0.33.0",
     "express": "^4.21.0",
     "nodemailer": "^6.10.1",
     "pg": "^8.21.0",
-    "postgres": "^3.4.4"
+    "postgres": "^3.4.4",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",

@@ -32,6 +32,7 @@ import {
   orders,
   orderItems,
   tenants,
+  leads,
   type ProductImage,
 } from "../db/schema.js";
 import { getTenantId } from "../lib/tenant.js";
@@ -1234,5 +1235,29 @@ adminRouter.patch(
     }
 
     res.json({ ok: true, status: row.status, paymentStatus: row.paymentStatus });
+  }),
+);
+
+// ===========================================================================
+// LEADS — Sistem Kur v2 potansiyel müşteri kayıtları (yeni → eski)
+// ===========================================================================
+adminRouter.get(
+  "/leads",
+  asyncHandler(async (req, res) => {
+    const tenantId = await getTenantId();
+    const tip = typeof req.query.tip === "string" ? req.query.tip : "";
+    const conditions: SQL[] = [eq(leads.tenantId, tenantId)];
+    if (["dogrulama", "whatsapp", "pdf"].includes(tip)) {
+      conditions.push(eq(leads.tip, tip as "dogrulama" | "whatsapp" | "pdf"));
+    }
+
+    const rows = await db
+      .select()
+      .from(leads)
+      .where(and(...conditions))
+      .orderBy(desc(leads.createdAt))
+      .limit(500);
+
+    res.json(rows);
   }),
 );
