@@ -21,6 +21,7 @@ import NotFound from './pages/NotFound';
 import Sss from './pages/Sss';
 import Kargo from './pages/Kargo';
 import IadeDegisim from './pages/IadeDegisim';
+import SistemKur from './pages/SistemKur';
 
 // Admin paneli (~1600 satır + adminApi) mağaza ziyaretçisinin bundle'ına
 // girmesin: sadece /admin ziyaretinde yüklenir.
@@ -67,6 +68,7 @@ export default function App() {
           <Route path="/sss" element={<Sss />} />
           <Route path="/kargo" element={<Kargo />} />
           <Route path="/iade-degisim" element={<IadeDegisim />} />
+          <Route path="/hesaplayici" element={<SistemKur />} />
           <Route path="/kategoriler" element={<Categories />} />
           <Route path="/kategori/:slug" element={<CategoryPage />} />
           <Route path="/urunler" element={<Products />} />

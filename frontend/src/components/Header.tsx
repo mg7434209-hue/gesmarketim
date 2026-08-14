@@ -12,6 +12,7 @@ const NAV_ITEMS: NavItem[] = [
   { to: '/', label: 'Anasayfa' },
   { to: '/urunler', label: 'Ürünler' },
   { to: '/kategoriler', label: 'Kategoriler' },
+  { to: '/hesaplayici', label: 'Sistem Kur' },
   { to: '/hakkimizda', label: 'Hakkımızda' },
   { to: '/iletisim', label: 'İletişim' },
 ];

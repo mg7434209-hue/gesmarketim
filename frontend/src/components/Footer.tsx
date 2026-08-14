@@ -7,6 +7,7 @@ type FooterLink = { label: string; to?: string; href?: string; external?: boolea
 const QUICK_LINKS: FooterLink[] = [
   { label: 'Anasayfa', to: '/' },
   { label: 'Kategoriler', to: '/kategoriler' },
+  { label: 'Sistem Kur', to: '/hesaplayici' },
   { label: 'Hakkımızda', to: '/hakkimizda' },
   { label: 'İletişim', to: '/iletisim' },
 ];
